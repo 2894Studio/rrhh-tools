@@ -106,7 +106,8 @@ companies:
 name_keywords:
   agency: [agencia, agency, studio, estudio, creative, creativos, comunicacion, publicidad, branding]
   consultancy: [consultora, consulting, consultores, consultancy, advisory, tecnologias, sistemas]
-  staffing: [staffing, recruit, recruiting, seleccion, talent, rrhh, interim, headhunt, empleo, ett]
+  staffing: [staffing, recruit, recruiting, reclutamiento, seleccion, talent, talento, rrhh,
+             interim, headhunt, headhunting, empleo, ett, personal, outplacement]
 
 # Patrones en la DESCRIPCION de la oferta. Pesos sumables.
 # La senal mas potente de intermediario es que la empresa real vaya anonimizada.
