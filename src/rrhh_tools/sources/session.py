@@ -17,7 +17,7 @@ from typing import Any
 
 from ..config import Query, Settings
 from ..http import AuthWall
-from ..parsing.guest import parse_job_detail, parse_search_cards
+from ..parsing.session import parse_session_cards, parse_session_detail
 from .base import session_search_url
 
 PAGE_SIZE = 25
@@ -35,12 +35,16 @@ def _cookie() -> str:
     return value
 
 
+JOB_VIEW = "https://www.linkedin.com/jobs/view/{job_id}/"
+
+
 def collect(
     queries: list[Query],
     settings: Settings,
     max_jobs: int,
     seen: set[str] | None = None,
     record_dir=None,
+    fetch_details: bool = True,
 ) -> tuple[list[dict[str, Any]], list[str]]:
     from playwright.sync_api import sync_playwright
 
@@ -85,7 +89,7 @@ def collect(
                         from ..http import url_key
                         record_dir.mkdir(parents=True, exist_ok=True)
                         (record_dir / f"{url_key(url)}.html").write_text(html, encoding="utf-8")
-                    cards = parse_search_cards(html)
+                    cards = parse_session_cards(html)
                     if not cards:
                         break
                     for card in cards:
@@ -93,8 +97,50 @@ def collect(
                             continue
                         seen.add(card["job_id"])
                         card["source"] = "session"
+                        # La descripcion es lo que mas le importa al
+                        # clasificador: sin ella no hay frases de
+                        # intermediario, ni menciones de IA, ni senal de
+                        # "primer disenador". Vale la peticion extra.
+                        if fetch_details:
+                            _cargar_detalle(page, card, settings, delay, record_dir)
                         records.append(card)
         finally:
             context.close()
             browser.close()
     return records, labels
+
+
+def _cargar_detalle(page, card: dict[str, Any], settings: Settings,
+                    delay: float, record_dir) -> None:
+    """Visita /jobs/view/<id> y anade la descripcion a la tarjeta.
+
+    Un fallo aqui no aborta la ejecucion: la oferta sigue siendo util con los
+    datos de la tarjeta, solo clasificara peor. Se deja constancia en
+    parse_warnings para que se vea en el informe.
+    """
+    url = JOB_VIEW.format(job_id=card["job_id"])
+    try:
+        page.goto(url, wait_until="domcontentloaded",
+                  timeout=settings.run["request_timeout_seconds"] * 1000)
+        time.sleep(delay)
+        if any(m in page.url for m in ("/authwall", "/uas/login", "/checkpoint/")):
+            raise AuthWall(
+                "LinkedIn ha redirigido al muro de login al abrir una oferta. "
+                "Tu cookie li_at ha caducado o la sesión está restringida.\n"
+                "Copia una cookie nueva a .env, o cambia a --source guest."
+            )
+        html = page.content()
+        if record_dir:
+            from ..http import url_key
+            record_dir.mkdir(parents=True, exist_ok=True)
+            (record_dir / f"{url_key(url)}.html").write_text(html, encoding="utf-8")
+        detalle = parse_session_detail(html)
+        card["parse_warnings"] = (card.get("parse_warnings") or []) + \
+            detalle.pop("parse_warnings", [])
+        detalle.pop("insights", None)
+        card.update({k: v for k, v in detalle.items() if v})
+    except AuthWall:
+        raise
+    except Exception as exc:  # noqa: BLE001 - una oferta rota no tumba la tirada
+        card.setdefault("parse_warnings", []).append(
+            f"no se pudo cargar el detalle de la oferta: {type(exc).__name__}")

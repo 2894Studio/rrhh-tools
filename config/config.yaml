@@ -15,10 +15,12 @@ search:
   geo:
     # 105646813 = Espana. VERIFICADO en URLs publicas de LinkedIn.
     spain: "105646813"
-    # El geoId de la Comunidad de Madrid NO esta verificado. Copialo de la barra de
-    # direcciones tras filtrar por Madrid en LinkedIn (parametro geoId=) y pegalo aqui.
-    # El codigo se niega a lanzar una query cuyo geo siga siendo PLACEHOLDER.
-    comunidad_madrid: "PLACEHOLDER_GEOID_MADRID"
+    # 100994331 = Comunidad de Madrid. Tomado de URLs publicas de LinkedIn que
+    # emparejan este geoId con "Madrid, Comunidad de Madrid, España".
+    # Compruebalo en la primera ejecucion: filtra por Madrid en LinkedIn y mira
+    # el parametro geoId= de la barra de direcciones. Si no coincide, cambialo
+    # aqui; un geoId equivocado busca en otra region sin dar ningun error.
+    comunidad_madrid: "100994331"
 
 queries:
   - {id: junior_ux_madrid,      keywords: "junior UX UI designer",   geo: comunidad_madrid}

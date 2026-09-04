@@ -27,21 +27,25 @@ uv run playwright install chromium   # solo si vas a usar --source session
 cp .env.example .env             # y pega ahí tu cookie li_at
 ```
 
-### Antes de la primera búsqueda: resolver el geoId de Madrid
+### Antes de la primera búsqueda
 
-`config/config.yaml` trae el geoId de España ya verificado (`105646813`), pero el de la
-Comunidad de Madrid viene como `PLACEHOLDER_GEOID_MADRID`. **La herramienta se niega a
-lanzar una búsqueda con un geoId sin resolver**, a propósito: uno adivinado buscaría en
-otra región sin dar ningún error y el informe saldría en silencio equivocado.
+```bash
+uv run rrhh-tools doctor --source session
+```
 
-Para resolverlo: entra en LinkedIn, busca ofertas filtrando por Madrid, y copia el valor
-del parámetro `geoId=` de la barra de direcciones a `config/config.yaml`.
+Comprueba la cookie, los geoId, que Chromium arranca y que los pesos cuadran, **sin tocar
+LinkedIn**. El fallo más caro es descubrir a mitad de una tirada que faltaba la cookie.
 
-Mientras tanto las búsquedas de ámbito España sí funcionan.
+Los dos geoId vienen resueltos: `105646813` para España y `100994331` para la Comunidad
+de Madrid, ambos tomados de URLs públicas de LinkedIn. **Verificadlos en la primera
+tirada**: filtrad por esa ubicación en LinkedIn y comparad el parámetro `geoId=` de la
+barra de direcciones. Uno equivocado busca en otra región sin dar ningún error, y por eso
+la herramienta se niega a lanzar una búsqueda cuyo geoId siga sin resolver.
 
 ## Uso
 
 ```bash
+uv run rrhh-tools doctor  --source session                         # comprobaciones previas
 uv run rrhh-tools search --source session --max-jobs 25 --record   # tirada corta primero
 uv run rrhh-tools process --run latest                             # ver el reparto
 uv run rrhh-tools report  --run latest                             # generar el informe
@@ -57,6 +61,26 @@ a LinkedIn.
 
 Empieza siempre con `--max-jobs 25` para confirmar que la sesión funciona antes de
 lanzar una ejecución completa.
+
+## Los dos modos de lectura de LinkedIn
+
+| | `--source session` (por defecto) | `--source guest` |
+|---|---|---|
+| Login | Sí, con vuestra cookie `li_at` | No |
+| Parser | `parsing/session.py` | `parsing/guest.py` |
+| Descripción de la oferta | Sí, visitando cada `/jobs/view/<id>` | Sí, vía el endpoint público |
+| Riesgo para la cuenta | LinkedIn puede restringirla | Ninguno |
+
+**El DOM del LinkedIn con login no se parece al del público**: usa `job-card-container`
+con `data-job-id` donde el público usa `base-card` con `data-entity-urn`. Por eso hay dos
+parsers y no uno. Reutilizar los selectores públicos contra el DOM con sesión devuelve
+cero ofertas —o, peor, datos basura que aparentan funcionar—; hay un test que lo fija.
+
+El modo sesión **descarga la descripción de cada oferta** visitando su página. Cuesta una
+petición más por oferta, pero de la descripción salen las señales más fuertes del
+clasificador: las frases de intermediario (*"para uno de nuestros clientes"*), las
+menciones de IA y la señal de *"serás el primer diseñador"*. Con `--no-details` se
+salta ese paso: va más rápido y clasifica bastante peor.
 
 ## Sobre la cuenta de LinkedIn
 
@@ -88,6 +112,11 @@ donde la fuente anonimiza el nombre de la empresa se dice así en vez de adivina
 
 Es un fichero YAML editable, para que el equipo comercial la mantenga a mano.
 
+Cada empresa lleva un **enlace de búsqueda en LinkedIn** para comprobar sus vacantes en el
+momento. Son búsquedas, no URLs de ofertas: una URL de oferta que no hemos visto sería
+inventada y podría llevar a una vacante que ya no existe; una búsqueda siempre refleja el
+estado real de LinkedIn en el instante del clic.
+
 ## Cómo mejorar el clasificador
 
 El sistema aprende de vosotros. `rrhh-tools review` imprime los casos dudosos ya en el
@@ -105,7 +134,7 @@ valida al arrancar.
 ## Desarrollo
 
 ```bash
-uv run pytest        # 165 tests, todos sin red
+uv run pytest        # 175 tests, todos sin red
 ```
 
 Un guardia en `tests/conftest.py` hace **fallar** cualquier test que intente abrir una

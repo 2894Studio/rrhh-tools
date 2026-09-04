@@ -33,6 +33,7 @@ empresas:
     sector: "HR tech / fintech"
     ubicacion: "Madrid"
     vacante: "Junior Product Designer"
+    busqueda: "Junior Product Designer beneficios empleados"
     detalle: >-
       La oferta pide 1-2 años de experiencia, preferiblemente en fintech o HR tech,
       y habla de diseñar la evolución de nuevos beneficios escalables con el usuario
@@ -133,6 +134,7 @@ empresas:
     accion: "Verificar. Menos prioritaria: su equipo de diseño ya está consolidado."
 
   - nombre: "Banca y seguros: BBVA, Santander, CaixaBank, Bankinter, Mutua Madrileña, Mapfre"
+    empresas: ["BBVA", "Banco Santander", "CaixaBank", "Bankinter", "Mutua Madrileña", "Mapfre"]
     evidencia: estrategica
     sector: "Banca y seguros"
     ubicacion: "Madrid"

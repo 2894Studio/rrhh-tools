@@ -126,6 +126,16 @@ td.num{text-align:right;font-weight:500;white-space:nowrap}
   padding:30px;text-align:center;color:var(--ink-60);font-weight:300
 }
 .scroll{overflow-x:auto}
+.enlaces{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.enlace{
+  display:inline-block;font-size:13px;font-weight:500;text-decoration:none;
+  color:var(--deep-cobalt);border:1px solid var(--soft-gray);border-radius:8px;
+  padding:8px 13px;transition:border-color .15s ease
+}
+.enlace:hover{border-color:var(--deep-cobalt)}
+.enlace::after{content:" \2197";font-weight:400}
+.card.dark .enlace{color:var(--sky-blue);border-color:rgba(255,255,255,.22)}
+.card.dark .enlace:hover{border-color:var(--sky-blue)}
 footer{
   margin:88px 0 64px;padding-top:32px;border-top:1px solid var(--soft-gray)
 }

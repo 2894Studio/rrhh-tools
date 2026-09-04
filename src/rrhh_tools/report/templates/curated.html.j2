@@ -87,6 +87,13 @@
       {% if e.detalle %}<p class="why">{{ e.detalle }}</p>{% endif %}
       <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> {{ e.por_que }}</p>
       {% if e.accion %}<div class="accion"><b>Siguiente paso:</b> {{ e.accion }}</div>{% endif %}
+      {% if e.enlaces %}
+      <div class="enlaces">
+        {% for l in e.enlaces %}
+        <a class="enlace" href="{{ l.url }}" target="_blank" rel="noopener">{{ l.texto }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
     </article>
     {% endfor %}
   </section>
@@ -109,6 +116,13 @@
       </div>
       <p class="why">{{ c.detalle }}</p>
       <p class="why"><b style="font-weight:500;color:#fff">Lectura:</b> {{ c.lectura }}</p>
+      {% if c.enlaces %}
+      <div class="enlaces">
+        {% for l in c.enlaces %}
+        <a class="enlace" href="{{ l.url }}" target="_blank" rel="noopener">{{ l.texto }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
     </article>
     {% endfor %}
   </section>

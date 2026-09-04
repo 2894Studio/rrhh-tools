@@ -24,6 +24,21 @@ def _settings(args):
     return load_settings(args.config)
 
 
+def _geo(settings, nombre: str) -> str | None:
+    """geoId si esta resuelto; None si sigue siendo un placeholder.
+
+    Los enlaces sin geoId siguen funcionando: buscan en todo LinkedIn.
+    """
+    try:
+        return settings.geo_id(nombre)
+    except ConfigError:
+        return None
+
+
+def _geo_madrid(settings) -> str | None:
+    return _geo(settings, "comunidad_madrid")
+
+
 def _load_env() -> None:
     """Lee .env sin dependencias externas."""
     path = Path(".env")
@@ -39,6 +54,90 @@ def _load_env() -> None:
 
 
 # ----------------------------------------------------------------------
+def cmd_doctor(args) -> int:
+    """Comprueba que todo esta listo ANTES de tocar LinkedIn.
+
+    Existe porque el fallo mas caro es descubrir a mitad de una tirada que la
+    cookie no estaba puesta o que un geoId apuntaba a otra region.
+    """
+    _load_env()
+    import os
+    fallos, avisos = [], []
+
+    print("Comprobaciones previas\n")
+
+    # --- configuracion ---
+    try:
+        settings = _settings(args)
+        print(f"  [ok]  Configuracion cargada ({settings.config_dir})")
+        print(f"  [ok]  Pesos del scoring suman {sum(settings.weights.values()):.0f}")
+    except ConfigError as exc:
+        print(f"  [FALLO] Configuracion: {exc}")
+        return 2
+
+    # --- geoIds y busquedas ---
+    lanzables, bloqueadas = settings.resolvable_queries()
+    if bloqueadas:
+        fallos.append("hay busquedas con el geoId sin resolver")
+        print(f"  [FALLO] {len(bloqueadas)} busquedas bloqueadas por un geoId sin resolver:")
+        for b in bloqueadas:
+            print(f"          {b.splitlines()[0]}")
+    else:
+        print(f"  [ok]  Las {len(lanzables)} busquedas configuradas son lanzables")
+    for nombre, valor in settings.raw["search"]["geo"].items():
+        print(f"          geo {nombre}: {valor}")
+    avisos.append(
+        "Verifica los geoId en la primera tirada: filtra por esa ubicacion en "
+        "LinkedIn y compara el parametro geoId= de la URL. Uno equivocado busca "
+        "en otra region sin dar ningun error."
+    )
+
+    # --- cookie ---
+    if args.source == "session":
+        cookie = os.environ.get("LINKEDIN_LI_AT", "").strip()
+        if not cookie:
+            fallos.append("falta la cookie li_at")
+            print("  [FALLO] Falta LINKEDIN_LI_AT. Copia .env.example a .env y pega tu cookie.")
+        elif len(cookie) < 20:
+            fallos.append("la cookie li_at parece incompleta")
+            print(f"  [FALLO] LINKEDIN_LI_AT parece incompleta ({len(cookie)} caracteres).")
+        else:
+            # Nunca se imprime el valor.
+            print(f"  [ok]  Cookie li_at presente ({len(cookie)} caracteres)")
+            avisos.append(
+                "La cookie caduca cada pocas semanas. Si la ejecucion aborta con "
+                "'muro de login', copia una nueva."
+            )
+        try:
+            from playwright.sync_api import sync_playwright
+            with sync_playwright() as pw:
+                navegador = pw.chromium.launch(headless=True)
+                navegador.close()
+            print("  [ok]  Playwright y Chromium funcionan")
+        except Exception as exc:  # noqa: BLE001
+            fallos.append("Chromium no arranca")
+            print(f"  [FALLO] Chromium no arranca ({type(exc).__name__}). "
+                  "Ejecuta:  uv run playwright install chromium")
+    else:
+        print("  [--]  Modo publico: no hace falta cookie ni navegador")
+
+    # --- disciplina de peticiones ---
+    run = settings.run
+    print(f"  [ok]  Ritmo: {run['min_delay_seconds']}s entre peticiones, "
+          f"tope {run['max_jobs_per_run']} ofertas por tirada")
+
+    print()
+    for aviso in avisos:
+        print(f"  aviso: {aviso}")
+    if fallos:
+        print(f"\n{len(fallos)} problema(s) que impiden la ejecucion: "
+              + "; ".join(fallos))
+        return 1
+    print("\nTodo listo. Empieza con una tirada corta:")
+    print(f"  rrhh-tools search --source {args.source} --max-jobs 25 --record")
+    return 0
+
+
 def cmd_search(args) -> int:
     _load_env()
     settings = _settings(args)
@@ -63,7 +162,8 @@ def cmd_search(args) -> int:
     try:
         if args.source == "session":
             from .sources import session
-            records, labels = session.collect(queries, settings, max_jobs, seen, record_dir)
+            records, labels = session.collect(queries, settings, max_jobs, seen, record_dir,
+                                              fetch_details=not args.no_details)
         else:
             from .sources import guest
             fetcher = ThrottledFetcher(
@@ -73,7 +173,8 @@ def cmd_search(args) -> int:
                 max_retries=settings.run["max_retries_on_throttle"],
                 record_dir=record_dir,
             )
-            records, labels = guest.collect(fetcher, queries, settings, max_jobs, seen)
+            records, labels = guest.collect(fetcher, queries, settings, max_jobs, seen,
+                                            fetch_details=not args.no_details)
             diagnostics.pages_fetched = fetcher.pages_fetched
     except AuthWall as exc:
         print(f"\n{exc}\n", file=sys.stderr)
@@ -111,7 +212,8 @@ def cmd_report(args) -> int:
     settings = _settings(args)
     run_id = cache.resolve_run(args.run)
     run = process(cache.load_raw(run_id), settings, run_id)
-    html = render_report(run, settings.report["title"], source_label=args.source_label)
+    html = render_report(run, settings.report["title"], source_label=args.source_label,
+                         geo_id=_geo_madrid(settings))
     out = Path(args.out or f"reports/{date.today().isoformat()}-{run_id}.html")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
@@ -132,7 +234,8 @@ def cmd_replay(args) -> int:
     run = process(records, settings, "replay", diagnostics,
                   today=date.fromisoformat(args.today) if args.today else None)
     html = render_report(run, settings.report["title"],
-                         source_label="fixtures (sin red)", es_muestra=True)
+                         source_label="fixtures (sin red)", es_muestra=True,
+                         geo_id=_geo_madrid(settings))
     out = Path(args.out or "reports/replay.html")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
@@ -151,7 +254,8 @@ def cmd_curated(args) -> int:
         print(f"No existe el fichero de la lista curada: {path}", file=sys.stderr)
         return 1
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
-    html = render_curated(data, "2894 — Empresas objetivo")
+    html = render_curated(data, "2894 — Empresas objetivo",
+                          geo_id=_geo_madrid(settings), geo_es=_geo(settings, "spain"))
     out = Path(args.out or "reports/empresas-objetivo.html")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
@@ -170,7 +274,9 @@ def cmd_site(args) -> int:
     datos = yaml.safe_load(
         (settings.config_dir / "curated_targets.yaml").read_text(encoding="utf-8"))
     (out / "empresas-objetivo.html").write_text(
-        render_curated(datos, "2894 — Empresas objetivo"), encoding="utf-8")
+        render_curated(datos, "2894 — Empresas objetivo",
+                       geo_id=_geo_madrid(settings), geo_es=_geo(settings, "spain")),
+        encoding="utf-8")
 
     radar = Path(args.radar) if args.radar else Path("reports/replay.html")
     if radar.is_file():
@@ -267,12 +373,18 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--config", default=None, help="directorio de configuración")
     sub = parser.add_subparsers(dest="command", required=True)
 
+    p = sub.add_parser("doctor", help="comprueba que todo está listo antes de tocar LinkedIn")
+    p.add_argument("--source", choices=["session", "guest"], default="session")
+    p.set_defaults(func=cmd_doctor)
+
     p = sub.add_parser("search", help="descarga ofertas de LinkedIn (único comando con red)")
     p.add_argument("--source", choices=["session", "guest"], default="session")
     p.add_argument("--max-jobs", type=int, default=None)
     p.add_argument("--run-id", default=None)
     p.add_argument("--resume", action="store_true", help="omite lo ya visto en esta ejecución")
     p.add_argument("--record", action="store_true", help="guarda el HTML recibido como fixture")
+    p.add_argument("--no-details", action="store_true",
+                   help="no descarga la descripción de cada oferta (más rápido, clasifica peor)")
     p.set_defaults(func=cmd_search)
 
     p = sub.add_parser("process", help="analiza una ejecución guardada")

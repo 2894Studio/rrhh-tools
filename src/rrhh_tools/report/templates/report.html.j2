@@ -105,7 +105,7 @@
 
         {% for j in c.jobs %}
         <div class="job">
-          <a href="{{ j.url }}">{{ j.title_raw }}</a>
+          <a href="{{ j.url }}" target="_blank" rel="noopener">{{ j.title_raw }}</a>
           <div class="muted">
             {{ j.location_raw or 'ubicación sin determinar' }}
             {%- if j.posted_text %} · {{ j.posted_text }}{% endif %}
@@ -114,6 +114,13 @@
           </div>
         </div>
         {% endfor %}
+
+        <div class="enlaces">
+          <a class="enlace" href="{{ row.linkedin }}" target="_blank" rel="noopener">Todas sus vacantes en LinkedIn</a>
+          {% if c.linkedin_url %}
+          <a class="enlace" href="{{ c.linkedin_url }}" target="_blank" rel="noopener">Perfil de empresa</a>
+          {% endif %}
+        </div>
       </article>
       {% endfor %}
     {% endif %}

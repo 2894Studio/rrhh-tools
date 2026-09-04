@@ -25,8 +25,17 @@ _JOB_ID_URN = re.compile(r"jobPosting:(\d+)")
 _COMPANY_SLUG = re.compile(r"/company/([^/?#]+)")
 
 
+_WS = re.compile(r"\s+")
+
+
 def _text(node: Any) -> str:
-    return node.get_text(" ", strip=True) if node else ""
+    """Texto plano con los espacios colapsados.
+
+    get_text(strip=True) solo recorta los extremos de cada nodo: el sangrado y
+    los saltos de linea DENTRO de un mismo bloque de texto sobreviven, y luego
+    frases como "primera persona de diseno" no casan con ningun patron.
+    """
+    return _WS.sub(" ", node.get_text(" ", strip=True)).strip() if node else ""
 
 
 def _first(soup: Any, selectors: list[str]) -> Any:
@@ -50,8 +59,20 @@ def parse_search_cards(html: str) -> list[dict[str, Any]]:
     """Fragmento de resultados -> lista de dicts crudos (sin modelos todavia)."""
     soup = BeautifulSoup(html, "lxml")
     cards = soup.select("li div.base-card, div.base-card, li div.job-search-card")
-    if not cards:  # el fragmento a veces llega como <li> sueltos
-        cards = soup.select("li")
+    if not cards:
+        # El fragmento a veces llega como <li> sueltos. El filtro es
+        # deliberadamente estricto: sin el, este parser "reconoce" tambien el
+        # DOM del LinkedIn con sesion y devuelve basura (titulos duplicados,
+        # empresa vacia) en vez de no devolver nada, que es peor porque
+        # aparenta funcionar.
+        cards = [
+            li for li in soup.select("li")
+            if li.select_one("a[href*='/jobs/view/']")
+            and not li.select_one("[data-job-id], [data-occludable-job-id]")
+            and (li.select_one("[class*='base-card'], [class*='base-search-card'], "
+                               "[class*='job-search-card']")
+                 or li.get("data-entity-urn"))
+        ]
 
     results: list[dict[str, Any]] = []
     for card in cards:
