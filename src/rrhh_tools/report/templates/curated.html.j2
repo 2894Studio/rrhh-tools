@@ -63,7 +63,7 @@
     <div class="sec-head">
       <div class="tag">Contexto</div>
       <h2>Cómo está el mercado.</h2>
-      <p>Datos públicos que enmarcan la conversación comercial.</p>
+      <p>Datos públicos que enmarcan {{ 'el mercado' if publico else 'la conversación comercial' }}.</p>
     </div>
     {% for d in contexto.datos_de_mercado %}
     <p class="dato">{{ d }}</p>

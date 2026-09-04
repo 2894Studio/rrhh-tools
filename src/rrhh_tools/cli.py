@@ -277,7 +277,8 @@ def cmd_site(args) -> int:
     datos = yaml.safe_load(
         (settings.config_dir / "curated_targets.yaml").read_text(encoding="utf-8"))
     (out / "empresas-objetivo.html").write_text(
-        render_curated(datos, "2894 — Empresas objetivo",
+        render_curated(datos,
+                       "2894 — Diseño en España" if args.publico else "2894 — Empresas objetivo",
                        geo_id=_geo_madrid(settings), geo_es=_geo(settings, "spain"),
                        publico=args.publico),
         encoding="utf-8")
