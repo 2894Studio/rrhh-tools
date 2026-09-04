@@ -17,6 +17,25 @@
 # La foto completa y al dia sale de ejecutar la herramienta contra LinkedIn:
 #   uv run rrhh-tools doctor --source session
 #   uv run rrhh-tools run
+#
+# ENLACES: QUE CAMPO GENERA QUE
+# -----------------------------
+#   linkedin_slug     -> enlace a la pestana de empleo de la empresa. Es el
+#                        UNICO enlace que acota de verdad a una empresa. Todos
+#                        los slugs de este fichero estan PROPUESTOS Y SIN
+#                        VERIFICAR: se dedujeron del nombre, no se han abierto.
+#                        Confirmalos con:  uv run rrhh-tools links --check
+#                        Sin slug, la ficha se queda con la busqueda por nombre,
+#                        que no acota pero tampoco falla nunca.
+#   oferta_url        -> solo se publica si `oferta_verificada: true`. Estas URLs
+#                        salen de busqueda web y NO se han podido abrir desde el
+#                        entorno de desarrollo; ademas una oferta muere en cuanto
+#                        se cubre. Se guardan aqui para no perder el hallazgo,
+#                        pero no se enlazan hasta comprobarlas.
+#   busqueda_rol      -> listado de ofertas de ese rol. Solo un termino de rol
+#                        limpio ("Junior Product Designer"), NUNCA una frase
+#                        copiada de la descripcion de una oferta: eso devuelve
+#                        cero resultados.
 
 contexto:
   generado: "2026-09-04"
@@ -32,12 +51,14 @@ contexto:
 empresas:
   # ---------------- OFERTAS CONCRETAS ENCONTRADAS ----------------
   - nombre: "Cabify"
+    linkedin_slug: "cabify"    # propuesto, sin verificar
     dominio: "cabify.com"
     evidencia: oferta
     sector: "Movilidad"
     ubicacion: "Madrid"
     vacante: "Product Designer I — Development Program 2026"
     oferta_url: "https://job-boards.greenhouse.io/cabify/jobs/8475047002"
+    oferta_verificada: false   # sin comprobar: no se publica el enlace
     oferta_fuente: "Portal de empleo propio de Cabify (Greenhouse)"
     detalle: >-
       Programa de desarrollo para perfil de entrada, en Madrid. Cabify tiene
@@ -53,12 +74,14 @@ empresas:
       abiertas es un equipo con mas trabajo del que puede absorber.
 
   - nombre: "Jobandtalent"
+    linkedin_slug: "jobandtalent"    # propuesto, sin verificar
     dominio: "jobandtalent.com"
     evidencia: oferta
     sector: "Marketplace de empleo"
     ubicacion: "España (remoto EMEA)"
     vacante: "HQ — Product Designer (EMEA Remote)"
     oferta_url: "https://builtin.com/job/hq-product-designer-emea-remote/3610491"
+    oferta_verificada: false   # sin comprobar: no se publica el enlace
     oferta_fuente: "Built In"
     detalle: "Pide experiencia diseñando productos y sistemas digitales. Remoto en EMEA."
     por_que: >-
@@ -68,6 +91,7 @@ empresas:
     accion: "Comprobar el nivel exacto que piden antes de proponer un perfil junior."
 
   - nombre: "Glovo"
+    linkedin_slug: "glovo"    # propuesto, sin verificar
     dominio: "glovoapp.com"
     evidencia: oferta
     sector: "Delivery / marketplace"
@@ -91,6 +115,7 @@ empresas:
     ubicacion: "Madrid"
     vacante: "Diseñador/a UX/UI Junior — prácticas"
     oferta_url: "https://www.primerempleo.com/practicas/madrid/disenador-a-ux-ui-junior-madrid/1405518"
+    oferta_verificada: false   # sin comprobar: no se publica el enlace
     oferta_fuente: "primerempleo.com"
     detalle: "Contrato de prácticas para empezar carrera profesional en UX/UI."
     por_que: >-
@@ -118,7 +143,9 @@ empresas:
     sector: "HR tech / fintech"
     ubicacion: "Madrid"
     vacante: "Junior Product Designer"
-    busqueda: "Junior Product Designer benefits AI-driven mindset"
+    # Antes aqui habia una frase entera de la descripcion de la oferta, que
+    # como `keywords` devuelve cero resultados. Ahora es un termino de rol.
+    busqueda_rol: "Junior Product Designer"
     detalle: >-
       Pide 1-2 años de experiencia, preferiblemente en fintech, HR tech o
       beneficios, y "AI-driven mindset": interes por incorporar herramientas de
@@ -134,6 +161,7 @@ empresas:
 
   # ---------------- SIN OFERTA: HIPOTESIS POR PERFIL ----------------
   - nombre: "Seedtag"
+    linkedin_slug: "seedtag"    # propuesto, sin verificar
     dominio: "seedtag.com"
     evidencia: estrategica
     sector: "AdTech con IA"
@@ -145,6 +173,7 @@ empresas:
     accion: "Comprobar vacantes en LinkedIn antes de invertir tiempo comercial."
 
   - nombre: "Clarity AI"
+    linkedin_slug: "clarity-ai"    # propuesto, sin verificar
     dominio: "clarity.ai"
     evidencia: estrategica
     sector: "IA aplicada a sostenibilidad ESG"
@@ -156,6 +185,7 @@ empresas:
     accion: "Comprobar vacantes en LinkedIn."
 
   - nombre: "Narrativa"
+    linkedin_slug: "narrativa"    # propuesto, sin verificar
     dominio: "narrativa.com"
     evidencia: estrategica
     sector: "IA generativa de contenido"
@@ -167,6 +197,7 @@ empresas:
     accion: "Comprobar vacantes en LinkedIn."
 
   - nombre: "Cobee"
+    linkedin_slug: "cobee"    # propuesto, sin verificar
     dominio: "cobee.io"
     evidencia: estrategica
     sector: "HR tech / beneficios"
@@ -178,6 +209,7 @@ empresas:
     accion: "Comparar con el texto de la oferta anónima. Comprobar vacantes."
 
   - nombre: "Payflow"
+    linkedin_slug: "payflow"    # propuesto, sin verificar
     dominio: "payflow.io"
     evidencia: estrategica
     sector: "Fintech / salario bajo demanda"
@@ -187,6 +219,7 @@ empresas:
     accion: "Comprobar vacantes en LinkedIn."
 
   - nombre: "Genially"
+    linkedin_slug: "genially"    # propuesto, sin verificar
     dominio: "genially.com"
     evidencia: estrategica
     sector: "SaaS de contenido interactivo"
@@ -196,6 +229,7 @@ empresas:
     accion: "Comprobar vacantes en LinkedIn."
 
   - nombre: "Carto"
+    linkedin_slug: "carto"    # propuesto, sin verificar
     dominio: "carto.com"
     evidencia: estrategica
     sector: "Geoespacial / analítica"
@@ -205,7 +239,15 @@ empresas:
     accion: "Comprobar vacantes en LinkedIn."
 
   - nombre: "Banca y seguros: BBVA, Santander, CaixaBank, Bankinter, Mutua Madrileña, Mapfre"
-    empresas: ["BBVA", "Banco Santander", "CaixaBank", "Bankinter", "Mutua Madrileña", "Mapfre"]
+    # Cada empresa con su slug para que la ficha agrupada enlace a la pestana
+    # de empleo de cada una y no a seis busquedas genericas.
+    empresas:
+      - {nombre: "BBVA",             linkedin_slug: "bbva"}
+      - {nombre: "Banco Santander",  linkedin_slug: "banco-santander"}
+      - {nombre: "CaixaBank",        linkedin_slug: "caixabank"}
+      - {nombre: "Bankinter",        linkedin_slug: "bankinter"}
+      - {nombre: "Mutua Madrileña",  linkedin_slug: "mutua-madrilena"}
+      - {nombre: "Mapfre",           linkedin_slug: "mapfre"}
     evidencia: estrategica
     sector: "Banca y seguros"
     ubicacion: "Madrid"

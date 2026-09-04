@@ -183,14 +183,24 @@ def test_los_tres_niveles_de_evidencia_no_se_mezclan(completo):
         assert titulo in completo, titulo
 
 
-def test_las_ofertas_reales_enlazan_a_su_oferta(publico, completo):
-    """Cuando hay URL de la oferta, va la primera: es el dato más fuerte."""
+def test_solo_se_enlaza_la_oferta_que_alguien_ha_abierto(publico, completo):
+    """CAMBIO DE CRITERIO, no un test relajado.
+
+    Antes se enlazaba toda `oferta_url`. Esas URLs salen de búsqueda web y
+    nunca se pudieron abrir desde el entorno de desarrollo —la red las bloquea—,
+    y además una oferta muere en cuanto se cubre el puesto: la página acabó
+    llena de enlaces a páginas muertas.
+
+    Ahora el enlace depende de `oferta_verificada`, que pone `links --check`
+    tras abrir la URL de verdad. La URL sigue en el YAML: no se pierde el
+    hallazgo, solo se deja de publicar hasta comprobarlo.
+    """
     con_url = [e for e in DATOS["empresas"] if e.get("oferta_url")]
-    assert con_url, "debería haber alguna oferta con URL real"
+    assert con_url, "debería haber alguna oferta con URL"
     for entrada in con_url:
         for salida in (publico, completo):
-            assert entrada["oferta_url"] in salida
-            assert "Abrir la oferta" in salida
+            enlazada = f'href="{entrada["oferta_url"]}"' in salida
+            assert enlazada == bool(entrada.get("oferta_verificada")), entrada["nombre"]
 
 
 def test_se_distingue_lo_encontrado_de_lo_supuesto(publico):

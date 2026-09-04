@@ -379,6 +379,59 @@ def _share_stylesheet(out: Path) -> None:
             pagina.write_text(html, encoding="utf-8")
 
 
+def cmd_links(args) -> int:
+    """Comprueba los enlaces que publica el informe. ES EL SEGUNDO COMANDO CON RED.
+
+    Solo pide lo que puede estar muerto: la pestana de empleo de cada empresa
+    (depende de que el slug sea correcto, y todos los del YAML estan propuestos
+    sin verificar) y las URLs de oferta de terceros, que caducan en cuanto se
+    cubre el puesto. Las busquedas no se comprueban: siempre responden.
+    """
+    import yaml
+    from .links_check import BLOQUEADO, MUERTO, OK, aplicar, comprobar, recolectar
+
+    settings = _settings(args)
+    ruta = Path(args.data) if args.data else settings.config_dir / "curated_targets.yaml"
+    datos = yaml.safe_load(ruta.read_text(encoding="utf-8"))
+    enlaces = recolectar(datos)
+    if not enlaces:
+        print("No hay enlaces que comprobar.")
+        return 0
+
+    ritmo = settings.run["min_delay_seconds"]
+    print(f"Comprobando {len(enlaces)} enlaces, uno cada {ritmo}s. "
+          f"Tardara unos {len(enlaces) * ritmo / 60:.0f} min.\n")
+    informe = comprobar(enlaces, min_delay=ritmo,
+                        timeout=settings.run["request_timeout_seconds"])
+
+    ancho = max(len(r.enlace.ficha) for r in informe.resultados)
+    for r in informe.resultados:
+        marca = {OK: "ok", MUERTO: "MUERTO", BLOQUEADO: "--"}.get(r.veredicto, "REVISAR")
+        print(f"  [{marca:>7}] {r.enlace.ficha:<{ancho}}  {r.codigo or '-'}  {r.enlace.url}")
+        if r.nota:
+            print(f"            {r.nota}")
+
+    accionables = [r for r in informe.resultados if r.accionable]
+    bloqueados = informe.por_veredicto(BLOQUEADO)
+    print(f"\n{len(informe.por_veredicto(OK))} correctos, {len(accionables)} a corregir, "
+          f"{len(bloqueados)} sin poder juzgar.")
+    if bloqueados:
+        print("Los bloqueados no dicen nada del enlace: repite mas tarde.")
+
+    if args.write:
+        cambios = aplicar(ruta, informe)
+        if cambios:
+            print(f"\n{ruta}:")
+            for c in cambios:
+                print(f"  - {c}")
+            print("\nRegenera el sitio:  uv run rrhh-tools site --publico --out site-publico")
+        else:
+            print("\nNada que cambiar en el YAML.")
+    elif accionables:
+        print("Aplica el resultado al YAML con:  rrhh-tools links --check --write")
+    return 0
+
+
 def cmd_review(args) -> int:
     """Imprime la cola de revisión lista para pegar en config/decisions.yaml."""
     settings = _settings(args)
@@ -485,6 +538,14 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--publico", action="store_true",
                    help="recorta el razonamiento comercial, para poder compartir el enlace")
     p.set_defaults(func=cmd_site)
+
+    p = sub.add_parser("links", help="comprueba los enlaces publicados (usa red)")
+    p.add_argument("--check", action="store_true", default=True,
+                   help="comprueba cada enlace (comportamiento por defecto)")
+    p.add_argument("--write", action="store_true",
+                   help="aplica el resultado al YAML: publica ofertas vivas, retira slugs malos")
+    p.add_argument("--data", default=None)
+    p.set_defaults(func=cmd_links)
 
     p = sub.add_parser("review", help="cola de revisión en formato decisions.yaml")
     p.add_argument("--run", default="latest")

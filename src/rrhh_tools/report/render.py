@@ -11,7 +11,9 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from ..linkedin_links import company_jobs, company_search, job_search
+from ..linkedin_links import (
+    company_jobs, company_search, jobs_by_name, jobs_by_role,
+)
 from ..logos import por_dominio
 from ..models import Company, ProcessedRun
 import json
@@ -120,8 +122,11 @@ def _enlace_empresa(company: Company, geo_id: str | None) -> str:
     """
     url = company.linkedin_url or ""
     if "/company/" in url:
-        return company_jobs(url.rstrip("/").split("/company/")[-1].split("?")[0])
-    return job_search(company.display_name, geo_id)
+        # Aqui el slug NO es adivinado: viene del propio LinkedIn al scrapear.
+        slug = company_jobs(url.rstrip("/").split("/company/")[-1].split("?")[0])
+        if slug:
+            return slug
+    return jobs_by_name(company.display_name, geo_id)
 
 
 # Encabezados de bloque para la version publica. Los del dominio (models.py)
@@ -206,10 +211,11 @@ def render_report(run: ProcessedRun, title: str, source_label: str = "LinkedIn",
 # una lista de exclusiones o un {% if %} de la plantilla.
 CAMPOS_PUBLICOS_EMPRESA = {
     "nombre", "sector", "ubicacion", "vacante", "evidencia", "detalle",
-    "dominio", "empresas", "busqueda", "oferta_url", "oferta_fuente",
-    "sin_busqueda_empresa",
+    "dominio", "empresas", "busqueda_rol", "oferta_url", "oferta_verificada",
+    "oferta_fuente", "sin_busqueda_empresa", "linkedin_slug",
 }
-CAMPOS_PUBLICOS_COMPETENCIA = {"nombre", "tipo", "detalle", "dominio"}
+CAMPOS_PUBLICOS_COMPETENCIA = {"nombre", "tipo", "detalle", "dominio",
+                               "linkedin_slug"}
 # Lo que se queda fuera y por que:
 #   por_que  -> por que es objetivo comercial. Es nuestra estrategia.
 #   accion   -> el siguiente paso comercial. Idem.
@@ -230,35 +236,80 @@ def _monograma(nombre: str) -> str:
     return (palabras[0][:1] + palabras[1][:1]).upper()
 
 
-def _enlaces_curados(entrada: dict, geo_id: str | None, geo_es: str | None) -> list[dict]:
-    """Un enlace de busqueda en LinkedIn por empresa de la ficha.
+def _empresas_de(entrada: dict) -> list[dict]:
+    """Empresas de una ficha, siempre como dicts.
 
-    Son busquedas, no ofertas: llevan al estado real de LinkedIn en el momento
-    del clic. Una entrada puede agrupar varias empresas (la banca, por ejemplo),
-    y entonces genera un enlace por cada una.
+    `empresas` admite tanto "BBVA" como {nombre, linkedin_slug}: la ficha
+    agrupada de banca necesita un slug por empresa, y las demas no.
+    """
+    crudas = entrada.get("empresas") or [
+        {"nombre": entrada.get("nombre", ""),
+         "linkedin_slug": entrada.get("linkedin_slug")}
+    ]
+    return [{"nombre": e, "linkedin_slug": None} if isinstance(e, str) else dict(e)
+            for e in crudas]
+
+
+def _enlaces_curados(entrada: dict, geo_id: str | None, geo_es: str | None) -> list[dict]:
+    """Los enlaces de una ficha, cada uno etiquetado con lo que es de verdad.
+
+    La etiqueta es la mitad del arreglo: un listado general no es una oferta, y
+    una busqueda no es la ficha de la empresa. Decirlo evita que el enlace
+    parezca roto cuando en realidad hace justo lo que puede hacer.
+
+    Por empresa salen hasta dos enlaces:
+      1. su pestana de empleo, que es lo unico que acota de verdad;
+      2. la busqueda por nombre, que no acota pero nunca falla.
+    Se ponen los dos a proposito: los slugs estan sin verificar, asi que el
+    segundo enlace es la red bajo el primero.
     """
     ubicacion = (entrada.get("ubicacion") or "").lower()
-    geo = geo_id if "madrid" in ubicacion else (geo_es or geo_id)
-    nombres = entrada.get("empresas") or [entrada.get("nombre", "")]
-    busqueda = entrada.get("busqueda")
-    if busqueda:
-        return [{"texto": "Buscar esta oferta en LinkedIn",
-                 "url": job_search(busqueda, geo, terms="")}]
-    enlaces = []
-    # Si hay una oferta concreta, va primero: es el dato mas fuerte de la ficha.
-    if entrada.get("oferta_url"):
+    en_madrid = "madrid" in ubicacion
+    geo = geo_id if en_madrid else (geo_es or geo_id)
+    donde = "Madrid" if en_madrid else "España"
+    enlaces: list[dict] = []
+
+    # Una oferta concreta solo se enlaza si alguien la ha abierto y sigue viva.
+    # Publicar una URL sin comprobar es lo que llenaba la pagina de enlaces
+    # muertos; la URL se conserva en el YAML, esperando a `links --check`.
+    if entrada.get("oferta_url") and entrada.get("oferta_verificada"):
         enlaces.append({"texto": "Abrir la oferta", "url": entrada["oferta_url"]})
-    # Cuando el "nombre" no es una empresa sino una descripcion de la oferta,
-    # buscarlo en LinkedIn no devolveria nada util.
+
+    # Ficha sin empresa identificada: lo unico honesto es el listado del rol,
+    # dicho como listado. Buscar el nombre no daria nada, porque no es un nombre.
+    rol = entrada.get("busqueda_rol")
+    if rol:
+        enlaces.append({"texto": f"Ofertas de {rol} en {donde} (listado)",
+                        "url": jobs_by_role(rol, geo)})
+        return enlaces
     if entrada.get("sin_busqueda_empresa"):
         return enlaces
-    enlaces += [
-        {"texto": f"Vacantes de {nombre} en LinkedIn" if len(nombres) > 1
-                  else "Ver vacantes en LinkedIn",
-         "url": job_search(nombre, geo)}
-        for nombre in nombres if nombre
-    ]
+
+    empresas = _empresas_de(entrada)
+    varias = len(empresas) > 1
+    for empresa in empresas:
+        nombre = (empresa.get("nombre") or "").strip()
+        if not nombre:
+            continue
+        ficha = company_jobs(empresa.get("linkedin_slug"))
+        if ficha:
+            enlaces.append({"texto": f"Vacantes de {nombre} en LinkedIn", "url": ficha})
+        enlaces.append({
+            "texto": f"Buscar «{nombre}» en LinkedIn" if varias or ficha
+                     else "Ver vacantes en LinkedIn",
+            "url": jobs_by_name(nombre, geo),
+        })
     return enlaces
+
+
+def _enlaces_competencia(ficha: dict) -> list[dict]:
+    """Igual que en las fichas de empresa: pestana de empleo si hay slug, y si
+    no la busqueda de empresas, que tambien lleva a algo real."""
+    nombre = ficha.get("nombre", "")
+    empleo = company_jobs(ficha.get("linkedin_slug"))
+    if empleo:
+        return [{"texto": f"Vacantes de {nombre} en LinkedIn", "url": empleo}]
+    return [{"texto": "Buscar en LinkedIn", "url": company_search(nombre)}]
 
 
 def render_curated(data: dict, title: str, geo_id: str | None = None,
@@ -337,8 +388,7 @@ def render_curated(data: dict, title: str, geo_id: str | None = None,
         grupos=grupos,
         competencia=[
             {**(_publicar(c, CAMPOS_PUBLICOS_COMPETENCIA) if publico else dict(c)),
-             "enlaces": [{"texto": "Ver en LinkedIn",
-                          "url": company_search(c.get("nombre", ""))}],
+             "enlaces": _enlaces_competencia(c),
              "logo": por_dominio(c.get("dominio")),
              "monograma": _monograma(c.get("nombre", ""))}
             for c in data.get("competencia_detectada", [])

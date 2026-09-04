@@ -132,6 +132,7 @@ td.num{text-align:right;font-weight:500;white-space:nowrap}
 
 .job{border-top:1px solid var(--soft-gray);padding:13px 0 0;margin-top:13px}
 .job a{color:var(--ink-black);font-weight:500;text-decoration:none;border-bottom:1px solid var(--sky-blue)}
+.titulo-vacante{color:var(--ink-black);font-weight:500}
 .job .muted{color:var(--ink-60);font-size:13px;margin-top:3px;font-weight:300}
 .reasons{margin:10px 0 0;padding-left:18px;font-size:13.5px;color:var(--ink-60);font-weight:300}
 .reasons li{margin:3px 0}

@@ -131,7 +131,13 @@
         <div class="job" data-vacante
              data-nivel="{{ j.seniority.label.clave_filtro if j.seniority else '' }}"
              data-rol="{{ j.rol.label.clave_filtro if j.rol else '' }}">
+{# En la muestra los ids de oferta son inventados: enlazarlos daria un 404.
+   Se pinta el titulo como texto para que el clic no exista. #}
+{% if es_muestra %}
+          <span class="titulo-vacante">{{ j.title_raw }}</span>
+{% else %}
           <a href="{{ j.url }}" target="_blank" rel="noopener">{{ j.title_raw }}</a>
+{% endif %}
           <div class="muted">
             {{ j.location_raw or 'ubicación sin determinar' }}
             {%- if j.posted_text %} · {{ j.posted_text }}{% endif %}
