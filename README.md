@@ -48,6 +48,7 @@ uv run rrhh-tools report  --run latest                             # generar el 
 uv run rrhh-tools review  --run latest                             # cola de revisión
 uv run rrhh-tools explain --company bankinter                      # desglose de una empresa
 uv run rrhh-tools replay                                           # end-to-end sin red
+uv run rrhh-tools curated                                          # lista curada inicial
 ```
 
 `search` es el **único** comando que abre una conexión. El resto trabaja sobre lo ya
@@ -74,6 +75,18 @@ inmediato si aparece el muro de login (reintentar no resucita una cookie caducad
 **No hay ni habrá evasión de detección**: nada de rotación de proxies, resolución de
 CAPTCHAs ni falsificación de huella de navegador. Se recogen datos de empresa y de
 oferta, nunca nombres ni perfiles de personas.
+
+## La lista curada inicial
+
+`rrhh-tools curated` renderiza `config/curated_targets.yaml`: una primera lista de
+empresas a las que llamar, para no esperar a la primera ejecución del radar.
+
+**No sale de LinkedIn.** Se construyó con búsqueda web y conocimiento del mercado
+español, así que cada empresa lleva su nivel de evidencia: *vacante confirmada* o
+*objetivo estratégico a verificar*. No se ha inventado ninguna oferta ni ninguna URL, y
+donde la fuente anonimiza el nombre de la empresa se dice así en vez de adivinarlo.
+
+Es un fichero YAML editable, para que el equipo comercial la mantenga a mano.
 
 ## Cómo mejorar el clasificador
 

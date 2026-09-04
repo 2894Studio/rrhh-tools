@@ -48,6 +48,10 @@ companies:
   - {name: "DEC BBDO",            category: agency, aliases: ["BBDO"]}
   - {name: "Isobar",              category: agency, match: exact}
   - {name: "Dentsu",              category: agency, match: exact}
+  # Encontrada durante la investigacion de mercado: tenia vacante de UX/UI
+  # junior en Madrid, pero es consultora digital (110 empleados en Espana,
+  # grupo cotizado en Milan, area propia de "UX & CRO"). No es cliente final.
+  - {name: "Alkemy",              category: agency, aliases: ["Alkemy Spain", "Alkemy Iberia", "Alkemy España", "Grupo Ontwice"]}
 
   # --- Consultoras IT / ESN (Bloque C) ---
   - {name: "Indra",            category: consultancy, aliases: [Minsait, "Indra Minsait"], match: exact}

@@ -16,7 +16,7 @@ from .config import ConfigError, load_settings
 from .http import AuthWall, FixtureFetcher, ThrottledFetcher, ThrottleStop
 from .models import RunDiagnostics
 from .pipeline.run import process
-from .report.render import render_report
+from .report.render import render_curated, render_report
 from .store import cache
 
 
@@ -141,6 +141,23 @@ def cmd_replay(args) -> int:
     return 0 if ok else 5
 
 
+def cmd_curated(args) -> int:
+    """Renderiza la lista curada inicial desde config/curated_targets.yaml."""
+    import yaml
+    settings = _settings(args)
+    path = Path(args.data or settings.config_dir / "curated_targets.yaml")
+    if not path.is_file():
+        print(f"No existe el fichero de la lista curada: {path}", file=sys.stderr)
+        return 1
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    html = render_curated(data, "2894 — Empresas objetivo")
+    out = Path(args.out or "reports/empresas-objetivo.html")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(html, encoding="utf-8")
+    print(f"Lista curada escrita en {out}")
+    return 0
+
+
 def cmd_review(args) -> int:
     """Imprime la cola de revisión lista para pegar en config/decisions.yaml."""
     settings = _settings(args)
@@ -224,6 +241,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--max-jobs", type=int, default=None)
     p.add_argument("--today", default=None, help="fecha de referencia, para pruebas")
     p.set_defaults(func=cmd_replay)
+
+    p = sub.add_parser("curated", help="renderiza la lista curada inicial de empresas")
+    p.add_argument("--data", default=None)
+    p.add_argument("--out", default=None)
+    p.set_defaults(func=cmd_curated)
 
     p = sub.add_parser("review", help="cola de revisión en formato decisions.yaml")
     p.add_argument("--run", default="latest")

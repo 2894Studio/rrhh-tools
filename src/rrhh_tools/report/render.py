@@ -73,3 +73,47 @@ def render_report(run: ProcessedRun, title: str, source_label: str = "LinkedIn")
         diagnostics=run.diagnostics,
         reconcile_msg=reconcile_msg,
     )
+
+
+def render_curated(data: dict, title: str) -> str:
+    """Informe de la lista curada inicial.
+
+    Usa la misma plantilla de estilos que el radar, para que ambos documentos se
+    lean como el mismo sistema.
+    """
+    env = Environment(
+        loader=FileSystemLoader(TEMPLATE_DIR),
+        autoescape=True,
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    empresas = data.get("empresas", [])
+    confirmadas = [e for e in empresas if e.get("evidencia") == "confirmada"]
+    estrategicas = [e for e in empresas if e.get("evidencia") != "confirmada"]
+
+    grupos = []
+    if confirmadas:
+        grupos.append({
+            "tag": "Evidencia confirmada",
+            "titulo": "Con vacante encontrada",
+            "descripcion": "Hay evidencia pública de una vacante de diseño junior. "
+                           "Cuando la fuente no publica el nombre de la empresa, se dice así.",
+            "empresas": confirmadas,
+        })
+    if estrategicas:
+        grupos.append({
+            "tag": "Objetivo estratégico",
+            "titulo": "Por perfil, a verificar",
+            "descripcion": "Sin vacante confirmada. Son clientes finales con producto digital "
+                           "propio y necesidad plausible: hipótesis razonadas, no hechos.",
+            "empresas": estrategicas,
+        })
+
+    return env.get_template("curated.html.j2").render(
+        title=title,
+        contexto=data.get("contexto", {}),
+        grupos=grupos,
+        competencia=data.get("competencia_detectada", []),
+        n_confirmadas=len(confirmadas),
+        n_estrategicas=len(estrategicas),
+    )
