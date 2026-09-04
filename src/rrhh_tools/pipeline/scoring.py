@@ -168,6 +168,15 @@ def score_company(
     return score, components, _build_why(score, components)
 
 
+def _upper_first(text: str) -> str:
+    """Mayuscula inicial conservando el resto.
+
+    str.capitalize() pone en minuscula todo lo demas, y convertia
+    "remoto desde España" en "Remoto desde españa".
+    """
+    return text[:1].upper() + text[1:] if text else text
+
+
 def _build_why(score: float, components: list[ScoreComponent]) -> str:
     """Frase legible: los dos factores que mas suman y el que mas lastra."""
     ranked = sorted(components, key=lambda c: c.points, reverse=True)
@@ -176,7 +185,7 @@ def _build_why(score: float, components: list[ScoreComponent]) -> str:
     drag = max(components, key=lambda c: c.weight * (1 - c.value))
     parts = []
     if top:
-        parts.append(" · ".join(c.explanation.capitalize() for c in top) + ".")
+        parts.append(" · ".join(_upper_first(c.explanation) for c in top) + ".")
     else:
         parts.append("Sin factores fuertes a favor.")
     if drag.value < 0.5:

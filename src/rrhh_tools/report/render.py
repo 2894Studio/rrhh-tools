@@ -36,7 +36,8 @@ def _badges(company: Company) -> list[str]:
     return out
 
 
-def render_report(run: ProcessedRun, title: str, source_label: str = "LinkedIn") -> str:
+def render_report(run: ProcessedRun, title: str, source_label: str = "LinkedIn",
+                  es_muestra: bool = False) -> str:
     env = Environment(
         loader=FileSystemLoader(TEMPLATE_DIR),
         # autoescape=True explicito, NO select_autoescape(["html"]): esa funcion
@@ -67,6 +68,9 @@ def render_report(run: ProcessedRun, title: str, source_label: str = "LinkedIn")
         run_id=run.run_id,
         config_hash=run.config_hash,
         source_label=source_label,
+        # Un informe generado contra fixtures lleva empresas reales con ofertas
+        # inventadas. Sin un aviso dentro de la propia pagina se lee como real.
+        es_muestra=es_muestra,
         counts=run.count_jobs(),
         blocks=blocks,
         filtered=run.filtered_jobs,

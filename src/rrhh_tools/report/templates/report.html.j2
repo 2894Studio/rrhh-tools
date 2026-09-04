@@ -25,6 +25,18 @@
     </div>
   </header>
 
+  {% if es_muestra %}
+  <div class="temp" style="background:var(--ink-black)">
+    <h2>Esto es una muestra, no datos reales</h2>
+    <p class="plain" style="opacity:1;color:#C7C9D0;margin-bottom:0;max-width:66ch">
+      Las empresas que aparecen abajo son reales, pero <strong style="color:#fff;font-weight:500">las
+      ofertas son inventadas</strong>: sirven para enseñar el formato del informe antes de
+      ejecutarlo contra LinkedIn. Ninguna de estas vacantes existe. No uséis esta página
+      para contactar a nadie.
+    </p>
+  </div>
+  {% endif %}
+
   <div class="temp">
     <h2>Temperatura del mercado</h2>
     <p class="plain">Cuántas vacantes de diseño junior hay ahora mismo, y de quién son.</p>

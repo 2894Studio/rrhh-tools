@@ -131,7 +131,8 @@ def cmd_replay(args) -> int:
     diagnostics = RunDiagnostics(queries_run=labels, pages_fetched=fetcher.pages_fetched)
     run = process(records, settings, "replay", diagnostics,
                   today=date.fromisoformat(args.today) if args.today else None)
-    html = render_report(run, settings.report["title"], source_label="fixtures (sin red)")
+    html = render_report(run, settings.report["title"],
+                         source_label="fixtures (sin red)", es_muestra=True)
     out = Path(args.out or "reports/replay.html")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
@@ -181,8 +182,31 @@ def cmd_site(args) -> int:
     (out / "index.html").write_text(
         render_index(date.today().strftime("%d/%m/%Y"), "2894 — Radar de diseño junior"),
         encoding="utf-8")
+
+    # Las tres paginas comparten la misma hoja de estilos, que va embebida en
+    # cada una para que el fichero suelto siga siendo autocontenido. En el sitio
+    # se extrae a styles.css: el navegador la descarga una vez y la cachea.
+    _share_stylesheet(out)
     print(f"Sitio montado en {out}/")
     return 0
+
+
+def _share_stylesheet(out: Path) -> None:
+    import re
+    paginas = sorted(out.glob("*.html"))
+    hoja = None
+    for pagina in paginas:
+        html = pagina.read_text(encoding="utf-8")
+        bloques = re.findall(r"<style>.*?</style>", html, re.S)
+        if not bloques:
+            continue
+        if hoja is None:
+            hoja = bloques[0]
+            (out / "styles.css").write_text(
+                hoja[len("<style>"):-len("</style>")].strip() + "\n", encoding="utf-8")
+        if bloques[0] == hoja:
+            html = html.replace(hoja, '<link rel="stylesheet" href="styles.css">', 1)
+            pagina.write_text(html, encoding="utf-8")
 
 
 def cmd_review(args) -> int:
