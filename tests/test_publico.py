@@ -171,3 +171,39 @@ def test_la_muestra_publicada_no_juzga_a_empresas_reales(settings, tmp_path):
     for nombre in reales:
         assert nombre not in html, f"la muestra publicada menciona a {nombre}"
     assert "inventadas" in html, "y debe decir que es una muestra"
+
+
+def test_los_tres_niveles_de_evidencia_no_se_mezclan(completo):
+    """Una oferta concreta con URL no es lo mismo que una hipótesis.
+
+    Mezclarlas haría que la lista entera pareciese más sólida de lo que es,
+    que es justo el error a evitar en un documento comercial.
+    """
+    for titulo in ["Vacantes concretas", "Hay oferta, falta el nombre", "Por verificar"]:
+        assert titulo in completo, titulo
+
+
+def test_las_ofertas_reales_enlazan_a_su_oferta(publico, completo):
+    """Cuando hay URL de la oferta, va la primera: es el dato más fuerte."""
+    con_url = [e for e in DATOS["empresas"] if e.get("oferta_url")]
+    assert con_url, "debería haber alguna oferta con URL real"
+    for entrada in con_url:
+        for salida in (publico, completo):
+            assert entrada["oferta_url"] in salida
+            assert "Abrir la oferta" in salida
+
+
+def test_se_distingue_lo_encontrado_de_lo_supuesto(publico):
+    """El lector tiene que poder ver de un vistazo qué está comprobado."""
+    plano = _plano(publico)
+    assert "Oferta encontrada" in plano
+    assert "Sin oferta" in plano
+    assert "comprobad que siguen abiertas" in plano
+
+
+def test_ninguna_ficha_sin_oferta_aparenta_tener_una():
+    """Una entrada `estrategica` no debe llevar URL de oferta ni vacante."""
+    for entrada in DATOS["empresas"]:
+        if entrada.get("evidencia") == "estrategica":
+            assert not entrada.get("oferta_url"), entrada["nombre"]
+            assert not entrada.get("vacante"), entrada["nombre"]

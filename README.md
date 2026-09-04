@@ -125,10 +125,22 @@ oferta, nunca nombres ni perfiles de personas.
 `rrhh-tools curated` renderiza `config/curated_targets.yaml`: una primera lista de
 empresas a las que llamar, para no esperar a la primera ejecución del radar.
 
-**No sale de LinkedIn.** Se construyó con búsqueda web y conocimiento del mercado
-español, así que cada empresa lleva su nivel de evidencia: *vacante confirmada* o
-*objetivo estratégico a verificar*. No se ha inventado ninguna oferta ni ninguna URL, y
-donde la fuente anonimiza el nombre de la empresa se dice así en vez de adivinarlo.
+**No sale de LinkedIn**, porque el entorno donde se desarrolló la herramienta lo tiene
+bloqueado. Se construyó con búsqueda web, y por eso cada ficha lleva su **nivel de
+evidencia**, que es lo más importante de este fichero:
+
+| Nivel | Qué significa |
+|---|---|
+| `oferta` | Oferta concreta encontrada, con empresa, puesto y URL. No se ha podido abrir para confirmar que sigue viva |
+| `confirmada` | Hay vacante, pero la fuente no publica quién la ofrece. Se dice así en vez de adivinarlo |
+| `estrategica` | **No hay oferta.** Es una empresa que encaja por perfil: una hipótesis, no un hecho |
+
+Mezclar los tres niveles haría que la lista pareciese más sólida de lo que es, así que van
+en bloques separados y hay un test que lo comprueba. No se ha inventado ninguna oferta ni
+ninguna URL.
+
+**La foto completa y al día sale de ejecutar la herramienta contra LinkedIn.** Esta lista
+es solo para no esperar a la primera ejecución.
 
 Es un fichero YAML editable, para que el equipo comercial la mantenga a mano.
 

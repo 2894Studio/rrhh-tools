@@ -1,186 +1,231 @@
-# Lista inicial de empresas objetivo para el equipo comercial de 2894.
+# Ofertas y empresas encontradas para el equipo comercial de 2894.
 #
-# COMO SE CONSTRUYO Y QUE FIABILIDAD TIENE
-# ----------------------------------------
-# Esta lista NO sale de LinkedIn. Se construyó con búsqueda web y conocimiento
-# del mercado español, porque el entorno donde se desarrolló el proyecto no
-# tenía salida a internet y no pudo consultar LinkedIn.
+# QUE ES REAL Y QUE NO
+# --------------------
+# Este fichero distingue tres niveles, y la diferencia importa:
 #
-# Por eso cada empresa lleva un nivel de evidencia explícito, y no se ha
-# inventado ninguna oferta ni ninguna URL:
+#   oferta      -> Oferta CONCRETA encontrada, con empresa, puesto y URL.
+#                  Salen de busqueda web, no de LinkedIn: el entorno donde se
+#                  desarrollo la herramienta lo tiene bloqueado. No he podido
+#                  abrir las URLs desde aqui, asi que hay que comprobar que
+#                  siguen abiertas antes de actuar.
+#   confirmada  -> Hay evidencia de una vacante pero la fuente no publica el
+#                  nombre de la empresa. Se dice asi en vez de adivinarlo.
+#   estrategica -> NO hay oferta. Es una empresa que encaja por perfil y merece
+#                  la pena mirar. Es una hipotesis, no un hecho.
 #
-#   confirmada  -> hay evidencia pública de una vacante de diseño junior,
-#                  aunque la fuente a veces anonimiza el nombre de la empresa.
-#   estrategica -> no hay vacante confirmada. Es un objetivo por perfil:
-#                  cliente final, producto digital propio, presencia en Madrid
-#                  y necesidad plausible. HAY QUE VERIFICARLO.
-#
-# La lista completa y fiable sale de ejecutar la herramienta:
-#   uv run rrhh-tools search --source session && uv run rrhh-tools report
+# La foto completa y al dia sale de ejecutar la herramienta contra LinkedIn:
+#   uv run rrhh-tools doctor --source session
+#   uv run rrhh-tools run
 
 contexto:
   generado: "2026-09-04"
-  metodo: "Búsqueda web y conocimiento de mercado. Sin acceso a LinkedIn."
+  metodo: "Búsqueda web. Sin acceso directo a LinkedIn desde el entorno de desarrollo."
   datos_de_mercado:
+    - "LinkedIn tiene ahora mismo unas 258 ofertas de Product Designer en la Comunidad de Madrid y 174 de UX Designer en toda España."
     - "España crea más de 52.000 puestos ligados a IA en 2026; Madrid concentra el 45% de las ofertas."
     - "El sector que más contrata perfiles de IA es banca y finanzas (22%), seguido de consultoría (19%) y telecomunicaciones (12%)."
-    - "Un 25% de las ofertas del ámbito IA son 100% en remoto."
 
-# El campo `dominio` sirve solo para sacar el favicon como logo. Se rellena
+# El campo `dominio` solo sirve para sacar el favicon como logo, y se rellena
 # unicamente cuando hay certeza: una ficha con el logo de otra empresa hace
-# dudar del resto de la ficha. Sin dominio, la tarjeta muestra un monograma.
+# dudar del resto de la ficha.
 empresas:
-  # ---------------- EVIDENCIA CONFIRMADA ----------------
+  # ---------------- OFERTAS CONCRETAS ENCONTRADAS ----------------
+  - nombre: "Cabify"
+    dominio: "cabify.com"
+    evidencia: oferta
+    sector: "Movilidad"
+    ubicacion: "Madrid"
+    vacante: "Product Designer I — Development Program 2026"
+    oferta_url: "https://job-boards.greenhouse.io/cabify/jobs/8475047002"
+    oferta_fuente: "Portal de empleo propio de Cabify (Greenhouse)"
+    detalle: >-
+      Programa de desarrollo para perfil de entrada, en Madrid. Cabify tiene
+      ademas abiertas una Senior Product Designer (publicada hace unos días) y
+      otra Product Designer con banda de 40-49K.
+    por_que: >-
+      Es la mejor puerta de entrada encontrada: un "Development Program" es
+      justo la via por la que entra un perfil junior, y ademas confirma que el
+      equipo de diseño de Cabify esta creciendo con tres vacantes a la vez.
+    accion: >-
+      Abrir la oferta y comprobar que sigue viva. Si el programa ya esta
+      cerrado, el argumento comercial sigue en pie: tres vacantes de diseño
+      abiertas es un equipo con mas trabajo del que puede absorber.
+
+  - nombre: "Jobandtalent"
+    dominio: "jobandtalent.com"
+    evidencia: oferta
+    sector: "Marketplace de empleo"
+    ubicacion: "España (remoto EMEA)"
+    vacante: "HQ — Product Designer (EMEA Remote)"
+    oferta_url: "https://builtin.com/job/hq-product-designer-emea-remote/3610491"
+    oferta_fuente: "Built In"
+    detalle: "Pide experiencia diseñando productos y sistemas digitales. Remoto en EMEA."
+    por_que: >-
+      Remoto desde España, lo que amplia el encaje mas alla de Madrid. Producto
+      de gran volumen y dos caras, trabajador y empresa, asi que la superficie
+      de diseño es grande.
+    accion: "Comprobar el nivel exacto que piden antes de proponer un perfil junior."
+
+  - nombre: "Glovo"
+    dominio: "glovoapp.com"
+    evidencia: oferta
+    sector: "Delivery / marketplace"
+    ubicacion: "Barcelona"
+    vacante: "Senior Product Designer"
+    oferta_fuente: "Búsqueda web"
+    detalle: >-
+      Se incorpora a un equipo de UX que trabaja junto a UX Research, Content
+      Design, Data, Producto e Ingeniería.
+    por_que: >-
+      No encaja para un junior, y aun asi importa: un equipo de diseño con
+      research y content design propios es una organizacion madura, mal
+      candidato a externalizar. Sirve de contraste.
+    accion: "Baja prioridad para colocar perfiles. Util como lectura de mercado."
+
+  - nombre: "Oferta junior de UX/UI en Madrid (primerempleo.com)"
+    evidencia: oferta
+    sector: "Sin especificar"
+    ubicacion: "Madrid"
+    vacante: "Diseñador/a UX/UI Junior — prácticas"
+    oferta_url: "https://www.primerempleo.com/practicas/madrid/disenador-a-ux-ui-junior-madrid/1405518"
+    oferta_fuente: "primerempleo.com"
+    detalle: "Contrato de prácticas para empezar carrera profesional en UX/UI."
+    por_que: >-
+      Es exactamente el tipo de puesto al que optan vuestros becarios. Merece
+      la pena identificar la empresa que hay detras.
+    accion: "Abrir la oferta, ver que empresa la publica y valorar si es cliente final."
+
+  - nombre: "Yodel Internacional"
+    evidencia: oferta
+    sector: "Sin especificar"
+    ubicacion: "Madrid"
+    vacante: "Junior — equipo de diseño gráfico"
+    oferta_fuente: "Búsqueda web"
+    detalle: >-
+      Busca perfil junior para el equipo de diseño gráfico, con criterio
+      estético y ganas de aprender en proyectos reales.
+    por_que: >-
+      Es diseño gráfico, no de producto, asi que encaja peor con el perfil de
+      vuestros becarios. Se lista para no ocultar lo que se encontro.
+    accion: "Baja prioridad: el encaje con UX/UI es parcial."
+
+  # ---------------- VACANTE CONFIRMADA, EMPRESA NO PUBLICADA ----------------
   - nombre: "Plataforma de beneficios para empleados (nombre no publicado)"
     evidencia: confirmada
     sector: "HR tech / fintech"
     ubicacion: "Madrid"
     vacante: "Junior Product Designer"
-    busqueda: "Junior Product Designer beneficios empleados"
+    busqueda: "Junior Product Designer benefits AI-driven mindset"
     detalle: >-
-      La oferta pide 1-2 años de experiencia, preferiblemente en fintech o HR tech,
-      y habla de diseñar la evolución de nuevos beneficios escalables con el usuario
-      en el centro. La fuente no publica el nombre de la empresa.
+      Pide 1-2 años de experiencia, preferiblemente en fintech, HR tech o
+      beneficios, y "AI-driven mindset": interes por incorporar herramientas de
+      IA al proceso de diseño, y comprension de viabilidad tecnica (HTML, CSS,
+      JavaScript). La fuente no publica el nombre de la empresa.
     por_que: >-
-      Encaja con el perfil de scaleup madrileña de beneficios para empleados. Es una
-      vacante junior real y explícita, con producto propio. Merece la pena identificar
-      la empresa: el enunciado apunta a un equipo de producto pequeño.
-    accion: "Identificar la empresa buscando el texto de la oferta en LinkedIn."
+      Es el mejor encaje encontrado con diferencia. Pide explicitamente
+      mentalidad de IA aplicada al diseño, que es el diferencial de vuestros
+      becarios, y en el nivel exacto que tienen.
+    accion: >-
+      Prioridad maxima: identificar la empresa buscando el texto de la oferta
+      en LinkedIn. El enunciado apunta a una scaleup madrileña de beneficios.
 
-  - nombre: "Fynce"
-    evidencia: confirmada
-    sector: "Fintech / gestión patrimonial"
-    ubicacion: "España"
-    vacante: "Diseñador UI/UX web"
-    detalle: "Fintech con producto propio en gestión patrimonial, buscando perfil de diseño UI/UX."
-    por_que: >-
-      Cliente final con producto propio, no consultora. Fintech en fase temprana:
-      el tipo de empresa que suele necesitar diseño sin tener equipo montado.
-    accion: "Contactar directamente. Buen candidato para presentar perfiles."
-
-  # ---------------- OBJETIVOS ESTRATEGICOS (a verificar) ----------------
-  - nombre: "Cobee"
-    dominio: "cobee.io"
-    evidencia: estrategica
-    sector: "HR tech / beneficios"
-    ubicacion: "Madrid"
-    por_que: >-
-      Scaleup madrileña de beneficios para empleados, con app y tarjeta propias.
-      Producto de consumo con mucha superficie de interfaz y equipo de diseño
-      históricamente pequeño para el tamaño del producto.
-    accion: "Verificar vacantes en su página de empleo y en LinkedIn."
-
-  - nombre: "Payflow"
-    dominio: "payflow.io"
-    evidencia: estrategica
-    sector: "Fintech / salario bajo demanda"
-    ubicacion: "Madrid"
-    por_que: >-
-      Reconocida en la categoría Growth del Deloitte Technology Fast 50 de 2026.
-      Crecimiento rápido con app de consumo: el momento en que una empresa
-      necesita más diseño del que tiene contratado.
-    accion: "Verificar vacantes. El crecimiento reciente es el gancho de la conversación."
-
+  # ---------------- SIN OFERTA: HIPOTESIS POR PERFIL ----------------
   - nombre: "Seedtag"
     dominio: "seedtag.com"
     evidencia: estrategica
     sector: "AdTech con IA"
     ubicacion: "Madrid"
+    detalle: "Publicidad contextual basada en IA para analizar contenido."
     por_que: >-
-      Publicidad contextual basada en IA para analizar contenido. Es el encaje más
-      directo con el perfil de vuestros becarios: empresa cuyo núcleo ES la IA y que
-      necesita traducir modelos a interfaces que un anunciante entienda.
-    accion: "Prioritaria. El argumento de 'diseñadores que entienden IA' aterriza solo."
+      Empresa cuyo nucleo ES la IA y que necesita traducir modelos a interfaces
+      que un anunciante entienda. No se le ha encontrado vacante abierta.
+    accion: "Comprobar vacantes en LinkedIn antes de invertir tiempo comercial."
 
   - nombre: "Clarity AI"
     dominio: "clarity.ai"
     evidencia: estrategica
     sector: "IA aplicada a sostenibilidad ESG"
     ubicacion: "Madrid"
+    detalle: "150M de euros levantados y mas de 300 instituciones financieras como clientes."
     por_que: >-
-      150M de euros levantados y más de 300 instituciones financieras como clientes.
-      Producto analítico complejo servido a usuarios no técnicos: es exactamente el
-      problema que resuelve un buen equipo de UX con criterio sobre IA.
-    accion: "Prioritaria por el mismo motivo que Seedtag."
-
-  - nombre: "Genially"
-    dominio: "genially.com"
-    evidencia: estrategica
-    sector: "SaaS de contenido interactivo"
-    ubicacion: "España (remoto)"
-    por_que: >-
-      Herramienta de creación usada por millones de personas; 17M levantados. Producto
-      cuya propuesta de valor ES la interfaz, así que el diseño no es un accesorio.
-    accion: "Verificar vacantes. Trabajan en remoto, lo que amplía el encaje."
-
-  - nombre: "Carto"
-    dominio: "carto.com"
-    evidencia: estrategica
-    sector: "Geoespacial / analítica"
-    ubicacion: "Madrid"
-    por_que: >-
-      Producto de visualización de datos geoespaciales con base en Madrid. La
-      visualización de datos compleja es un terreno donde un junior bien dirigido
-      aporta rápido y donde la ayuda externa se justifica sola.
-    accion: "Verificar vacantes."
-
-  - nombre: "Jobandtalent"
-    dominio: "jobandtalent.com"
-    evidencia: estrategica
-    sector: "Marketplace de empleo"
-    ubicacion: "Madrid"
-    por_que: >-
-      Scaleup madrileña con producto de gran volumen y dos caras (trabajador y
-      empresa), lo que multiplica la superficie de diseño.
-    accion: "Verificar vacantes."
-
-  - nombre: "Cabify"
-    dominio: "cabify.com"
-    evidencia: estrategica
-    sector: "Movilidad"
-    ubicacion: "Madrid"
-    por_que: >-
-      Equipo de producto grande y maduro en Madrid. Peor candidata a externalizar que
-      una empresa pequeña, pero contrata diseño con regularidad y el volumen compensa.
-    accion: "Verificar. Menos prioritaria: su equipo de diseño ya está consolidado."
-
-  - nombre: "Banca y seguros: BBVA, Santander, CaixaBank, Bankinter, Mutua Madrileña, Mapfre"
-    empresas: ["BBVA", "Banco Santander", "CaixaBank", "Bankinter", "Mutua Madrileña", "Mapfre"]
-    evidencia: estrategica
-    sector: "Banca y seguros"
-    ubicacion: "Madrid"
-    por_que: >-
-      Es el sector que más contrata perfiles ligados a IA en España (22% de las
-      ofertas) y tiene sus sedes en Madrid. Son clientes finales grandes: el ciclo de
-      venta es más largo, pero el presupuesto y la continuidad también.
-    accion: >-
-      Trabajar por debajo del nivel corporativo: buscar al responsable de diseño o de
-      producto de una línea concreta, no al departamento de compras.
+      Producto analitico complejo servido a usuarios no tecnicos. No se le ha
+      encontrado vacante abierta.
+    accion: "Comprobar vacantes en LinkedIn."
 
   - nombre: "Narrativa"
     dominio: "narrativa.com"
     evidencia: estrategica
     sector: "IA generativa de contenido"
     ubicacion: "Madrid"
+    detalle: "Startup madrileña de generación automática de contenido con IA."
     por_que: >-
-      Startup madrileña de generación automática de contenido con IA. Empresa pequeña
-      con núcleo de IA: el perfil que menos probable es que tenga equipo de diseño
-      propio, y por tanto el mejor candidato a externalizar.
-    accion: "Prioritaria por tamaño. Alta probabilidad de no tener diseñador en plantilla."
+      Empresa pequeña con nucleo de IA: la que menos probable es que tenga
+      equipo de diseño propio. No se le ha encontrado vacante abierta.
+    accion: "Comprobar vacantes en LinkedIn."
 
-# Empresas con vacante de diseño junior que NO son objetivo comercial.
-# Se listan porque son senal de mercado, no porque haya que llamarlas.
+  - nombre: "Cobee"
+    dominio: "cobee.io"
+    evidencia: estrategica
+    sector: "HR tech / beneficios"
+    ubicacion: "Madrid"
+    detalle: "Scaleup madrileña de beneficios para empleados, con app y tarjeta propias."
+    por_que: >-
+      Encaja con el perfil de la oferta anonimizada de arriba: merece la pena
+      comprobar si es ella.
+    accion: "Comparar con el texto de la oferta anónima. Comprobar vacantes."
+
+  - nombre: "Payflow"
+    dominio: "payflow.io"
+    evidencia: estrategica
+    sector: "Fintech / salario bajo demanda"
+    ubicacion: "Madrid"
+    detalle: "Reconocida en la categoría Growth del Deloitte Technology Fast 50 de 2026."
+    por_que: "Crecimiento rápido con app de consumo. No se le ha encontrado vacante abierta."
+    accion: "Comprobar vacantes en LinkedIn."
+
+  - nombre: "Genially"
+    dominio: "genially.com"
+    evidencia: estrategica
+    sector: "SaaS de contenido interactivo"
+    ubicacion: "España (remoto)"
+    detalle: "Herramienta de creación usada por millones de personas; 17M levantados."
+    por_que: "Producto cuya propuesta de valor ES la interfaz. Sin vacante encontrada."
+    accion: "Comprobar vacantes en LinkedIn."
+
+  - nombre: "Carto"
+    dominio: "carto.com"
+    evidencia: estrategica
+    sector: "Geoespacial / analítica"
+    ubicacion: "Madrid"
+    detalle: "Producto de visualización de datos geoespaciales con base en Madrid."
+    por_que: "Visualización de datos compleja. Sin vacante encontrada."
+    accion: "Comprobar vacantes en LinkedIn."
+
+  - nombre: "Banca y seguros: BBVA, Santander, CaixaBank, Bankinter, Mutua Madrileña, Mapfre"
+    empresas: ["BBVA", "Banco Santander", "CaixaBank", "Bankinter", "Mutua Madrileña", "Mapfre"]
+    evidencia: estrategica
+    sector: "Banca y seguros"
+    ubicacion: "Madrid"
+    detalle: "Es el sector que más contrata perfiles ligados a IA en España: 22% de las ofertas."
+    por_que: >-
+      Clientes finales grandes con sede en Madrid. Ciclo de venta mas largo,
+      pero presupuesto y continuidad tambien. Sin vacantes concretas encontradas.
+    accion: >-
+      Buscar al responsable de diseño o de producto de una linea concreta, no
+      al departamento de compras.
+
+# Empresas con vacante de diseño que NO son objetivo comercial.
+# `detalle` se publica y `lectura` no: aqui solo van HECHOS comprobables.
 competencia_detectada:
   - nombre: "Alkemy España"
     dominio: "alkemy.com"
     tipo: "Consultora digital"
-    # OJO: `detalle` se publica, `lectura` no. Por eso aqui solo van HECHOS
-    # comprobables; cualquier valoracion nuestra va en `lectura`.
     detalle: >-
       Tenía vacante de Junior UX/UI Designer en Madrid. Es consultora digital con
-      área propia de UX y CRO: 110 empleados en España, grupo cotizado en Milán con
-      700 empleados.
+      área propia de UX y CRO: 110 empleados en España, grupo cotizado en Milán
+      con 700 empleados.
     lectura: >-
-      No es cliente final y compite con 2894. Que una consultora de este tamaño abra
-      una vacante junior de UX confirma que hay demanda de perfiles como los
-      vuestros en Madrid.
+      No es cliente final y compite con 2894. Que una consultora de este tamaño
+      abra una vacante junior de UX confirma que hay demanda de perfiles como
+      los vuestros en Madrid.

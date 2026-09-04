@@ -34,7 +34,7 @@
        primera ejecución del radar.</p>
     <div class="meta">
       <span>Generado <code>2026-09-04</code></span>
-      <span>Método <code>Búsqueda web y conocimiento de mercado. Sin acceso a LinkedIn.</code></span>
+      <span>Método <code>Búsqueda web. Sin acceso directo a LinkedIn desde el entorno de desarrollo.</code></span>
     </div>
   </header>
 
@@ -56,9 +56,9 @@
       <h2>Cómo está el mercado.</h2>
       <p>Datos públicos que enmarcan la conversación comercial.</p>
     </div>
+    <p class="dato">LinkedIn tiene ahora mismo unas 258 ofertas de Product Designer en la Comunidad de Madrid y 174 de UX Designer en toda España.</p>
     <p class="dato">España crea más de 52.000 puestos ligados a IA en 2026; Madrid concentra el 45% de las ofertas.</p>
     <p class="dato">El sector que más contrata perfiles de IA es banca y finanzas (22%), seguido de consultoría (19%) y telecomunicaciones (12%).</p>
-    <p class="dato">Un 25% de las ofertas del ámbito IA son 100% en remoto.</p>
   </section>
 
 <div id="filtros" class="filtros"></div>
@@ -68,7 +68,7 @@
   <button type="button" class="enlace" data-limpiar>Quitar los filtros</button>
 </div>
 
-<script type="application/json" id="facetas">[{"clave": "evidencia", "etiqueta": "Evidencia", "multi": false, "opciones": [{"valor": "confirmada", "etiqueta": "Vacante confirmada"}, {"valor": "estrategica", "etiqueta": "A verificar"}]}, {"clave": "ubicacion", "etiqueta": "Dónde", "multi": false, "opciones": [{"valor": "madrid", "etiqueta": "Madrid"}, {"valor": "espana", "etiqueta": "España / remoto"}]}]</script>
+<script type="application/json" id="facetas">[{"clave": "evidencia", "etiqueta": "Evidencia", "multi": false, "opciones": [{"valor": "oferta", "etiqueta": "Oferta encontrada"}, {"valor": "confirmada", "etiqueta": "Vacante sin empresa"}, {"valor": "estrategica", "etiqueta": "Sin oferta"}]}, {"clave": "ubicacion", "etiqueta": "Dónde", "multi": false, "opciones": [{"valor": "madrid", "etiqueta": "Madrid"}, {"valor": "espana", "etiqueta": "España / remoto"}]}]</script>
 <script>
 // Los controles se pintan arriba, pero las fichas estan mas abajo en el
 // documento: hay que esperar a que el DOM este completo o no se encuentra
@@ -249,9 +249,129 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
   <section data-seccion="1">
     <div class="sec-head">
-      <div class="tag">Evidencia confirmada</div>
-      <h2>Con vacante encontrada.</h2>
-      <p>Hay evidencia pública de una vacante de diseño. Cuando la fuente no publica el nombre de la empresa, se dice así.</p>
+      <div class="tag">Oferta encontrada</div>
+      <h2>Vacantes concretas.</h2>
+      <p>Ofertas reales localizadas, con empresa y puesto. No se han podido abrir desde el entorno de desarrollo: comprobad que siguen abiertas antes de actuar.</p>
+    </div>
+    <div data-lista>
+    <article class="card" data-ficha
+             data-evidencia="oferta"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/cabify.com.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>CA</div>'">
+          <div>
+          <h3>Cabify</h3>
+          <div class="badges">
+            <span class="badge brand">
+Oferta encontrada            </span>
+<span class="badge line">Movilidad</span><span class="badge line">Madrid</span><span class="badge line">Product Designer I — Development Program 2026</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Programa de desarrollo para perfil de entrada, en Madrid. Cabify tiene ademas abiertas una Senior Product Designer (publicada hace unos días) y otra Product Designer con banda de 40-49K.</p>      <p class="why" style="font-size:13px">Fuente: Portal de empleo propio de Cabify (Greenhouse).</p>
+      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Es la mejor puerta de entrada encontrada: un &#34;Development Program&#34; es justo la via por la que entra un perfil junior, y ademas confirma que el equipo de diseño de Cabify esta creciendo con tres vacantes a la vez.</p>
+<div class="accion"><b>Siguiente paso:</b> Abrir la oferta y comprobar que sigue viva. Si el programa ya esta cerrado, el argumento comercial sigue en pie: tres vacantes de diseño abiertas es un equipo con mas trabajo del que puede absorber.</div>      <div class="enlaces">
+        <a class="enlace" href="https://job-boards.greenhouse.io/cabify/jobs/8475047002" target="_blank" rel="noopener">Abrir la oferta</a>
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Cabify+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="oferta"
+             data-ubicacion="espana">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/jobandtalent.com.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>JO</div>'">
+          <div>
+          <h3>Jobandtalent</h3>
+          <div class="badges">
+            <span class="badge brand">
+Oferta encontrada            </span>
+<span class="badge line">Marketplace de empleo</span><span class="badge line">España (remoto EMEA)</span><span class="badge line">HQ — Product Designer (EMEA Remote)</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Pide experiencia diseñando productos y sistemas digitales. Remoto en EMEA.</p>      <p class="why" style="font-size:13px">Fuente: Built In.</p>
+      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Remoto desde España, lo que amplia el encaje mas alla de Madrid. Producto de gran volumen y dos caras, trabajador y empresa, asi que la superficie de diseño es grande.</p>
+<div class="accion"><b>Siguiente paso:</b> Comprobar el nivel exacto que piden antes de proponer un perfil junior.</div>      <div class="enlaces">
+        <a class="enlace" href="https://builtin.com/job/hq-product-designer-emea-remote/3610491" target="_blank" rel="noopener">Abrir la oferta</a>
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Jobandtalent+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=105646813" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="oferta"
+             data-ubicacion="espana">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/glovoapp.com.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>GL</div>'">
+          <div>
+          <h3>Glovo</h3>
+          <div class="badges">
+            <span class="badge brand">
+Oferta encontrada            </span>
+<span class="badge line">Delivery / marketplace</span><span class="badge line">Barcelona</span><span class="badge line">Senior Product Designer</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Se incorpora a un equipo de UX que trabaja junto a UX Research, Content Design, Data, Producto e Ingeniería.</p>      <p class="why" style="font-size:13px">Fuente: Búsqueda web.</p>
+      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> No encaja para un junior, y aun asi importa: un equipo de diseño con research y content design propios es una organizacion madura, mal candidato a externalizar. Sirve de contraste.</p>
+<div class="accion"><b>Siguiente paso:</b> Baja prioridad para colocar perfiles. Util como lectura de mercado.</div>      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Glovo+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=105646813" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="oferta"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <div class="monograma">OJ</div>
+          <div>
+          <h3>Oferta junior de UX/UI en Madrid (primerempleo.com)</h3>
+          <div class="badges">
+            <span class="badge brand">
+Oferta encontrada            </span>
+<span class="badge line">Sin especificar</span><span class="badge line">Madrid</span><span class="badge line">Diseñador/a UX/UI Junior — prácticas</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Contrato de prácticas para empezar carrera profesional en UX/UI.</p>      <p class="why" style="font-size:13px">Fuente: primerempleo.com.</p>
+      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Es exactamente el tipo de puesto al que optan vuestros becarios. Merece la pena identificar la empresa que hay detras.</p>
+<div class="accion"><b>Siguiente paso:</b> Abrir la oferta, ver que empresa la publica y valorar si es cliente final.</div>      <div class="enlaces">
+        <a class="enlace" href="https://www.primerempleo.com/practicas/madrid/disenador-a-ux-ui-junior-madrid/1405518" target="_blank" rel="noopener">Abrir la oferta</a>
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Oferta+junior+de+UX%2FUI+en+Madrid+%28primerempleo.com%29+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="oferta"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <div class="monograma">YI</div>
+          <div>
+          <h3>Yodel Internacional</h3>
+          <div class="badges">
+            <span class="badge brand">
+Oferta encontrada            </span>
+<span class="badge line">Sin especificar</span><span class="badge line">Madrid</span><span class="badge line">Junior — equipo de diseño gráfico</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Busca perfil junior para el equipo de diseño gráfico, con criterio estético y ganas de aprender en proyectos reales.</p>      <p class="why" style="font-size:13px">Fuente: Búsqueda web.</p>
+      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Es diseño gráfico, no de producto, asi que encaja peor con el perfil de vuestros becarios. Se lista para no ocultar lo que se encontro.</p>
+<div class="accion"><b>Siguiente paso:</b> Baja prioridad: el encaje con UX/UI es parcial.</div>      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Yodel+Internacional+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    </div>
+  </section>
+  <section data-seccion="2">
+    <div class="sec-head">
+      <div class="tag">Vacante sin empresa</div>
+      <h2>Hay oferta, falta el nombre.</h2>
+      <p>Hay evidencia de una vacante, pero la fuente no publica quién la ofrece. Se dice así en vez de adivinarlo.</p>
     </div>
     <div data-lista>
     <article class="card" data-ficha
@@ -264,91 +384,25 @@ document.addEventListener("DOMContentLoaded", function () {
           <h3>Plataforma de beneficios para empleados (nombre no publicado)</h3>
           <div class="badges">
             <span class="badge brand">
-              Vacante confirmada
-            </span>
+Vacante sin empresa            </span>
 <span class="badge line">HR tech / fintech</span><span class="badge line">Madrid</span><span class="badge line">Junior Product Designer</span>          </div>
           </div>
         </div>
       </div>
-<p class="why">La oferta pide 1-2 años de experiencia, preferiblemente en fintech o HR tech, y habla de diseñar la evolución de nuevos beneficios escalables con el usuario en el centro. La fuente no publica el nombre de la empresa.</p>      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Encaja con el perfil de scaleup madrileña de beneficios para empleados. Es una vacante junior real y explícita, con producto propio. Merece la pena identificar la empresa: el enunciado apunta a un equipo de producto pequeño.</p>
-<div class="accion"><b>Siguiente paso:</b> Identificar la empresa buscando el texto de la oferta en LinkedIn.</div>      <div class="enlaces">
-        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Junior+Product+Designer+beneficios+empleados+&amp;geoId=100994331" target="_blank" rel="noopener">Buscar esta oferta en LinkedIn</a>
-      </div>
-    </article>
-    <article class="card" data-ficha
-             data-evidencia="confirmada"
-             data-ubicacion="espana">
-      <div class="card-top">
-        <div class="marca">
-          <div class="monograma">FY</div>
-          <div>
-          <h3>Fynce</h3>
-          <div class="badges">
-            <span class="badge brand">
-              Vacante confirmada
-            </span>
-<span class="badge line">Fintech / gestión patrimonial</span><span class="badge line">España</span><span class="badge line">Diseñador UI/UX web</span>          </div>
-          </div>
-        </div>
-      </div>
-<p class="why">Fintech con producto propio en gestión patrimonial, buscando perfil de diseño UI/UX.</p>      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Cliente final con producto propio, no consultora. Fintech en fase temprana: el tipo de empresa que suele necesitar diseño sin tener equipo montado.</p>
-<div class="accion"><b>Siguiente paso:</b> Contactar directamente. Buen candidato para presentar perfiles.</div>      <div class="enlaces">
-        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Fynce+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=105646813" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+<p class="why">Pide 1-2 años de experiencia, preferiblemente en fintech, HR tech o beneficios, y &#34;AI-driven mindset&#34;: interes por incorporar herramientas de IA al proceso de diseño, y comprension de viabilidad tecnica (HTML, CSS, JavaScript). La fuente no publica el nombre de la empresa.</p>      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Es el mejor encaje encontrado con diferencia. Pide explicitamente mentalidad de IA aplicada al diseño, que es el diferencial de vuestros becarios, y en el nivel exacto que tienen.</p>
+<div class="accion"><b>Siguiente paso:</b> Prioridad maxima: identificar la empresa buscando el texto de la oferta en LinkedIn. El enunciado apunta a una scaleup madrileña de beneficios.</div>      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Junior+Product+Designer+benefits+AI-driven+mindset+&amp;geoId=100994331" target="_blank" rel="noopener">Buscar esta oferta en LinkedIn</a>
       </div>
     </article>
     </div>
   </section>
-  <section data-seccion="2">
+  <section data-seccion="3">
     <div class="sec-head">
-      <div class="tag">Objetivo estratégico</div>
-      <h2>Por perfil, a verificar.</h2>
-      <p>Sin vacante confirmada. Son clientes finales con producto digital propio y necesidad plausible: hipótesis razonadas, no hechos.</p>
+      <div class="tag">Sin oferta encontrada</div>
+      <h2>Por verificar.</h2>
+      <p>NO hay oferta. Son clientes finales con producto digital propio y necesidad plausible: hipótesis razonadas, no hechos.</p>
     </div>
     <div data-lista>
-    <article class="card" data-ficha
-             data-evidencia="estrategica"
-             data-ubicacion="madrid">
-      <div class="card-top">
-        <div class="marca">
-          <img class="logo" src="https://icons.duckduckgo.com/ip3/cobee.io.ico" alt="" loading="lazy"
-               onerror="this.outerHTML='<div class=\'monograma\'>CO</div>'">
-          <div>
-          <h3>Cobee</h3>
-          <div class="badges">
-            <span class="badge line">
-              A verificar
-            </span>
-<span class="badge line">HR tech / beneficios</span><span class="badge line">Madrid</span>          </div>
-          </div>
-        </div>
-      </div>
-      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Scaleup madrileña de beneficios para empleados, con app y tarjeta propias. Producto de consumo con mucha superficie de interfaz y equipo de diseño históricamente pequeño para el tamaño del producto.</p>
-<div class="accion"><b>Siguiente paso:</b> Verificar vacantes en su página de empleo y en LinkedIn.</div>      <div class="enlaces">
-        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Cobee+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
-      </div>
-    </article>
-    <article class="card" data-ficha
-             data-evidencia="estrategica"
-             data-ubicacion="madrid">
-      <div class="card-top">
-        <div class="marca">
-          <img class="logo" src="https://icons.duckduckgo.com/ip3/payflow.io.ico" alt="" loading="lazy"
-               onerror="this.outerHTML='<div class=\'monograma\'>PA</div>'">
-          <div>
-          <h3>Payflow</h3>
-          <div class="badges">
-            <span class="badge line">
-              A verificar
-            </span>
-<span class="badge line">Fintech / salario bajo demanda</span><span class="badge line">Madrid</span>          </div>
-          </div>
-        </div>
-      </div>
-      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Reconocida en la categoría Growth del Deloitte Technology Fast 50 de 2026. Crecimiento rápido con app de consumo: el momento en que una empresa necesita más diseño del que tiene contratado.</p>
-<div class="accion"><b>Siguiente paso:</b> Verificar vacantes. El crecimiento reciente es el gancho de la conversación.</div>      <div class="enlaces">
-        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Payflow+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
-      </div>
-    </article>
     <article class="card" data-ficha
              data-evidencia="estrategica"
              data-ubicacion="madrid">
@@ -360,14 +414,13 @@ document.addEventListener("DOMContentLoaded", function () {
           <h3>Seedtag</h3>
           <div class="badges">
             <span class="badge line">
-              A verificar
-            </span>
+Sin oferta            </span>
 <span class="badge line">AdTech con IA</span><span class="badge line">Madrid</span>          </div>
           </div>
         </div>
       </div>
-      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Publicidad contextual basada en IA para analizar contenido. Es el encaje más directo con el perfil de vuestros becarios: empresa cuyo núcleo ES la IA y que necesita traducir modelos a interfaces que un anunciante entienda.</p>
-<div class="accion"><b>Siguiente paso:</b> Prioritaria. El argumento de &#39;diseñadores que entienden IA&#39; aterriza solo.</div>      <div class="enlaces">
+<p class="why">Publicidad contextual basada en IA para analizar contenido.</p>      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Empresa cuyo nucleo ES la IA y que necesita traducir modelos a interfaces que un anunciante entienda. No se le ha encontrado vacante abierta.</p>
+<div class="accion"><b>Siguiente paso:</b> Comprobar vacantes en LinkedIn antes de invertir tiempo comercial.</div>      <div class="enlaces">
         <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Seedtag+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
       </div>
     </article>
@@ -382,15 +435,77 @@ document.addEventListener("DOMContentLoaded", function () {
           <h3>Clarity AI</h3>
           <div class="badges">
             <span class="badge line">
-              A verificar
-            </span>
+Sin oferta            </span>
 <span class="badge line">IA aplicada a sostenibilidad ESG</span><span class="badge line">Madrid</span>          </div>
           </div>
         </div>
       </div>
-      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> 150M de euros levantados y más de 300 instituciones financieras como clientes. Producto analítico complejo servido a usuarios no técnicos: es exactamente el problema que resuelve un buen equipo de UX con criterio sobre IA.</p>
-<div class="accion"><b>Siguiente paso:</b> Prioritaria por el mismo motivo que Seedtag.</div>      <div class="enlaces">
+<p class="why">150M de euros levantados y mas de 300 instituciones financieras como clientes.</p>      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Producto analitico complejo servido a usuarios no tecnicos. No se le ha encontrado vacante abierta.</p>
+<div class="accion"><b>Siguiente paso:</b> Comprobar vacantes en LinkedIn.</div>      <div class="enlaces">
         <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Clarity+AI+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="estrategica"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/narrativa.com.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>NA</div>'">
+          <div>
+          <h3>Narrativa</h3>
+          <div class="badges">
+            <span class="badge line">
+Sin oferta            </span>
+<span class="badge line">IA generativa de contenido</span><span class="badge line">Madrid</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Startup madrileña de generación automática de contenido con IA.</p>      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Empresa pequeña con nucleo de IA: la que menos probable es que tenga equipo de diseño propio. No se le ha encontrado vacante abierta.</p>
+<div class="accion"><b>Siguiente paso:</b> Comprobar vacantes en LinkedIn.</div>      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Narrativa+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="estrategica"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/cobee.io.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>CO</div>'">
+          <div>
+          <h3>Cobee</h3>
+          <div class="badges">
+            <span class="badge line">
+Sin oferta            </span>
+<span class="badge line">HR tech / beneficios</span><span class="badge line">Madrid</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Scaleup madrileña de beneficios para empleados, con app y tarjeta propias.</p>      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Encaja con el perfil de la oferta anonimizada de arriba: merece la pena comprobar si es ella.</p>
+<div class="accion"><b>Siguiente paso:</b> Comparar con el texto de la oferta anónima. Comprobar vacantes.</div>      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Cobee+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="estrategica"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/payflow.io.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>PA</div>'">
+          <div>
+          <h3>Payflow</h3>
+          <div class="badges">
+            <span class="badge line">
+Sin oferta            </span>
+<span class="badge line">Fintech / salario bajo demanda</span><span class="badge line">Madrid</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Reconocida en la categoría Growth del Deloitte Technology Fast 50 de 2026.</p>      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Crecimiento rápido con app de consumo. No se le ha encontrado vacante abierta.</p>
+<div class="accion"><b>Siguiente paso:</b> Comprobar vacantes en LinkedIn.</div>      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Payflow+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
       </div>
     </article>
     <article class="card" data-ficha
@@ -404,14 +519,13 @@ document.addEventListener("DOMContentLoaded", function () {
           <h3>Genially</h3>
           <div class="badges">
             <span class="badge line">
-              A verificar
-            </span>
+Sin oferta            </span>
 <span class="badge line">SaaS de contenido interactivo</span><span class="badge line">España (remoto)</span>          </div>
           </div>
         </div>
       </div>
-      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Herramienta de creación usada por millones de personas; 17M levantados. Producto cuya propuesta de valor ES la interfaz, así que el diseño no es un accesorio.</p>
-<div class="accion"><b>Siguiente paso:</b> Verificar vacantes. Trabajan en remoto, lo que amplía el encaje.</div>      <div class="enlaces">
+<p class="why">Herramienta de creación usada por millones de personas; 17M levantados.</p>      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Producto cuya propuesta de valor ES la interfaz. Sin vacante encontrada.</p>
+<div class="accion"><b>Siguiente paso:</b> Comprobar vacantes en LinkedIn.</div>      <div class="enlaces">
         <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Genially+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=105646813" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
       </div>
     </article>
@@ -426,59 +540,14 @@ document.addEventListener("DOMContentLoaded", function () {
           <h3>Carto</h3>
           <div class="badges">
             <span class="badge line">
-              A verificar
-            </span>
+Sin oferta            </span>
 <span class="badge line">Geoespacial / analítica</span><span class="badge line">Madrid</span>          </div>
           </div>
         </div>
       </div>
-      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Producto de visualización de datos geoespaciales con base en Madrid. La visualización de datos compleja es un terreno donde un junior bien dirigido aporta rápido y donde la ayuda externa se justifica sola.</p>
-<div class="accion"><b>Siguiente paso:</b> Verificar vacantes.</div>      <div class="enlaces">
+<p class="why">Producto de visualización de datos geoespaciales con base en Madrid.</p>      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Visualización de datos compleja. Sin vacante encontrada.</p>
+<div class="accion"><b>Siguiente paso:</b> Comprobar vacantes en LinkedIn.</div>      <div class="enlaces">
         <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Carto+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
-      </div>
-    </article>
-    <article class="card" data-ficha
-             data-evidencia="estrategica"
-             data-ubicacion="madrid">
-      <div class="card-top">
-        <div class="marca">
-          <img class="logo" src="https://icons.duckduckgo.com/ip3/jobandtalent.com.ico" alt="" loading="lazy"
-               onerror="this.outerHTML='<div class=\'monograma\'>JO</div>'">
-          <div>
-          <h3>Jobandtalent</h3>
-          <div class="badges">
-            <span class="badge line">
-              A verificar
-            </span>
-<span class="badge line">Marketplace de empleo</span><span class="badge line">Madrid</span>          </div>
-          </div>
-        </div>
-      </div>
-      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Scaleup madrileña con producto de gran volumen y dos caras (trabajador y empresa), lo que multiplica la superficie de diseño.</p>
-<div class="accion"><b>Siguiente paso:</b> Verificar vacantes.</div>      <div class="enlaces">
-        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Jobandtalent+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
-      </div>
-    </article>
-    <article class="card" data-ficha
-             data-evidencia="estrategica"
-             data-ubicacion="madrid">
-      <div class="card-top">
-        <div class="marca">
-          <img class="logo" src="https://icons.duckduckgo.com/ip3/cabify.com.ico" alt="" loading="lazy"
-               onerror="this.outerHTML='<div class=\'monograma\'>CA</div>'">
-          <div>
-          <h3>Cabify</h3>
-          <div class="badges">
-            <span class="badge line">
-              A verificar
-            </span>
-<span class="badge line">Movilidad</span><span class="badge line">Madrid</span>          </div>
-          </div>
-        </div>
-      </div>
-      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Equipo de producto grande y maduro en Madrid. Peor candidata a externalizar que una empresa pequeña, pero contrata diseño con regularidad y el volumen compensa.</p>
-<div class="accion"><b>Siguiente paso:</b> Verificar. Menos prioritaria: su equipo de diseño ya está consolidado.</div>      <div class="enlaces">
-        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Cabify+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
       </div>
     </article>
     <article class="card" data-ficha
@@ -491,42 +560,19 @@ document.addEventListener("DOMContentLoaded", function () {
           <h3>Banca y seguros: BBVA, Santander, CaixaBank, Bankinter, Mutua Madrileña, Mapfre</h3>
           <div class="badges">
             <span class="badge line">
-              A verificar
-            </span>
+Sin oferta            </span>
 <span class="badge line">Banca y seguros</span><span class="badge line">Madrid</span>          </div>
           </div>
         </div>
       </div>
-      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Es el sector que más contrata perfiles ligados a IA en España (22% de las ofertas) y tiene sus sedes en Madrid. Son clientes finales grandes: el ciclo de venta es más largo, pero el presupuesto y la continuidad también.</p>
-<div class="accion"><b>Siguiente paso:</b> Trabajar por debajo del nivel corporativo: buscar al responsable de diseño o de producto de una línea concreta, no al departamento de compras.</div>      <div class="enlaces">
+<p class="why">Es el sector que más contrata perfiles ligados a IA en España: 22% de las ofertas.</p>      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Clientes finales grandes con sede en Madrid. Ciclo de venta mas largo, pero presupuesto y continuidad tambien. Sin vacantes concretas encontradas.</p>
+<div class="accion"><b>Siguiente paso:</b> Buscar al responsable de diseño o de producto de una linea concreta, no al departamento de compras.</div>      <div class="enlaces">
         <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=BBVA+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Vacantes de BBVA en LinkedIn</a>
         <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Banco+Santander+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Vacantes de Banco Santander en LinkedIn</a>
         <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=CaixaBank+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Vacantes de CaixaBank en LinkedIn</a>
         <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Bankinter+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Vacantes de Bankinter en LinkedIn</a>
         <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Mutua+Madrile%C3%B1a+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Vacantes de Mutua Madrileña en LinkedIn</a>
         <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Mapfre+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Vacantes de Mapfre en LinkedIn</a>
-      </div>
-    </article>
-    <article class="card" data-ficha
-             data-evidencia="estrategica"
-             data-ubicacion="madrid">
-      <div class="card-top">
-        <div class="marca">
-          <img class="logo" src="https://icons.duckduckgo.com/ip3/narrativa.com.ico" alt="" loading="lazy"
-               onerror="this.outerHTML='<div class=\'monograma\'>NA</div>'">
-          <div>
-          <h3>Narrativa</h3>
-          <div class="badges">
-            <span class="badge line">
-              A verificar
-            </span>
-<span class="badge line">IA generativa de contenido</span><span class="badge line">Madrid</span>          </div>
-          </div>
-        </div>
-      </div>
-      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Startup madrileña de generación automática de contenido con IA. Empresa pequeña con núcleo de IA: el perfil que menos probable es que tenga equipo de diseño propio, y por tanto el mejor candidato a externalizar.</p>
-<div class="accion"><b>Siguiente paso:</b> Prioritaria por tamaño. Alta probabilidad de no tener diseñador en plantilla.</div>      <div class="enlaces">
-        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Narrativa+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
       </div>
     </article>
     </div>
@@ -562,7 +608,7 @@ document.addEventListener("DOMContentLoaded", function () {
     <p class="poetic">Ellos buscan. Nosotros presentamos.</p>
     <p class="plain">Esta lista prepara la conversación; la llamada la hacéis vosotros.</p>
     <p class="note">
-      2 empresas con evidencia de vacante y 10 objetivos
+      1 empresas con evidencia de vacante y 8 objetivos
       estratégicos por verificar. Los objetivos estratégicos son hipótesis razonadas sobre
       el perfil de la empresa, no vacantes comprobadas: confirmadlas antes de invertir
       tiempo comercial en ellas.

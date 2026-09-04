@@ -95,8 +95,10 @@
           <div>
           <h3>{{ e.nombre }}</h3>
           <div class="badges">
-            <span class="badge {{ 'brand' if e.evidencia == 'confirmada' else 'line' }}">
-              {{ 'Vacante confirmada' if e.evidencia == 'confirmada' else 'A verificar' }}
+            <span class="badge {{ 'brand' if e.evidencia in ('oferta', 'confirmada') else 'line' }}">
+              {% if e.evidencia == 'oferta' %}Oferta encontrada
+              {%- elif e.evidencia == 'confirmada' %}Vacante sin empresa
+              {%- else %}Sin oferta{% endif %}
             </span>
             {% if e.sector %}<span class="badge line">{{ e.sector }}</span>{% endif %}
             {% if e.ubicacion %}<span class="badge line">{{ e.ubicacion }}</span>{% endif %}
@@ -106,6 +108,9 @@
         </div>
       </div>
       {% if e.detalle %}<p class="why">{{ e.detalle }}</p>{% endif %}
+      {% if e.oferta_fuente %}
+      <p class="why" style="font-size:13px">Fuente: {{ e.oferta_fuente }}.</p>
+      {% endif %}
       {% if e.por_que %}
       <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> {{ e.por_que }}</p>
       {% endif %}

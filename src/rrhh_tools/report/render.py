@@ -75,8 +75,9 @@ FACETAS_RADAR = [
 
 FACETAS_CURADA = [
     {"clave": "evidencia", "etiqueta": "Evidencia", "multi": False,
-     "opciones": [{"valor": "confirmada", "etiqueta": "Vacante confirmada"},
-                  {"valor": "estrategica", "etiqueta": "A verificar"}]},
+     "opciones": [{"valor": "oferta", "etiqueta": "Oferta encontrada"},
+                  {"valor": "confirmada", "etiqueta": "Vacante sin empresa"},
+                  {"valor": "estrategica", "etiqueta": "Sin oferta"}]},
     {"clave": "ubicacion", "etiqueta": "Dónde", "multi": False,
      "opciones": [{"valor": "madrid", "etiqueta": "Madrid"},
                   {"valor": "espana", "etiqueta": "España / remoto"}]},
@@ -181,7 +182,7 @@ def render_report(run: ProcessedRun, title: str, source_label: str = "LinkedIn",
 # una lista de exclusiones o un {% if %} de la plantilla.
 CAMPOS_PUBLICOS_EMPRESA = {
     "nombre", "sector", "ubicacion", "vacante", "evidencia", "detalle",
-    "dominio", "empresas", "busqueda",
+    "dominio", "empresas", "busqueda", "oferta_url", "oferta_fuente",
 }
 CAMPOS_PUBLICOS_COMPETENCIA = {"nombre", "tipo", "detalle", "dominio"}
 # Lo que se queda fuera y por que:
@@ -218,12 +219,17 @@ def _enlaces_curados(entrada: dict, geo_id: str | None, geo_es: str | None) -> l
     if busqueda:
         return [{"texto": "Buscar esta oferta en LinkedIn",
                  "url": job_search(busqueda, geo, terms="")}]
-    return [
+    enlaces = []
+    # Si hay una oferta concreta, va primero: es el dato mas fuerte de la ficha.
+    if entrada.get("oferta_url"):
+        enlaces.append({"texto": "Abrir la oferta", "url": entrada["oferta_url"]})
+    enlaces += [
         {"texto": f"Vacantes de {nombre} en LinkedIn" if len(nombres) > 1
                   else "Ver vacantes en LinkedIn",
          "url": job_search(nombre, geo)}
         for nombre in nombres if nombre
     ]
+    return enlaces
 
 
 def render_curated(data: dict, title: str, geo_id: str | None = None,
@@ -252,30 +258,44 @@ def render_curated(data: dict, title: str, geo_id: str | None = None,
         entrada["monograma"] = _monograma(entrada.get("nombre", ""))
         ubic = (entrada.get("ubicacion") or "").lower()
         entrada["clave_ubicacion"] = "madrid" if "madrid" in ubic else "espana"
+    # Tres niveles de evidencia, y la diferencia importa mucho: una oferta
+    # concreta con URL no es lo mismo que una hipotesis razonada sobre una
+    # empresa. Mezclarlas hace que la lista entera parezca mas solida de lo que
+    # es, que es justo el error que hay que evitar aqui.
+    ofertas = [e for e in empresas if e.get("evidencia") == "oferta"]
     confirmadas = [e for e in empresas if e.get("evidencia") == "confirmada"]
-    estrategicas = [e for e in empresas if e.get("evidencia") != "confirmada"]
+    estrategicas = [e for e in empresas if e.get("evidencia") == "estrategica"]
 
     # Las cabeceras tambien cambian en publico: "objetivo estrategico" sigue
     # siendo framing comercial aunque el razonamiento ya no este.
     grupos = []
+    if ofertas:
+        grupos.append({
+            "tag": "Oferta encontrada",
+            "titulo": "Vacantes concretas",
+            "descripcion": "Ofertas reales localizadas, con empresa y puesto. No se han "
+                           "podido abrir desde el entorno de desarrollo: comprobad que "
+                           "siguen abiertas antes de actuar.",
+            "empresas": ofertas,
+        })
     if confirmadas:
         grupos.append({
-            "tag": "Evidencia confirmada",
-            "titulo": "Con vacante encontrada",
-            "descripcion": "Hay evidencia pública de una vacante de diseño. "
-                           "Cuando la fuente no publica el nombre de la empresa, se dice así.",
+            "tag": "Vacante sin empresa",
+            "titulo": "Hay oferta, falta el nombre",
+            "descripcion": "Hay evidencia de una vacante, pero la fuente no publica quién "
+                           "la ofrece. Se dice así en vez de adivinarlo.",
             "empresas": confirmadas,
         })
     if estrategicas:
         grupos.append({
-            "tag": "Sin vacante confirmada" if publico else "Objetivo estratégico",
-            "titulo": "Por verificar" if publico else "Por perfil, a verificar",
+            "tag": "Sin oferta encontrada",
+            "titulo": "Por verificar",
             "descripcion": (
-                "Empresas con producto digital propio en España sobre las que no se ha "
-                "confirmado ninguna vacante abierta. Compruébalo en LinkedIn."
+                "Empresas con producto digital propio en España a las que no se les ha "
+                "encontrado ninguna vacante abierta. Compruébalo en LinkedIn."
                 if publico else
-                "Sin vacante confirmada. Son clientes finales con producto digital "
-                "propio y necesidad plausible: hipótesis razonadas, no hechos."
+                "NO hay oferta. Son clientes finales con producto digital propio y "
+                "necesidad plausible: hipótesis razonadas, no hechos."
             ),
             "empresas": estrategicas,
         })
