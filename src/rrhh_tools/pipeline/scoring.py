@@ -146,7 +146,11 @@ def score_company(
     vol_value, vol_why = _volume_value(len(jobs), n_junior)
 
     # --- factores de oferta: maximo entre las vacantes ---
-    best_sen, best_loc, best_ai, best_rec = (0.0, ""), (0.0, ""), (0.0, ""), (0.0, "")
+    # Se inicializa a None, no a (0.0, ""): con un inicializador de valor 0.0,
+    # max() empata con cualquier factor que puntue 0 y devuelve el PRIMERO, que
+    # es el inicializador, dejando la explicacion vacia en el informe. Le pasaba
+    # a los puestos de nivel lead, que puntuan 0 en encaje de nivel.
+    best_sen = best_loc = best_ai = best_rec = None
     best_job_id, best_job_total = None, -1.0
     for job in jobs:
         label = job.seniority.label if job.seniority else SeniorityLabel.MID
@@ -154,10 +158,10 @@ def score_company(
         loc = _LOCATION_VALUES[job.location_bucket]
         ai = _ai_value(settings, normalize_text(job.haystack))
         rec = _recency_value(job, today)
-        best_sen = max(best_sen, sen, key=lambda x: x[0])
-        best_loc = max(best_loc, loc, key=lambda x: x[0])
-        best_ai = max(best_ai, ai, key=lambda x: x[0])
-        best_rec = max(best_rec, rec, key=lambda x: x[0])
+        best_sen = sen if best_sen is None else max(best_sen, sen, key=lambda x: x[0])
+        best_loc = loc if best_loc is None else max(best_loc, loc, key=lambda x: x[0])
+        best_ai = ai if best_ai is None else max(best_ai, ai, key=lambda x: x[0])
+        best_rec = rec if best_rec is None else max(best_rec, rec, key=lambda x: x[0])
         total = (sen[0] * weights["seniority_match"] + loc[0] * weights["location_fit"]
                  + ai[0] * weights["ai_relevance"] + rec[0] * weights["recency"])
         if total > best_job_total:

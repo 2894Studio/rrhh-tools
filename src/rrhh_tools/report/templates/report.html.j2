@@ -166,7 +166,9 @@
     </div>
     <article class="card">
       <details {% if filtered %}open{% endif %}>
-        <summary>{{ filtered|length }} ofertas apartadas por no ser diseño digital</summary>
+        <summary>{{ filtered|length }}
+          {{- ' oferta apartada' if filtered|length == 1 else ' ofertas apartadas' }}
+          por no ser diseño digital</summary>
         <div class="scroll">
         <table>
           <thead><tr><th>Oferta</th><th>Empresa</th><th>Motivo</th></tr></thead>

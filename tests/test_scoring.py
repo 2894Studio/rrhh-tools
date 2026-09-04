@@ -101,3 +101,21 @@ def test_la_puntuacion_es_determinista(settings):
     a, _, _ = score_company(cliente_final(), ofertas, settings, HOY)
     b, _, _ = score_company(cliente_final(), ofertas, settings, HOY)
     assert a == b
+
+
+def test_un_factor_que_puntua_cero_conserva_su_explicacion(settings):
+    """Bug real: max() con empate a 0.0 devolvía el inicializador vacío.
+
+    Le pasaba a los puestos de nivel lead, que puntúan 0 en encaje de nivel:
+    la tabla del informe mostraba la fila con la casilla "Lectura" en blanco.
+    """
+    from rrhh_tools.models import SeniorityVerdict
+    oferta = JobPosting(
+        job_id="1", title_raw="Head of Design", company_key="acme",
+        company_name_raw="Acme", location_bucket=LocationBucket.OUTSIDE_ES,
+        posted_at=HOY, posted_confidence=1.0, description_text="Descripción.",
+        seniority=SeniorityVerdict(label=SeniorityLabel.LEAD, confidence=0.95),
+    )
+    _, componentes, _ = score_company(cliente_final(), [oferta], settings, HOY)
+    for componente in componentes:
+        assert componente.explanation, f"{componente.name} sin explicación"
