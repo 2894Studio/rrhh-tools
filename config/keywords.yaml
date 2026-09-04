@@ -1,0 +1,133 @@
+# Fuentes de las expresiones regulares. Se compilan una vez al arrancar.
+# Todo se evalua sobre el titulo/descripcion NORMALIZADO (minusculas, sin acentos,
+# separadores -> espacio), salvo donde se indique "cased".
+
+role:
+  # Puerta A: es una oferta de diseno digital?
+  positive:
+    - "\\b(ux|ui|ux ?ui|ui ?ux)\\b"
+    - "\\bproduct design(er)?\\b"
+    - "\\bdise[nñ]ador[ae]?\\b"
+    - "\\bdise[nñ]o\\b"
+    - "\\bdesign(er)?\\b"
+    - "\\binteraction design"
+    - "\\bvisual design"
+    - "\\bux (writer|research(er)?)\\b"
+    - "\\bproducto digital\\b"
+  # Diseno, si, pero no del que nos interesa.
+  exclude:
+    - "\\bindustrial\\b"
+    - "\\binterior(es|ismo)?\\b"
+    - "\\btextil\\b"
+    - "\\b(moda|fashion)\\b"
+    - "\\bjoyer[ia]"
+    - "\\binstructional\\b"
+    - "\\b(circuit|hardware|mecanic|pcb)\\b"
+    - "\\bcad\\b"
+    - "\\barquitectura tecnica\\b"
+    - "\\bpaisaj"
+
+seniority:
+  # Puerta B: NEGATIVA. Tiene prioridad sobre la positiva.
+  # Notas de regex que importan:
+  #  - (?<![a-z]) y (?![a-z]) evitan que "head" case dentro de "headless"
+  #    y que "intern" case dentro de "internal".
+  #  - "senior" ya cubre "senior" tras quitar acentos.
+  negative:
+    - "(?<![a-z])(sr|senior|snr)(?![a-z])"
+    - "(?<![a-z])(lead|leader|principal|staff)(?![a-z])"
+    - "(?<![a-z])(head|chief|vp)(?![a-z])"
+    - "(?<![a-z])(manager|mgr|director[ae]?)(?![a-z])"
+    - "(?<![a-z])(jefe|jefa|responsable|coordinador[ae]?)(?![a-z])"
+    - "(?<![a-z])(architect|arquitect[oa])(?![a-z])"
+    - "\\bespecialista senior\\b"
+    - "\\bexperto\\b"
+  # Se aplica sobre el titulo con su CAJA ORIGINAL, para que "ii" en minusculas
+  # dentro de una palabra cualquiera no dispare un falso positivo.
+  negative_cased:
+    - "\\b(II|III|IV)\\b"
+  # Puerta C: POSITIVA.
+  positive:
+    - "(?<![a-z])(jr|junior)(?![a-z])"
+    - "\\bentry ?level\\b"
+    - "\\bnivel inicial\\b"
+    - "\\bbecari[oa]\\b"
+    - "\\bbeca\\b"
+    - "\\bpracticas\\b"
+    - "\\b(internship)\\b"
+    - "(?<![a-z])intern(?![a-z])"
+    - "\\btrainee\\b"
+    - "\\bgraduate\\b"
+    - "\\brecien (graduad|titulad)[oa]\\b"
+    - "\\baprendiz\\b"
+    - "\\bprimer empleo\\b"
+    - "\\bearly career\\b"
+  # Peso 0.5, nunca decisivo por si solo.
+  weak_positive:
+    - "\\bassociate\\b"
+    - "\\basociad[oa]\\b"
+
+description_seniority:
+  # Rescate cuando el titulo no dice nada del nivel.
+  positive:
+    - "\\b(0|1)\\s*[-–a]\\s*2\\s*(anos|years)"
+    - "\\bmenos de 2 anos\\b"
+    - "\\bhasta 2 anos\\b"
+    - "\\bsin experiencia previa\\b"
+    - "\\bno se requiere experiencia\\b"
+    - "\\bprimer empleo\\b"
+    - "\\bno experience required\\b"
+  negative:
+    - "\\b([3-9]|1[0-9])\\s*\\+?\\s*(anos|years)"
+    - "\\bminimo (3|4|5|6|7|8|9|10) anos\\b"
+    - "\\bat least (3|4|5|6|7|8|9|10) years\\b"
+
+ai_relevance:
+  # El diferencial de los perfiles de 2894. Su ausencia no descalifica
+  # (hay un 0.2 de base en el scoring), pero su presencia sube mucho el encaje.
+  patterns:
+    - "\\b(ia|ai)\\b"
+    - "\\bgen ?ai\\b"
+    - "\\bllm\\b"
+    - "\\binteligencia artificial\\b"
+    - "\\bmachine learning\\b"
+    - "\\baprendizaje automatico\\b"
+    - "\\bcopilot\\b"
+    - "\\bprompt"
+    - "\\bautomatizacion\\b"
+    - "\\bfigma ai\\b"
+    - "\\bdesign with ai\\b"
+    - "\\bchatgpt\\b"
+    - "\\bmidjourney\\b"
+
+first_designer:
+  # SOLO evidencia textual explicita. Nunca inferido del numero de vacantes:
+  # eso acoplaria este factor con multiple_open_design_roles y contaria
+  # el tamano de la empresa dos veces y en sentidos opuestos.
+  strong:
+    - "seras el primer[ao]? dise[nñ]ador"
+    - "primer[ao]? dise[nñ]ador[ae]? de la empresa"
+    - "primera persona de dise[nñ]o"
+    - "unic[oa] dise[nñ]ador"
+    - "crear el equipo de dise[nñ]o"
+    - "montar el equipo de dise[nñ]o"
+    - "first designer"
+    - "found(ing)? the design (practice|team)"
+    - "no tenemos equipo de dise[nñ]o"
+    - "definir la cultura de dise[nñ]o"
+  # Senales de organizacion de diseno ya madura: peor objetivo para externalizar.
+  mature:
+    - "design system team"
+    - "design ops"
+    - "equipo de dise[nñ]o de \\d+"
+    - "nuestro equipo de dise[nñ]o de"
+    - "chapter de dise[nñ]o"
+    - "design chapter"
+    - "principal designer"
+
+# Sufijos legales y geograficos que se recortan SOLO al final del nombre.
+# Nunca en medio: "Grupo Bimbo" no debe perder "Grupo" si va delante.
+legal_suffixes:
+  [sl, slu, s l, s l u, sa, sau, srl, spa, ltd, limited, llc, inc, plc, gmbh, ag, bv, nv,
+   oy, ab, sociedad limitada, sociedad anonima, holding, holdings, group, grupo, iberia,
+   espana, spain, emea, europe, international, global]

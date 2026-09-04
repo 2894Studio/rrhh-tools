@@ -1,0 +1,188 @@
+# Empresas que NO son cliente final, agrupadas por categoria.
+# Cada categoria se mapea a un bloque del informe:
+#   agency      -> Bloque B (senal de competencia)
+#   consultancy -> Bloque C (intermediarios)
+#   staffing    -> Bloque C (intermediarios)
+#
+# "match: exact" desactiva el fuzzy para esa entrada. Usalo en nombres cortos o
+# propensos a colision (Indra, VASS, GFT, Babel, Sngular...). Sin esto, "Sngular"
+# arrastraria a "Singular Bank" y "Babel" a cualquier empresa con esa raiz.
+
+categories:
+  agency:
+    label: "Agencia / estudio digital"
+    block: B
+    reading: "Competencia directa de 2894. Que contraten junior = hay demanda en el mercado."
+  consultancy:
+    label: "Consultora IT / ESN"
+    block: C
+    reading: "Intermediario. El cliente final esta detras y a veces se intuye en la oferta."
+  staffing:
+    label: "Seleccion / ETT / headhunting"
+    block: C
+    reading: "Intermediario puro. La empresa real va anonimizada en la oferta."
+
+companies:
+  # --- Agencias y estudios (Bloque B) ---
+  - {name: "Nateevo",             category: agency, linkedin_slugs: [nateevo]}
+  - {name: "Flat 101",            category: agency, aliases: ["Flat101"]}
+  - {name: "The Cocktail",        category: agency, aliases: ["The Cocktail Experience", "Cocktail Experience"]}
+  - {name: "Good Rebels",         category: agency, linkedin_slugs: [goodrebels]}
+  - {name: "Making Science",      category: agency}
+  - {name: "Elogia",              category: agency, match: exact}
+  - {name: "We Are Social",       category: agency}
+  - {name: "Secuoyas",            category: agency}
+  - {name: "Garaje de Ideas",     category: agency}
+  - {name: "Gamma UX",            category: agency}
+  - {name: "Erretres",            category: agency, match: exact}
+  - {name: "Vasava",              category: agency, match: exact}
+  - {name: "Barrabes",            category: agency, aliases: ["Barrabes.biz"]}
+  - {name: "Rload",               category: agency, match: exact}
+  - {name: "Monobo",              category: agency, match: exact}
+  - {name: "Comunicare",          category: agency, match: exact}
+  - {name: "Territorio Creativo", category: agency}
+  - {name: "Bysidecar",           category: agency, match: exact}
+  - {name: "Wunderman Thompson",  category: agency, aliases: ["VML", "Wunderman"]}
+  - {name: "Ogilvy",              category: agency, match: exact}
+  - {name: "Publicis Sapient",    category: agency, aliases: ["Publicis"]}
+  - {name: "DEC BBDO",            category: agency, aliases: ["BBDO"]}
+  - {name: "Isobar",              category: agency, match: exact}
+  - {name: "Dentsu",              category: agency, match: exact}
+
+  # --- Consultoras IT / ESN (Bloque C) ---
+  - {name: "Indra",            category: consultancy, aliases: [Minsait, "Indra Minsait"], match: exact}
+  - {name: "NTT Data",         category: consultancy, aliases: ["NTT Data Europe", "Everis"]}
+  - {name: "Accenture",        category: consultancy, aliases: ["Accenture Song"]}
+  - {name: "Capgemini",        category: consultancy, aliases: ["Capgemini Engineering", "Altran"]}
+  - {name: "Deloitte",         category: consultancy, aliases: ["Deloitte Digital"]}
+  - {name: "Sopra Steria",     category: consultancy}
+  - {name: "Seidor",           category: consultancy, match: exact}
+  - {name: "Inetum",           category: consultancy, match: exact}
+  - {name: "VASS",             category: consultancy, match: exact}
+  - {name: "Babel",            category: consultancy, match: exact}
+  - {name: "Izertis",          category: consultancy, match: exact}
+  - {name: "atSistemas",       category: consultancy, aliases: ["at Sistemas"]}
+  - {name: "Knowmad Mood",     category: consultancy, aliases: ["Knowmad", "atSistemas Knowmad Mood"]}
+  - {name: "Hiberus",          category: consultancy, match: exact}
+  - {name: "Paradigma Digital", category: consultancy, aliases: ["Paradigma"]}
+  - {name: "Sngular",          category: consultancy, match: exact}
+  - {name: "Oesia",            category: consultancy, aliases: ["Grupo Oesia"], match: exact}
+  - {name: "GFT",              category: consultancy, match: exact}
+  - {name: "Devoteam",         category: consultancy, match: exact}
+  - {name: "Stratesys",        category: consultancy, match: exact}
+  - {name: "Grupo ICA",        category: consultancy}
+  - {name: "Ayesa",            category: consultancy, match: exact}
+  - {name: "Tecnocom",         category: consultancy, match: exact}
+  - {name: "Softtek",          category: consultancy, match: exact}
+  - {name: "Globant",          category: consultancy, match: exact}
+  - {name: "Cognizant",        category: consultancy, match: exact}
+  - {name: "Wipro",            category: consultancy, match: exact}
+  - {name: "Infosys",          category: consultancy, match: exact}
+  - {name: "TCS",              category: consultancy, aliases: ["Tata Consultancy Services"], match: exact}
+  - {name: "IBM Consulting",   category: consultancy}
+  - {name: "KPMG",             category: consultancy, match: exact}
+  - {name: "EY",               category: consultancy, aliases: ["Ernst and Young"], match: exact}
+  - {name: "PwC",              category: consultancy, aliases: ["PricewaterhouseCoopers"], match: exact}
+
+  # --- Seleccion / ETT (Bloque C) ---
+  - {name: "Michael Page",         category: staffing, aliases: ["Page Personnel", "PageGroup"]}
+  - {name: "Hays",                 category: staffing, match: exact}
+  - {name: "Randstad",             category: staffing, aliases: ["Randstad Digital"]}
+  - {name: "Adecco",               category: staffing, match: exact}
+  - {name: "Robert Walters",       category: staffing}
+  - {name: "Talent Search People", category: staffing}
+  - {name: "Manpower",             category: staffing, aliases: ["ManpowerGroup"]}
+  - {name: "Experis",              category: staffing, match: exact}
+  - {name: "Hudson",               category: staffing, match: exact}
+  - {name: "Spring Professional",  category: staffing}
+  - {name: "Grupo Eulen",          category: staffing, aliases: ["Eulen"]}
+  - {name: "Nortempo",             category: staffing, match: exact}
+  - {name: "Iman Temporing",       category: staffing}
+  - {name: "Grafton",              category: staffing, match: exact}
+
+# Palabras clave en el NOMBRE. SOLO modificador (+-0.15), NUNCA decisivo por si solas.
+# Sin esta regla, "Prosegur Solutions", "Digital Origin" o "Glovo Labs" caerian
+# injustamente por contener "solutions" / "digital" / "labs". Hay un test que lo cubre.
+name_keywords:
+  agency: [agencia, agency, studio, estudio, creative, creativos, comunicacion, publicidad, branding]
+  consultancy: [consultora, consulting, consultores, consultancy, advisory, tecnologias, sistemas]
+  staffing: [staffing, recruit, recruiting, seleccion, talent, rrhh, interim, headhunt, empleo, ett]
+
+# Patrones en la DESCRIPCION de la oferta. Pesos sumables.
+# La senal mas potente de intermediario es que la empresa real vaya anonimizada.
+description_patterns:
+  staffing:
+    weight: -3
+    patterns:
+      - "para uno de nuestros clientes"
+      - "nuestro cliente busca"
+      - "nuestro cliente es"
+      - "importante empresa del sector"
+      - "empresa lider en su sector"
+      - "reconocida empresa del sector"
+      - "seleccionamos para"
+      - "proceso de seleccion para nuestro cliente"
+      - "nuestro cliente, una"
+      - "on behalf of our client"
+      - "our client is looking"
+      - "headhunting"
+      - "empresa de trabajo temporal"
+  agency:
+    weight: -2
+    patterns:
+      - "nuestros clientes"
+      - "proyectos de cliente"
+      - "client projects"
+      - "multi-cliente"
+      - "somos una agencia"
+      - "somos una consultora"
+      - "partner tecnologico"
+      - "fabrica de software"
+      - "outsourcing"
+      - "en las oficinas del cliente"
+      - "clientes de diferentes sectores"
+      - "cartera de clientes"
+  end_client:
+    weight: 2
+    patterns:
+      - "nuestro producto"
+      - "our product"
+      - "nuestros usuarios"
+      - "our users"
+      - "nuestra app"
+      - "nuestra plataforma"
+      - "in-house"
+      - "equipo interno de diseno"
+      - "roadmap de producto"
+      - "product roadmap"
+      - "nuestro equipo de producto"
+      - "nuestros clientes finales"
+
+# Campo "Sector" de LinkedIn.
+li_industries:
+  deny_strong:   # 0.80
+    - "Staffing and Recruiting"
+    - "Human Resources Services"
+    - "Advertising Services"
+    - "Design Services"
+    - "Marketing Services"
+    - "Public Relations and Communications Services"
+  deny_weak:     # 0.60 - NUNCA decisivo: las empresas de producto se auto-etiquetan asi constantemente
+    - "IT Services and IT Consulting"
+    - "Business Consulting and Services"
+  allow:         # +0.15 de modificador hacia cliente final
+    - "Banking"
+    - "Financial Services"
+    - "Insurance"
+    - "Retail"
+    - "Telecommunications"
+    - "Hospitality"
+    - "Food and Beverage Services"
+    - "Broadcast Media Production and Distribution"
+    - "Software Development"
+    - "Motor Vehicle Manufacturing"
+    - "Airlines and Aviation"
+    - "Utilities"
+    - "Hospitals and Health Care"
+    - "Real Estate"
+    - "Education"

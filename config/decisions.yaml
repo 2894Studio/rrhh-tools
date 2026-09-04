@@ -1,0 +1,12 @@
+# Overrides humanos del clasificador. SE COMMITEA: es conocimiento acumulado del equipo.
+#
+# Tienen prioridad sobre cualquier otra regla (confianza 1.0).
+# Rellenalo con la salida de `rrhh-tools review --run latest`, que imprime
+# los casos dudosos ya en este formato, listos para pegar.
+#
+# Formato:
+#   - company_key: nombre-normalizado-o-slug-de-linkedin
+#     verdict: END_CLIENT | AGENCY | CONSULTANCY | STAFFING
+#     note: por que lo decidimos asi (para el que lo lea dentro de seis meses)
+
+overrides: []

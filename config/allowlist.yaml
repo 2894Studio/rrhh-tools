@@ -1,0 +1,71 @@
+# Clientes finales conocidos del mercado espanol.
+# Esta lista se comprueba ANTES que el fuzzy matching, y eso es deliberado:
+# es la proteccion que evita que "Singular Bank" colisione con "Sngular" (consultora)
+# o que "Prosegur Solutions" caiga por contener "solutions".
+#
+# Anade aqui cualquier empresa que el clasificador marque mal como intermediario.
+
+companies:
+  # Banca y seguros
+  - {name: "BBVA", sector: "Banking"}
+  - {name: "Banco Santander", sector: "Banking", aliases: ["Santander", "Openbank"]}
+  - {name: "CaixaBank", sector: "Banking", aliases: ["Imagin"]}
+  - {name: "Singular Bank", sector: "Banking"}   # OJO: no confundir con Sngular (consultora)
+  - {name: "Bankinter", sector: "Banking"}
+  - {name: "ING Espana", sector: "Banking", aliases: ["ING"]}
+  - {name: "Mapfre", sector: "Insurance"}
+  - {name: "Mutua Madrilena", sector: "Insurance"}
+  - {name: "Linea Directa", sector: "Insurance"}
+  - {name: "Santalucia", sector: "Insurance"}
+  - {name: "Cobee", sector: "Financial Services"}
+  - {name: "Fintonic", sector: "Financial Services"}
+  - {name: "Bnext", sector: "Financial Services"}
+
+  # Producto digital / SaaS / marketplaces
+  - {name: "Cabify", sector: "Software Development"}
+  - {name: "Glovo", sector: "Software Development"}
+  - {name: "Idealista", sector: "Real Estate"}
+  - {name: "Wallapop", sector: "Software Development"}
+  - {name: "Jobandtalent", sector: "Software Development"}
+  - {name: "Factorial", sector: "Software Development", aliases: ["Factorial HR"]}
+  - {name: "TravelPerk", sector: "Software Development"}
+  - {name: "Typeform", sector: "Software Development"}
+  - {name: "Red Points", sector: "Software Development"}
+  - {name: "Holded", sector: "Software Development"}
+  - {name: "Payflow", sector: "Financial Services"}
+  - {name: "Seedtag", sector: "Software Development"}
+  - {name: "Clarity AI", sector: "Software Development"}
+  - {name: "Multiverse Computing", sector: "Software Development"}
+  - {name: "Devengo", sector: "Financial Services"}
+  - {name: "Genially", sector: "Software Development"}
+  - {name: "Lookiero", sector: "Retail"}
+  - {name: "Exoticca", sector: "Hospitality"}
+  - {name: "Housfy", sector: "Real Estate"}
+  - {name: "Signaturit", sector: "Software Development"}
+
+  # Retail, consumo, industria, telco, media
+  - {name: "Inditex", sector: "Retail", aliases: ["Zara", "Massimo Dutti", "Bershka"]}
+  - {name: "Mercadona", sector: "Retail"}
+  - {name: "El Corte Ingles", sector: "Retail"}
+  - {name: "Telefonica", sector: "Telecommunications", aliases: ["Movistar"]}
+  - {name: "Orange Espana", sector: "Telecommunications"}
+  - {name: "Vodafone Espana", sector: "Telecommunications"}
+  - {name: "Iberdrola", sector: "Utilities"}
+  - {name: "Repsol", sector: "Utilities"}
+  - {name: "Naturgy", sector: "Utilities"}
+  - {name: "Endesa", sector: "Utilities"}
+  - {name: "Iberia", sector: "Airlines and Aviation"}
+  - {name: "Renfe", sector: "Transportation"}
+  - {name: "Meliá Hotels", sector: "Hospitality", aliases: ["Melia"]}
+  - {name: "NH Hotel Group", sector: "Hospitality"}
+  - {name: "Prosegur", sector: "Security", aliases: ["Prosegur Solutions", "Prosegur Cash"]}
+  - {name: "Correos", sector: "Transportation"}
+  - {name: "Atresmedia", sector: "Broadcast Media Production and Distribution"}
+  - {name: "Mediaset Espana", sector: "Broadcast Media Production and Distribution"}
+  - {name: "PRISA", sector: "Broadcast Media Production and Distribution", aliases: ["PRISA Media"]}
+  - {name: "LaLiga", sector: "Spectator Sports"}
+  - {name: "Cepsa", sector: "Utilities", aliases: ["Moeve"]}
+  - {name: "Acciona", sector: "Utilities"}
+  - {name: "Ferrovial", sector: "Construction"}
+  - {name: "Grupo Bimbo", sector: "Food and Beverage Services"}
+  - {name: "Damm", sector: "Food and Beverage Services"}

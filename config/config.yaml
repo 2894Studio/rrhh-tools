@@ -1,0 +1,67 @@
+# Configuracion principal de rrhh-tools.
+# Todo lo ajustable vive aqui: no hace falta tocar codigo para cambiar el criterio.
+
+run:
+  max_jobs_per_run: 250        # tope duro por ejecucion (volumen bajo = menos riesgo de bloqueo)
+  max_pages_per_query: 5
+  min_delay_seconds: 4.0       # ritmo fijo entre peticiones
+  jitter_seconds: 0.5          # solo para no ir en lockstep; NO es evasion de deteccion
+  request_timeout_seconds: 30
+  max_retries_on_throttle: 3
+
+search:
+  date_posted: "r604800"       # f_TPR: ultimos 7 dias
+  experience_levels: ["1", "2"]  # f_E: 1=practicas, 2=nivel inicial
+  geo:
+    # 105646813 = Espana. VERIFICADO en URLs publicas de LinkedIn.
+    spain: "105646813"
+    # El geoId de la Comunidad de Madrid NO esta verificado. Copialo de la barra de
+    # direcciones tras filtrar por Madrid en LinkedIn (parametro geoId=) y pegalo aqui.
+    # El codigo se niega a lanzar una query cuyo geo siga siendo PLACEHOLDER.
+    comunidad_madrid: "PLACEHOLDER_GEOID_MADRID"
+
+queries:
+  - {id: junior_ux_madrid,      keywords: "junior UX UI designer",   geo: comunidad_madrid}
+  - {id: junior_product_madrid, keywords: "junior product designer", geo: comunidad_madrid}
+  - {id: disenador_junior,      keywords: "disenador junior",        geo: comunidad_madrid}
+  - {id: becario_ux,            keywords: "becario UX",              geo: comunidad_madrid}
+  - {id: practicas_diseno,      keywords: "practicas diseno UX",     geo: comunidad_madrid}
+  - {id: remote_junior_ux,      keywords: "junior UX designer",      geo: spain, workplace: remote}
+  - {id: remote_junior_product, keywords: "junior product designer", geo: spain, workplace: remote}
+
+scoring:
+  # Deben sumar 100. config.py lo valida al cargar y aborta si no cuadra.
+  weights:
+    end_client_confidence: 30
+    seniority_match: 20
+    location_fit: 15
+    ai_relevance: 10
+    recency: 10
+    first_designer_signal: 10
+    multiple_open_design_roles: 5
+
+  # NO ACOPLAR ESTOS DOS FACTORES.
+  # first_designer_signal se activa SOLO con evidencia textual explicita
+  # ("seras el primer disenador"), nunca por numero de vacantes.
+  # multiple_open_design_roles se lee SOLO como "mas plazas para nuestros perfiles",
+  # nunca como tamano de empresa.
+  # Si se atan al mismo proxy (tamano), el modelo cuenta lo mismo dos veces
+  # y en sentidos opuestos, y las puntuaciones dejan de significar nada.
+
+thresholds:
+  exclude_at: 0.85     # confianza minima para clasificar en bloque B o C
+  review_at: 0.50      # por debajo de exclude_at y por encima de esto -> bloque D
+  include_at: 0.70     # confianza minima de CLIENTE_FINAL para el bloque A
+  report_min_score: 40
+
+locations:
+  madrid_municipios:
+    [madrid, alcobendas, las rozas, pozuelo, tres cantos, getafe, alcala de henares,
+     san sebastian de los reyes, leganes, mostoles, boadilla, majadahonda, coslada]
+  spain_markers:
+    [espana, spain, madrid, barcelona, valencia, sevilla, malaga, bilbao, zaragoza,
+     murcia, palma, alicante, vigo, gijon, coruna, valladolid, granada, santander]
+
+report:
+  title: "2894 - Radar de diseno junior"
+  max_companies_per_block: 60
