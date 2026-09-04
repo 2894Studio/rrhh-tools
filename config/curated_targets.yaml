@@ -20,13 +20,16 @@
 #
 # ENLACES: QUE CAMPO GENERA QUE
 # -----------------------------
-#   linkedin_slug     -> enlace a la pestana de empleo de la empresa. Es el
-#                        UNICO enlace que acota de verdad a una empresa. Todos
-#                        los slugs de este fichero estan PROPUESTOS Y SIN
-#                        VERIFICAR: se dedujeron del nombre, no se han abierto.
-#                        Confirmalos con:  uv run rrhh-tools links --check
-#                        Sin slug, la ficha se queda con la busqueda por nombre,
-#                        que no acota pero tampoco falla nunca.
+#   linkedin_slug     -> enlace a la pestana de empleo de la empresa. Ahora
+#                        mismo NO HAY NINGUNO, y es deliberado. Se probo a
+#                        deducirlos del nombre y no funciona: LinkedIn redirige
+#                        los slugs que no existen a /company/unavailable/, o sea
+#                        un 404. Un slug solo se anade aqui cuando alguien lo ha
+#                        abierto de verdad, o cuando lo trae el scraper desde el
+#                        propio LinkedIn. Para anadirlos comprobados:
+#                          uv run rrhh-tools links --check --write
+#                        Sin slug la ficha usa la busqueda por nombre, que no
+#                        acota a la empresa pero nunca falla.
 #   oferta_url        -> solo se publica si `oferta_verificada: true`. Estas URLs
 #                        salen de busqueda web y NO se han podido abrir desde el
 #                        entorno de desarrollo; ademas una oferta muere en cuanto
@@ -48,10 +51,24 @@ contexto:
 # El campo `dominio` solo sirve para sacar el favicon como logo, y se rellena
 # unicamente cuando hay certeza: una ficha con el logo de otra empresa hace
 # dudar del resto de la ficha.
+# BUSQUEDAS VIVAS DE LINKEDIN
+# Es lo unico de esta pagina que no puede quedarse obsoleto: no afirman nada,
+# llevan al estado real de LinkedIn en el momento del clic. Si una ficha de
+# abajo esta equivocada, estos enlaces siguen sirviendo. Sin filtro de fecha a
+# proposito: se ve todo lo que hay abierto, no solo lo de esta semana.
+busquedas:
+  - {rol: "Product Designer",        geo: madrid}
+  - {rol: "Product Designer",        geo: espana}
+  - {rol: "UX UI Designer",          geo: madrid}
+  - {rol: "UX Designer",             geo: madrid}
+  - {rol: "UI Designer",             geo: madrid}
+  - {rol: "AI Designer",             geo: espana}
+  - {rol: "Junior Product Designer", geo: madrid}
+  - {rol: "Becario diseño UX",       geo: madrid}
+
 empresas:
   # ---------------- OFERTAS CONCRETAS ENCONTRADAS ----------------
   - nombre: "Cabify"
-    linkedin_slug: "cabify"    # propuesto, sin verificar
     dominio: "cabify.com"
     evidencia: oferta
     sector: "Movilidad"
@@ -74,7 +91,6 @@ empresas:
       abiertas es un equipo con mas trabajo del que puede absorber.
 
   - nombre: "Jobandtalent"
-    linkedin_slug: "jobandtalent"    # propuesto, sin verificar
     dominio: "jobandtalent.com"
     evidencia: oferta
     sector: "Marketplace de empleo"
@@ -91,7 +107,6 @@ empresas:
     accion: "Comprobar el nivel exacto que piden antes de proponer un perfil junior."
 
   - nombre: "Glovo"
-    linkedin_slug: "glovo"    # propuesto, sin verificar
     dominio: "glovoapp.com"
     evidencia: oferta
     sector: "Delivery / marketplace"
@@ -161,7 +176,6 @@ empresas:
 
   # ---------------- SIN OFERTA: HIPOTESIS POR PERFIL ----------------
   - nombre: "Seedtag"
-    linkedin_slug: "seedtag"    # propuesto, sin verificar
     dominio: "seedtag.com"
     evidencia: estrategica
     sector: "AdTech con IA"
@@ -173,7 +187,6 @@ empresas:
     accion: "Comprobar vacantes en LinkedIn antes de invertir tiempo comercial."
 
   - nombre: "Clarity AI"
-    linkedin_slug: "clarity-ai"    # propuesto, sin verificar
     dominio: "clarity.ai"
     evidencia: estrategica
     sector: "IA aplicada a sostenibilidad ESG"
@@ -185,7 +198,6 @@ empresas:
     accion: "Comprobar vacantes en LinkedIn."
 
   - nombre: "Narrativa"
-    linkedin_slug: "narrativa"    # propuesto, sin verificar
     dominio: "narrativa.com"
     evidencia: estrategica
     sector: "IA generativa de contenido"
@@ -197,7 +209,6 @@ empresas:
     accion: "Comprobar vacantes en LinkedIn."
 
   - nombre: "Cobee"
-    linkedin_slug: "cobee"    # propuesto, sin verificar
     dominio: "cobee.io"
     evidencia: estrategica
     sector: "HR tech / beneficios"
@@ -209,7 +220,6 @@ empresas:
     accion: "Comparar con el texto de la oferta anónima. Comprobar vacantes."
 
   - nombre: "Payflow"
-    linkedin_slug: "payflow"    # propuesto, sin verificar
     dominio: "payflow.io"
     evidencia: estrategica
     sector: "Fintech / salario bajo demanda"
@@ -219,7 +229,6 @@ empresas:
     accion: "Comprobar vacantes en LinkedIn."
 
   - nombre: "Genially"
-    linkedin_slug: "genially"    # propuesto, sin verificar
     dominio: "genially.com"
     evidencia: estrategica
     sector: "SaaS de contenido interactivo"
@@ -229,7 +238,6 @@ empresas:
     accion: "Comprobar vacantes en LinkedIn."
 
   - nombre: "Carto"
-    linkedin_slug: "carto"    # propuesto, sin verificar
     dominio: "carto.com"
     evidencia: estrategica
     sector: "Geoespacial / analítica"
@@ -242,12 +250,12 @@ empresas:
     # Cada empresa con su slug para que la ficha agrupada enlace a la pestana
     # de empleo de cada una y no a seis busquedas genericas.
     empresas:
-      - {nombre: "BBVA",             linkedin_slug: "bbva"}
-      - {nombre: "Banco Santander",  linkedin_slug: "banco-santander"}
-      - {nombre: "CaixaBank",        linkedin_slug: "caixabank"}
-      - {nombre: "Bankinter",        linkedin_slug: "bankinter"}
-      - {nombre: "Mutua Madrileña",  linkedin_slug: "mutua-madrilena"}
-      - {nombre: "Mapfre",           linkedin_slug: "mapfre"}
+      - {nombre: "BBVA"}
+      - {nombre: "Banco Santander"}
+      - {nombre: "CaixaBank"}
+      - {nombre: "Bankinter"}
+      - {nombre: "Mutua Madrileña"}
+      - {nombre: "Mapfre"}
     evidencia: estrategica
     sector: "Banca y seguros"
     ubicacion: "Madrid"

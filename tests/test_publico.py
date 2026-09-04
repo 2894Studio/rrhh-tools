@@ -88,7 +88,8 @@ def test_el_aviso_de_fiabilidad_se_conserva(publico):
     """Es honestidad sobre el dato, no estrategia: no se recorta."""
     plano = _plano(publico)
     assert "no sale de LinkedIn" in plano
-    assert "no se ha inventado ninguna oferta" in plano
+    assert "no están comprobadas" in plano
+    assert "llevan al estado real de LinkedIn" in plano
 
 
 def test_el_framing_comercial_desaparece(publico, completo):
@@ -179,7 +180,7 @@ def test_los_tres_niveles_de_evidencia_no_se_mezclan(completo):
     Mezclarlas haría que la lista entera pareciese más sólida de lo que es,
     que es justo el error a evitar en un documento comercial.
     """
-    for titulo in ["Vacantes concretas", "Hay oferta, falta el nombre", "Por verificar"]:
+    for titulo in ["Pistas de vacante, sin comprobar", "Pista sin empresa", "Por verificar"]:
         assert titulo in completo, titulo
 
 
@@ -204,11 +205,28 @@ def test_solo_se_enlaza_la_oferta_que_alguien_ha_abierto(publico, completo):
 
 
 def test_se_distingue_lo_encontrado_de_lo_supuesto(publico):
-    """El lector tiene que poder ver de un vistazo qué está comprobado."""
+    """CAMBIO DE CRITERIO: "Oferta encontrada" se leía como un hecho.
+
+    No lo era. Esas vacantes salen de búsqueda web, nunca se abrieron, y en la
+    práctica alguna ya no existía. La etiqueta ahora dice lo que es, y solo
+    pasa a "comprobada" cuando `links --check` la ha abierto de verdad.
+    """
     plano = _plano(publico)
-    assert "Oferta encontrada" in plano
-    assert "Sin oferta" in plano
-    assert "comprobad que siguen abiertas" in plano
+    assert "Oferta encontrada" not in plano
+    assert "Sin comprobar" in plano
+    assert "no como una oferta abierta" in plano
+
+
+def test_las_busquedas_vivas_van_las_primeras(publico):
+    """Es lo único de la página que no puede quedarse viejo, así que abre.
+
+    Cuando una ficha se equivoca —y se han equivocado—, estos enlaces siguen
+    llevando a lo que hay publicado hoy.
+    """
+    plano = _plano(publico)
+    assert "Ofertas abiertas ahora mismo" in plano
+    assert plano.index("Ofertas abiertas ahora mismo") < plano.index("Cómo está el mercado")
+    assert "keywords=Product+Designer" in publico
 
 
 def test_ninguna_ficha_sin_oferta_aparenta_tener_una():

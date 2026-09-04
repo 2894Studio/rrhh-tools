@@ -162,16 +162,41 @@ def test_ningun_keywords_es_una_frase_de_una_descripcion(html):
             assert len(valor.split()) <= 4, f"keywords demasiado largo: {valor!r}"
 
 
-def test_cada_empresa_con_slug_lleva_ademas_su_busqueda(html, datos):
-    """Los dos enlaces, a proposito: los slugs estan sin verificar y la
-    busqueda por nombre es la red que hay debajo."""
-    con_slug = [e for e in datos["empresas"] if e.get("linkedin_slug")]
-    assert con_slug
+def test_el_yaml_no_lleva_slugs_adivinados(datos):
+    """Se probo a deducirlos del nombre y no funciona.
+
+    LinkedIn no da 404 en un slug inexistente: redirige a
+    /company/unavailable/, que es la pagina de error que se vio al abrirlos.
+    Un slug solo entra aqui comprobado, o traido por el scraper desde el propio
+    LinkedIn. El valor por defecto es no tener ninguno.
+    """
+    for entrada in datos["empresas"] + datos.get("competencia_detectada", []):
+        for ficha in entrada.get("empresas") or [entrada]:
+            if isinstance(ficha, dict):
+                assert not ficha.get("linkedin_slug"), ficha.get("nombre")
+
+
+def test_un_slug_comprobado_da_los_dos_enlaces(datos):
+    """Cuando alguien SI ha comprobado un slug, la ficha lleva los dos: la
+    pestana de empleo, que acota, y la busqueda por nombre como red."""
+    copia = yaml.safe_load(RUTA_YAML.read_text(encoding="utf-8"))
+    entrada = next(e for e in copia["empresas"] if e["nombre"] == "Cabify")
+    entrada["linkedin_slug"] = "cabify"
+    urls = _hrefs(render_curated(copia, "t", geo_id="100994331"))
+    assert "https://www.linkedin.com/company/cabify/jobs/" in urls
+    assert any(parse_qs(urlparse(u).query).get("keywords") == ["Cabify"] for u in urls)
+
+
+def test_toda_empresa_tiene_al_menos_un_enlace_que_no_puede_fallar(html, datos):
+    """Sin slug, la busqueda por nombre es lo unico que hay. Tiene que estar."""
     urls = _hrefs(html)
-    for entrada in con_slug:
-        nombre = entrada["nombre"]
-        assert any(f"/company/{entrada['linkedin_slug']}/jobs/" in u for u in urls)
-        assert any(parse_qs(urlparse(u).query).get("keywords") == [nombre] for u in urls)
+    for entrada in datos["empresas"]:
+        if entrada.get("sin_busqueda_empresa") or entrada.get("busqueda_rol"):
+            continue
+        for ficha in entrada.get("empresas") or [entrada]:
+            nombre = ficha["nombre"] if isinstance(ficha, dict) else ficha
+            assert any(parse_qs(urlparse(u).query).get("keywords") == [nombre]
+                       for u in urls), nombre
 
 
 # --------------------------------------------------------------------------
@@ -226,7 +251,12 @@ def test_recolecta_solo_lo_que_puede_morir(datos):
     from rrhh_tools.links_check import recolectar
     campos = {e.campo for e in recolectar(datos)}
     assert campos <= {"linkedin_slug", "oferta_url"}
-    assert "linkedin_slug" in campos
+    # Hoy no hay slugs, asi que solo quedan las ofertas por comprobar.
+    assert "oferta_url" in campos
+
+    con_slug = yaml.safe_load(RUTA_YAML.read_text(encoding="utf-8"))
+    con_slug["empresas"][0]["linkedin_slug"] = "cabify"
+    assert "linkedin_slug" in {e.campo for e in recolectar(con_slug)}
 
 
 def test_un_200_que_redirige_fuera_del_slug_no_cuenta_como_correcto():
@@ -272,7 +302,12 @@ def test_el_write_retira_un_slug_muerto(tmp_path):
     from rrhh_tools.links_check import Enlace, Informe, MUERTO, Resultado, aplicar
 
     destino = tmp_path / "c.yaml"
-    destino.write_text(RUTA_YAML.read_text(encoding="utf-8"), encoding="utf-8")
+    # El YAML de verdad ya no lleva slugs, asi que se anade uno para ejercitar
+    # el camino: es lo que pasara cuando alguien comprobado uno y luego muera.
+    destino.write_text(
+        RUTA_YAML.read_text(encoding="utf-8").replace(
+            '  - nombre: "Cabify"\n', '  - nombre: "Cabify"\n    linkedin_slug: "cabify"\n'),
+        encoding="utf-8")
     informe = Informe([Resultado(
         Enlace("https://www.linkedin.com/company/cabify/jobs/", "Cabify", "linkedin_slug"),
         MUERTO, 404)])

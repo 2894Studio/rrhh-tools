@@ -77,9 +77,9 @@ FACETAS_RADAR = [
 
 FACETAS_CURADA = [
     {"clave": "evidencia", "etiqueta": "Evidencia", "multi": False,
-     "opciones": [{"valor": "oferta", "etiqueta": "Oferta encontrada"},
-                  {"valor": "confirmada", "etiqueta": "Vacante sin empresa"},
-                  {"valor": "estrategica", "etiqueta": "Sin oferta"}]},
+     "opciones": [{"valor": "oferta", "etiqueta": "Pista de vacante"},
+                  {"valor": "confirmada", "etiqueta": "Pista sin empresa"},
+                  {"valor": "estrategica", "etiqueta": "Solo empresa"}]},
     {"clave": "ubicacion", "etiqueta": "Dónde", "multi": False,
      "opciones": [{"valor": "madrid", "etiqueta": "Madrid"},
                   {"valor": "espana", "etiqueta": "España / remoto"}]},
@@ -302,6 +302,25 @@ def _enlaces_curados(entrada: dict, geo_id: str | None, geo_es: str | None) -> l
     return enlaces
 
 
+def _busquedas_vivas(datos: dict, geo_id: str | None, geo_es: str | None) -> list[dict]:
+    """Enlaces a busquedas de LinkedIn por rol.
+
+    Es la unica parte de esta pagina que NO puede quedarse obsoleta: no afirma
+    que exista ninguna vacante, lleva al estado real de LinkedIn en el momento
+    del clic. Cuando una ficha de empresa se equivoca -y se han equivocado-,
+    esto sigue sirviendo.
+    """
+    salida = []
+    for b in datos.get("busquedas", []):
+        en_madrid = b.get("geo") == "madrid"
+        salida.append({
+            "rol": b["rol"],
+            "donde": "Madrid" if en_madrid else "España",
+            "url": jobs_by_role(b["rol"], geo_id if en_madrid else geo_es),
+        })
+    return salida
+
+
 def _enlaces_competencia(ficha: dict) -> list[dict]:
     """Igual que en las fichas de empresa: pestana de empleo si hay slug, y si
     no la busqueda de empresas, que tambien lleva a algo real."""
@@ -350,20 +369,28 @@ def render_curated(data: dict, title: str, geo_id: str | None = None,
     # siendo framing comercial aunque el razonamiento ya no este.
     grupos = []
     if ofertas:
+        # Estas fichas AFIRMAN que existe una vacante concreta, y esa afirmacion
+        # sale de busqueda web, no de LinkedIn, y nunca se ha podido abrir. Ha
+        # fallado en la practica: alguna de estas vacantes ya no existe o nunca
+        # fue exacta. Asi que el encabezado deja de decir "oferta encontrada",
+        # que se leia como un hecho comprobado, y dice lo que es.
+        comprobadas = [e for e in ofertas if e.get("oferta_verificada")]
         grupos.append({
-            "tag": "Oferta encontrada",
-            "titulo": "Vacantes concretas",
-            "descripcion": "Ofertas reales localizadas, con empresa y puesto. No se han "
-                           "podido abrir desde el entorno de desarrollo: comprobad que "
-                           "siguen abiertas antes de actuar.",
+            "tag": "Sin comprobar" if not comprobadas else "Pistas de vacante",
+            "titulo": "Pistas de vacante, sin comprobar",
+            "descripcion": "Vacantes que aparecieron en búsqueda web. NO se han abierto "
+                           "ni verificado en LinkedIn, así que el puesto puede estar "
+                           "cerrado o el dato ser inexacto. Trátalas como una pista para "
+                           "mirar la empresa, no como una oferta abierta.",
             "empresas": ofertas,
         })
     if confirmadas:
         grupos.append({
-            "tag": "Vacante sin empresa",
-            "titulo": "Hay oferta, falta el nombre",
-            "descripcion": "Hay evidencia de una vacante, pero la fuente no publica quién "
-                           "la ofrece. Se dice así en vez de adivinarlo.",
+            "tag": "Sin comprobar",
+            "titulo": "Pista sin empresa",
+            "descripcion": "Apareció una vacante en búsqueda web pero la fuente no publica "
+                           "quién la ofrece, y tampoco se ha podido verificar. Se dice así "
+                           "en vez de adivinarlo.",
             "empresas": confirmadas,
         })
     if estrategicas:
@@ -385,6 +412,7 @@ def render_curated(data: dict, title: str, geo_id: str | None = None,
         publico=publico,
         facetas_json=_facetas_json(FACETAS_CURADA),
         contexto=data.get("contexto", {}),
+        busquedas=_busquedas_vivas(data, geo_id, geo_es),
         grupos=grupos,
         competencia=[
             {**(_publicar(c, CAMPOS_PUBLICOS_COMPETENCIA) if publico else dict(c)),

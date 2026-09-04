@@ -50,14 +50,33 @@
     <p>Esta lista <strong>no sale de LinkedIn</strong>. Se construyó con búsqueda web y
        conocimiento del mercado español, porque el entorno donde se desarrolló la
        herramienta no tenía salida a internet y no pudo consultar LinkedIn.</p>
-    <p>Por eso cada empresa lleva su nivel de evidencia, y <strong>no se ha inventado
-       ninguna oferta ni ninguna URL</strong>. Donde la fuente anonimiza el nombre de la
-       empresa, se dice así en vez de adivinarlo.</p>
+    <p>Eso tiene una consecuencia práctica que conviene decir sin rodeos: <strong>las
+       vacantes concretas que aparecen más abajo no están comprobadas</strong>. Alguna ya
+       no existe. Sirven para saber a qué empresa mirar, no como oferta abierta.</p>
+    <p>Lo que sí es fiable son <strong>los enlaces de búsqueda</strong>: no afirman nada,
+       llevan al estado real de LinkedIn en el momento en que los abres. Empieza por ahí.</p>
     {% if not publico %}
     <p>La lista completa y fiable sale de ejecutar el radar:
        <code>rrhh-tools search --source session</code>.</p>
     {% endif %}
   </div>
+
+  {% if busquedas %}
+  <section>
+    <div class="sec-head">
+      <div class="tag">Empieza por aquí</div>
+      <h2>Ofertas abiertas ahora mismo.</h2>
+      <p>Búsquedas en LinkedIn, no una lista guardada: cada enlace enseña lo que hay
+         publicado en el momento en que lo abres. Es la parte de esta página que no
+         se queda vieja.</p>
+    </div>
+    <div class="enlaces">
+      {% for b in busquedas %}
+      <a class="enlace" href="{{ b.url }}" target="_blank" rel="noopener">{{ b.rol }} · {{ b.donde }}</a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
 
   <section>
     <div class="sec-head">
@@ -95,9 +114,9 @@
           <div>
           <h3>{{ e.nombre }}</h3>
           <div class="badges">
-            <span class="badge {{ 'brand' if e.evidencia in ('oferta', 'confirmada') else 'line' }}">
-              {% if e.evidencia == 'oferta' %}Oferta encontrada
-              {%- elif e.evidencia == 'confirmada' %}Vacante sin empresa
+            <span class="badge {{ 'brand' if e.oferta_verificada else 'line' }}">
+              {% if e.evidencia == 'oferta' %}{{ 'Oferta comprobada' if e.oferta_verificada else 'Sin comprobar' }}
+              {%- elif e.evidencia == 'confirmada' %}Sin comprobar
               {%- else %}Sin oferta{% endif %}
             </span>
             {% if e.sector %}<span class="badge line">{{ e.sector }}</span>{% endif %}
