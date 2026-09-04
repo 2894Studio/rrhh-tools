@@ -294,7 +294,8 @@ def cmd_site(args) -> int:
               file=sys.stderr)
 
     (out / "index.html").write_text(
-        render_index(date.today().strftime("%d/%m/%Y"), "2894 — Radar de diseño junior"),
+        render_index(date.today().strftime("%d/%m/%Y"), "2894 — Radar de diseño",
+                     publico=args.publico),
         encoding="utf-8")
 
     # Las tres paginas comparten la misma hoja de estilos, que va embebida en

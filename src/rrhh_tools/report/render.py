@@ -299,7 +299,7 @@ def render_curated(data: dict, title: str, geo_id: str | None = None,
     )
 
 
-def render_index(generado: str, title: str) -> str:
+def render_index(generado: str, title: str, publico: bool = False) -> str:
     """Portada del sitio estático que agrupa los informes."""
     env = Environment(
         loader=FileSystemLoader(TEMPLATE_DIR),
@@ -307,4 +307,5 @@ def render_index(generado: str, title: str) -> str:
         trim_blocks=True,
         lstrip_blocks=True,
     )
-    return env.get_template("index.html.j2").render(title=title, generado=generado)
+    return env.get_template("index.html.j2").render(
+        title=title, generado=generado, publico=publico)
