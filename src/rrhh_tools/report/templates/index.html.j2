@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+{% include "_styles.html.j2" %}
+<style>
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;margin-top:8px}
+.tile{
+  display:block;text-decoration:none;color:inherit;background:#fff;
+  border:1px solid var(--soft-gray);border-radius:var(--radius);padding:28px 26px;
+  transition:border-color .18s ease, transform .18s ease
+}
+.tile:hover{border-color:var(--deep-cobalt);transform:translateY(-2px)}
+.tile.brand{background:var(--deep-cobalt);border-color:var(--deep-cobalt);color:#fff}
+.tile.brand:hover{border-color:#fff}
+.tile.dark{background:var(--ink-black);border-color:var(--ink-black);color:#fff}
+.tile.dark:hover{border-color:var(--sky-blue)}
+.tile .k{
+  font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--deep-cobalt);margin-bottom:12px
+}
+.tile.brand .k,.tile.dark .k{color:rgba(255,255,255,.72)}
+.tile h3{font-weight:700;font-size:22px;margin:0 0 10px;letter-spacing:-.015em}
+.tile p{font-weight:300;font-size:14.5px;margin:0;color:var(--ink-60);line-height:1.5}
+.tile.brand p,.tile.dark p{color:rgba(255,255,255,.86)}
+.tile .go{margin-top:18px;font-weight:500;font-size:13.5px}
+.nota{
+  margin-top:56px;border:1px dashed var(--soft-gray);border-radius:var(--radius);
+  padding:26px 28px;font-weight:300;color:var(--ink-60);font-size:14.5px;max-width:74ch
+}
+.nota b{font-weight:500;color:var(--ink-black)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="wordmark">2894</div>
+    <h1>Radar de diseño junior.</h1>
+    <p class="plain">Quién está contratando diseño junior en España, y a qué empresas
+       podemos llamar para presentar nuestros perfiles.</p>
+    <div class="meta"><span>Actualizado <code>{{ generado }}</code></span></div>
+  </header>
+
+  <div class="grid">
+    <a class="tile brand" href="empresas-objetivo.html">
+      <div class="k">Empezar por aquí</div>
+      <h3>Empresas objetivo</h3>
+      <p>La primera lista de empresas a las que llamar, con el porqué de cada una y el
+         siguiente paso concreto.</p>
+      <div class="go">Ver la lista →</div>
+    </a>
+
+    <a class="tile" href="radar.html">
+      <div class="k">Muestra</div>
+      <h3>El radar</h3>
+      <p>Cómo se verá el informe automático cuando se ejecute contra LinkedIn.
+         Los datos son de prueba; el formato es el real.</p>
+      <div class="go">Ver el formato →</div>
+    </a>
+
+    <a class="tile dark" href="https://github.com/2894Studio/rrhh-tools/tree/claude/junior-designer-job-scraper-4gk742">
+      <div class="k">Código</div>
+      <h3>La herramienta</h3>
+      <p>El proyecto que genera estos informes, con las instrucciones para
+         ejecutarlo en local.</p>
+      <div class="go">Ir al repositorio →</div>
+    </a>
+  </div>
+
+  <div class="nota">
+    <b>Sobre estos datos.</b> La lista de empresas objetivo no sale de LinkedIn: se
+    construyó con búsqueda web y conocimiento del mercado, así que cada empresa lleva su
+    nivel de evidencia. El radar todavía no se ha ejecutado contra LinkedIn real, porque
+    requiere una cookie de sesión y correr en una máquina con acceso. La muestra usa datos
+    de prueba para enseñar el formato.
+  </div>
+
+  <footer>
+    <p class="poetic">Ellos buscan. Nosotros presentamos.</p>
+    <p class="plain">Esto prepara la conversación; la llamada la hacemos nosotros.</p>
+  </footer>
+</div>
+</body>
+</html>

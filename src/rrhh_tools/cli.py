@@ -16,7 +16,7 @@ from .config import ConfigError, load_settings
 from .http import AuthWall, FixtureFetcher, ThrottledFetcher, ThrottleStop
 from .models import RunDiagnostics
 from .pipeline.run import process
-from .report.render import render_curated, render_report
+from .report.render import render_curated, render_index, render_report
 from .store import cache
 
 
@@ -158,6 +158,33 @@ def cmd_curated(args) -> int:
     return 0
 
 
+def cmd_site(args) -> int:
+    """Monta el sitio estático: portada + lista curada + muestra del radar."""
+    import shutil
+    import yaml
+    settings = _settings(args)
+    out = Path(args.out or "site")
+    out.mkdir(parents=True, exist_ok=True)
+
+    datos = yaml.safe_load(
+        (settings.config_dir / "curated_targets.yaml").read_text(encoding="utf-8"))
+    (out / "empresas-objetivo.html").write_text(
+        render_curated(datos, "2894 — Empresas objetivo"), encoding="utf-8")
+
+    radar = Path(args.radar) if args.radar else Path("reports/replay.html")
+    if radar.is_file():
+        shutil.copy(radar, out / "radar.html")
+    else:
+        print(f"Aviso: no se encontró {radar}; el sitio saldrá sin la muestra del radar.",
+              file=sys.stderr)
+
+    (out / "index.html").write_text(
+        render_index(date.today().strftime("%d/%m/%Y"), "2894 — Radar de diseño junior"),
+        encoding="utf-8")
+    print(f"Sitio montado en {out}/")
+    return 0
+
+
 def cmd_review(args) -> int:
     """Imprime la cola de revisión lista para pegar en config/decisions.yaml."""
     settings = _settings(args)
@@ -246,6 +273,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--data", default=None)
     p.add_argument("--out", default=None)
     p.set_defaults(func=cmd_curated)
+
+    p = sub.add_parser("site", help="monta el sitio estático con los informes")
+    p.add_argument("--out", default=None)
+    p.add_argument("--radar", default=None, help="informe del radar a incluir como muestra")
+    p.set_defaults(func=cmd_site)
 
     p = sub.add_parser("review", help="cola de revisión en formato decisions.yaml")
     p.add_argument("--run", default="latest")

@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2894 — Empresas objetivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* Sistema de marca 2894 / AZ.
+   Paleta deliberadamente fria: no hay ni un acento calido en toda la hoja.
+   La prioridad se codifica con INTENSIDAD DE COBALTO, no con rojo/ambar/verde,
+   porque el sistema prohibe los tonos calidos.
+   sky-blue nunca se usa como texto sobre fondo claro: da 1.96:1 de contraste,
+   muy por debajo del minimo AA. Solo aparece como elemento grafico. */
+:root{
+  --cloud-white:#F7F8FA;
+  --sky-blue:#7DB7FF;
+  --deep-cobalt:#0A46FF;
+  --soft-gray:#E6E8EC;
+  --ink-black:#0B0B0D;
+  --ink-60:#5B5C61;
+  --radius:14px;
+  --max:1080px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--cloud-white);
+  color:var(--ink-black);
+  font-family:"DM Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-weight:400;
+  font-size:16px;
+  line-height:1.55;
+}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+
+/* --- Portada: titular editorial grande, alineado a la izquierda, con aire --- */
+.hero{padding:88px 0 56px}
+.wordmark{
+  font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  font-size:14px;color:var(--deep-cobalt);margin:0 0 40px
+}
+.hero h1{
+  font-weight:700;font-size:clamp(38px,6.2vw,68px);line-height:1.02;
+  letter-spacing:-.025em;margin:0 0 18px;max-width:15ch
+}
+/* La voz de marca empareja una linea evocadora con una funcional. */
+.hero .plain{font-weight:300;font-size:clamp(17px,2.1vw,21px);color:var(--ink-60);margin:0;max-width:52ch}
+.meta{margin-top:36px;font-size:13px;color:var(--ink-60);display:flex;flex-wrap:wrap;gap:8px 22px}
+.meta code{font-family:inherit;font-weight:500;color:var(--ink-black)}
+
+/* --- Panel de datos en cobalto. Es el UNICO bloque cobalto solido del
+       informe: la regla de marca permite un solo elemento destacado. --- */
+.temp{
+  background:var(--deep-cobalt);color:#fff;border-radius:var(--radius);
+  padding:34px 32px;margin:8px 0 12px
+}
+.temp h2{font-weight:700;font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+.temp .plain{font-weight:300;margin:0 0 26px;opacity:.85;font-size:15px}
+.temp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:12px}
+.stat{background:rgba(255,255,255,.12);border-radius:10px;padding:16px 18px}
+.stat .n{font-weight:700;font-size:30px;line-height:1;letter-spacing:-.02em}
+.stat .l{font-weight:400;font-size:12.5px;opacity:.88;margin-top:7px;line-height:1.35}
+
+/* --- Secciones --- */
+section{margin:64px 0}
+.sec-head{margin-bottom:26px;border-top:1px solid var(--soft-gray);padding-top:26px}
+.sec-head .tag{
+  font-weight:700;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--deep-cobalt);margin-bottom:10px
+}
+.sec-head h2{font-weight:700;font-size:clamp(26px,3.4vw,38px);letter-spacing:-.02em;margin:0 0 10px}
+.sec-head p{font-weight:300;color:var(--ink-60);margin:0;max-width:62ch;font-size:15.5px}
+
+/* --- Tarjetas de empresa --- */
+.card{
+  background:#fff;border:1px solid var(--soft-gray);border-radius:var(--radius);
+  padding:24px 26px;margin-bottom:14px
+}
+.card.dark{background:var(--ink-black);border-color:var(--ink-black);color:#fff}
+.card.dark .why,.card.dark .muted{color:#B9BBC2}
+.card.dark .job{border-color:rgba(255,255,255,.16)}
+.card.dark a{color:var(--sky-blue)}   /* sky-blue solo sobre ink-black: 9.45:1 */
+.card-top{display:flex;gap:20px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.card h3{font-weight:700;font-size:20px;margin:0 0 6px;letter-spacing:-.012em}
+.card h3 a{color:inherit;text-decoration:none;border-bottom:2px solid var(--sky-blue)}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+.badge{
+  font-size:11.5px;font-weight:500;padding:4px 10px;border-radius:6px;
+  background:var(--soft-gray);color:var(--ink-black)
+}
+.badge.brand{background:var(--deep-cobalt);color:#fff}
+.badge.line{background:transparent;border:1px solid var(--soft-gray);color:var(--ink-60)}
+.why{font-weight:300;color:var(--ink-60);margin:14px 0 0;font-size:15px}
+
+/* Puntuacion: intensidad de cobalto, nunca semaforo de colores calidos. */
+.score{text-align:right;flex-shrink:0;min-width:76px}
+.score .n{font-weight:700;font-size:34px;line-height:1;letter-spacing:-.03em;color:var(--deep-cobalt)}
+.card.dark .score .n{color:var(--sky-blue)}
+.score .l{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-60);margin-top:5px;font-weight:500}
+.bar{height:5px;background:var(--soft-gray);border-radius:3px;overflow:hidden;margin-top:16px}
+.bar span{display:block;height:100%;background:var(--deep-cobalt);border-radius:3px}
+.card.dark .bar{background:rgba(255,255,255,.18)}
+.card.dark .bar span{background:var(--sky-blue)}
+
+details{margin-top:16px}
+summary{
+  cursor:pointer;font-weight:500;font-size:13.5px;color:var(--deep-cobalt);
+  list-style:none;padding:6px 0
+}
+.card.dark summary{color:var(--sky-blue)}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+ ";font-weight:700}
+details[open] summary::before{content:"– "}
+
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13.5px}
+th{
+  text-align:left;font-weight:500;color:var(--ink-60);border-bottom:1px solid var(--soft-gray);
+  padding:8px 10px 8px 0;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase
+}
+td{padding:9px 10px 9px 0;border-bottom:1px solid var(--soft-gray);vertical-align:top}
+td.num{text-align:right;font-weight:500;white-space:nowrap}
+.card.dark th,.card.dark td{border-color:rgba(255,255,255,.14)}
+
+.job{border-top:1px solid var(--soft-gray);padding:13px 0 0;margin-top:13px}
+.job a{color:var(--ink-black);font-weight:500;text-decoration:none;border-bottom:1px solid var(--sky-blue)}
+.job .muted{color:var(--ink-60);font-size:13px;margin-top:3px;font-weight:300}
+.reasons{margin:10px 0 0;padding-left:18px;font-size:13.5px;color:var(--ink-60);font-weight:300}
+.reasons li{margin:3px 0}
+.empty{
+  border:1px dashed var(--soft-gray);border-radius:var(--radius);
+  padding:30px;text-align:center;color:var(--ink-60);font-weight:300
+}
+.scroll{overflow-x:auto}
+footer{
+  margin:88px 0 64px;padding-top:32px;border-top:1px solid var(--soft-gray)
+}
+footer .poetic{font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 6px}
+footer .plain{font-weight:300;color:var(--ink-60);margin:0 0 26px}
+footer .note{font-size:12.5px;color:var(--ink-60);font-weight:300;max-width:74ch}
+@media print{
+  body{background:#fff}
+  .card,.temp{break-inside:avoid}
+  details{display:none}
+}
+</style><style>
+.aviso{
+  background:var(--ink-black);color:#fff;border-radius:var(--radius);
+  padding:30px 32px;margin:8px 0 12px
+}
+.aviso h2{font-weight:700;font-size:21px;margin:0 0 12px;letter-spacing:-.01em}
+.aviso p{font-weight:300;margin:0 0 12px;color:#C7C9D0;font-size:15px;max-width:66ch}
+.aviso p:last-child{margin-bottom:0}
+.aviso strong{color:#fff;font-weight:500}
+.accion{
+  margin-top:14px;padding:13px 16px;background:var(--soft-gray);
+  border-radius:10px;font-size:14px
+}
+.accion b{font-weight:500}
+.dato{border-left:3px solid var(--deep-cobalt);padding-left:16px;margin:12px 0;font-weight:300;color:var(--ink-60)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="wordmark">2894</div>
+    <h1>Por dónde empezar.</h1>
+    <p class="plain">Una primera lista de empresas a las que llamar, para no esperar a la
+       primera ejecución del radar.</p>
+    <div class="meta">
+      <span>Generado <code>2026-09-04</code></span>
+      <span>Método <code>Búsqueda web y conocimiento de mercado. Sin acceso a LinkedIn.</code></span>
+    </div>
+  </header>
+
+  <div class="aviso">
+    <h2>Qué fiabilidad tiene esta lista</h2>
+    <p>Esta lista <strong>no sale de LinkedIn</strong>. Se construyó con búsqueda web y
+       conocimiento del mercado español, porque el entorno donde se desarrolló la
+       herramienta no tenía salida a internet y no pudo consultar LinkedIn.</p>
+    <p>Por eso cada empresa lleva su nivel de evidencia, y <strong>no se ha inventado
+       ninguna oferta ni ninguna URL</strong>. Donde la fuente anonimiza el nombre de la
+       empresa, se dice así en vez de adivinarlo.</p>
+    <p>La lista completa y fiable sale de ejecutar el radar:
+       <code>rrhh-tools search --source session</code>.</p>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <div class="tag">Contexto</div>
+      <h2>Cómo está el mercado.</h2>
+      <p>Datos públicos que enmarcan la conversación comercial.</p>
+    </div>
+    <p class="dato">España crea más de 52.000 puestos ligados a IA en 2026; Madrid concentra el 45% de las ofertas.</p>
+    <p class="dato">El sector que más contrata perfiles de IA es banca y finanzas (22%), seguido de consultoría (19%) y telecomunicaciones (12%).</p>
+    <p class="dato">Un 25% de las ofertas del ámbito IA son 100% en remoto.</p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="tag">Evidencia confirmada</div>
+      <h2>Con vacante encontrada.</h2>
+      <p>Hay evidencia pública de una vacante de diseño junior. Cuando la fuente no publica el nombre de la empresa, se dice así.</p>
+    </div>
+    <article class="card">
+      <div class="card-top">
+        <div style="flex:1;min-width:230px">
+          <h3>Plataforma de beneficios para empleados (nombre no publicado)</h3>
+          <div class="badges">
+            <span class="badge brand">
+              Vacante confirmada
+            </span>
+<span class="badge line">HR tech / fintech</span><span class="badge line">Madrid</span><span class="badge line">Junior Product Designer</span>          </div>
+        </div>
+      </div>
+<p class="why">La oferta pide 1-2 años de experiencia, preferiblemente en fintech o HR tech, y habla de diseñar la evolución de nuevos beneficios escalables con el usuario en el centro. La fuente no publica el nombre de la empresa.</p>      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Encaja con el perfil de scaleup madrileña de beneficios para empleados. Es una vacante junior real y explícita, con producto propio. Merece la pena identificar la empresa: el enunciado apunta a un equipo de producto pequeño.</p>
+<div class="accion"><b>Siguiente paso:</b> Identificar la empresa buscando el texto de la oferta en LinkedIn.</div>    </article>
+    <article class="card">
+      <div class="card-top">
+        <div style="flex:1;min-width:230px">
+          <h3>Fynce</h3>
+          <div class="badges">
+            <span class="badge brand">
+              Vacante confirmada
+            </span>
+<span class="badge line">Fintech / gestion patrimonial</span><span class="badge line">España</span><span class="badge line">Diseñador UI/UX web</span>          </div>
+        </div>
+      </div>
+<p class="why">Fintech con producto propio en gestión patrimonial, buscando perfil de diseño UI/UX.</p>      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Cliente final con producto propio, no consultora. Fintech en fase temprana: el tipo de empresa que suele necesitar diseño sin tener equipo montado.</p>
+<div class="accion"><b>Siguiente paso:</b> Contactar directamente. Buen candidato para presentar perfiles.</div>    </article>
+  </section>
+  <section>
+    <div class="sec-head">
+      <div class="tag">Objetivo estratégico</div>
+      <h2>Por perfil, a verificar.</h2>
+      <p>Sin vacante confirmada. Son clientes finales con producto digital propio y necesidad plausible: hipótesis razonadas, no hechos.</p>
+    </div>
+    <article class="card">
+      <div class="card-top">
+        <div style="flex:1;min-width:230px">
+          <h3>Cobee</h3>
+          <div class="badges">
+            <span class="badge line">
+              A verificar
+            </span>
+<span class="badge line">HR tech / beneficios</span><span class="badge line">Madrid</span>          </div>
+        </div>
+      </div>
+      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Scaleup madrileña de beneficios para empleados, con app y tarjeta propias. Producto de consumo con mucha superficie de interfaz y equipo de diseño históricamente pequeño para el tamaño del producto.</p>
+<div class="accion"><b>Siguiente paso:</b> Verificar vacantes en su pagina de empleo y en LinkedIn.</div>    </article>
+    <article class="card">
+      <div class="card-top">
+        <div style="flex:1;min-width:230px">
+          <h3>Payflow</h3>
+          <div class="badges">
+            <span class="badge line">
+              A verificar
+            </span>
+<span class="badge line">Fintech / salario bajo demanda</span><span class="badge line">Madrid</span>          </div>
+        </div>
+      </div>
+      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Reconocida en la categoría Growth del Deloitte Technology Fast 50 de 2026. Crecimiento rápido con app de consumo: el momento en que una empresa necesita más diseño del que tiene contratado.</p>
+<div class="accion"><b>Siguiente paso:</b> Verificar vacantes. El crecimiento reciente es el gancho de la conversación.</div>    </article>
+    <article class="card">
+      <div class="card-top">
+        <div style="flex:1;min-width:230px">
+          <h3>Seedtag</h3>
+          <div class="badges">
+            <span class="badge line">
+              A verificar
+            </span>
+<span class="badge line">AdTech con IA</span><span class="badge line">Madrid</span>          </div>
+        </div>
+      </div>
+      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Publicidad contextual basada en IA para analizar contenido. Es el encaje más directo con el perfil de vuestros becarios: empresa cuyo núcleo ES la IA y que necesita traducir modelos a interfaces que un anunciante entienda.</p>
+<div class="accion"><b>Siguiente paso:</b> Prioritaria. El argumento de &#39;diseñadores que entienden IA&#39; aterriza solo.</div>    </article>
+    <article class="card">
+      <div class="card-top">
+        <div style="flex:1;min-width:230px">
+          <h3>Clarity AI</h3>
+          <div class="badges">
+            <span class="badge line">
+              A verificar
+            </span>
+<span class="badge line">IA aplicada a sostenibilidad ESG</span><span class="badge line">Madrid</span>          </div>
+        </div>
+      </div>
+      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> 150M de euros levantados y más de 300 instituciones financieras como clientes. Producto analítico complejo servido a usuarios no técnicos: es exactamente el problema que resuelve un buen equipo de UX con criterio sobre IA.</p>
+<div class="accion"><b>Siguiente paso:</b> Prioritaria por el mismo motivo que Seedtag.</div>    </article>
+    <article class="card">
+      <div class="card-top">
+        <div style="flex:1;min-width:230px">
+          <h3>Genially</h3>
+          <div class="badges">
+            <span class="badge line">
+              A verificar
+            </span>
+<span class="badge line">SaaS de contenido interactivo</span><span class="badge line">España (remoto)</span>          </div>
+        </div>
+      </div>
+      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Herramienta de creación usada por millones de personas; 17M levantados. Producto cuya propuesta de valor ES la interfaz, así que el diseño no es un accesorio.</p>
+<div class="accion"><b>Siguiente paso:</b> Verificar vacantes. Trabajan en remoto, lo que amplía el encaje.</div>    </article>
+    <article class="card">
+      <div class="card-top">
+        <div style="flex:1;min-width:230px">
+          <h3>Carto</h3>
+          <div class="badges">
+            <span class="badge line">
+              A verificar
+            </span>
+<span class="badge line">Geoespacial / analítica</span><span class="badge line">Madrid</span>          </div>
+        </div>
+      </div>
+      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Producto de visualización de datos geoespaciales con base en Madrid. La visualización de datos compleja es un terreno donde un junior bien dirigido aporta rápido y donde la ayuda externa se justifica sola.</p>
+<div class="accion"><b>Siguiente paso:</b> Verificar vacantes.</div>    </article>
+    <article class="card">
+      <div class="card-top">
+        <div style="flex:1;min-width:230px">
+          <h3>Jobandtalent</h3>
+          <div class="badges">
+            <span class="badge line">
+              A verificar
+            </span>
+<span class="badge line">Marketplace de empleo</span><span class="badge line">Madrid</span>          </div>
+        </div>
+      </div>
+      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Scaleup madrileña con producto de gran volumen y dos caras (trabajador y empresa), lo que multiplica la superficie de diseño.</p>
+<div class="accion"><b>Siguiente paso:</b> Verificar vacantes.</div>    </article>
+    <article class="card">
+      <div class="card-top">
+        <div style="flex:1;min-width:230px">
+          <h3>Cabify</h3>
+          <div class="badges">
+            <span class="badge line">
+              A verificar
+            </span>
+<span class="badge line">Movilidad</span><span class="badge line">Madrid</span>          </div>
+        </div>
+      </div>
+      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Equipo de producto grande y maduro en Madrid. Peor candidata a externalizar que una empresa pequeña, pero contrata diseño con regularidad y el volumen compensa.</p>
+<div class="accion"><b>Siguiente paso:</b> Verificar. Menos prioritaria: su equipo de diseño ya está consolidado.</div>    </article>
+    <article class="card">
+      <div class="card-top">
+        <div style="flex:1;min-width:230px">
+          <h3>Banca y seguros: BBVA, Santander, CaixaBank, Bankinter, Mutua Madrileña, Mapfre</h3>
+          <div class="badges">
+            <span class="badge line">
+              A verificar
+            </span>
+<span class="badge line">Banca y seguros</span><span class="badge line">Madrid</span>          </div>
+        </div>
+      </div>
+      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Es el sector que más contrata perfiles ligados a IA en España (22% de las ofertas) y tiene sus sedes en Madrid. Son clientes finales grandes: el ciclo de venta es más largo, pero el presupuesto y la continuidad también.</p>
+<div class="accion"><b>Siguiente paso:</b> Trabajar por debajo del nivel corporativo: buscar al responsable de diseño o de producto de una línea concreta, no al departamento de compras.</div>    </article>
+    <article class="card">
+      <div class="card-top">
+        <div style="flex:1;min-width:230px">
+          <h3>Narrativa</h3>
+          <div class="badges">
+            <span class="badge line">
+              A verificar
+            </span>
+<span class="badge line">IA generativa de contenido</span><span class="badge line">Madrid</span>          </div>
+        </div>
+      </div>
+      <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> Startup madrileña de generación automática de contenido con IA. Empresa pequeña con núcleo de IA: el perfil que menos probable es que tenga equipo de diseño propio, y por tanto el mejor candidato a externalizar.</p>
+<div class="accion"><b>Siguiente paso:</b> Prioritaria por tamaño. Alta probabilidad de no tener diseñador en plantilla.</div>    </article>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="tag">Bloque B</div>
+      <h2>Señal de competencia.</h2>
+      <p>Empresas con vacante de diseño junior que <em>no</em> son objetivo comercial.
+         Se listan porque dicen algo del mercado, no porque haya que llamarlas.</p>
+    </div>
+    <article class="card dark">
+      <div class="card-top">
+        <div style="flex:1;min-width:230px">
+          <h3>Alkemy España</h3>
+          <div class="badges"><span class="badge line">Consultora digital</span></div>
+        </div>
+      </div>
+      <p class="why">Tenía vacante de Junior UX/UI Designer en Madrid. Es consultora digital con área propia de UX y CRO: 110 empleados en España, grupo cotizado en Milán con 700 empleados. No es cliente final y compite con 2894.</p>
+      <p class="why"><b style="font-weight:500;color:#fff">Lectura:</b> Que una consultora de este tamaño abra una vacante junior de UX confirma que hay demanda de perfiles como los vuestros en Madrid.</p>
+    </article>
+  </section>
+
+  <footer>
+    <p class="poetic">Ellos buscan. Nosotros presentamos.</p>
+    <p class="plain">Esta lista prepara la conversación; la llamada la hacéis vosotros.</p>
+    <p class="note">
+      2 empresas con evidencia de vacante y 10 objetivos
+      estratégicos por verificar. Los objetivos estratégicos son hipótesis razonadas sobre
+      el perfil de la empresa, no vacantes comprobadas: confirmadlas antes de invertir
+      tiempo comercial en ellas.
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>

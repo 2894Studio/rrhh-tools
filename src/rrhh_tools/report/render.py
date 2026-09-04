@@ -117,3 +117,14 @@ def render_curated(data: dict, title: str) -> str:
         n_confirmadas=len(confirmadas),
         n_estrategicas=len(estrategicas),
     )
+
+
+def render_index(generado: str, title: str) -> str:
+    """Portada del sitio estático que agrupa los informes."""
+    env = Environment(
+        loader=FileSystemLoader(TEMPLATE_DIR),
+        autoescape=True,
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    return env.get_template("index.html.j2").render(title=title, generado=generado)
