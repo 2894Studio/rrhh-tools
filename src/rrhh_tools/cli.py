@@ -138,9 +138,34 @@ def cmd_doctor(args) -> int:
     return 0
 
 
+def _es_fallo_de_red(exc: BaseException) -> bool:
+    """Distingue un problema de conexion de un error del programa.
+
+    Se mira por nombre para no importar requests aqui solo por esto.
+    """
+    nombres = {type(e).__name__ for e in _cadena(exc)}
+    return bool(nombres & {"ConnectionError", "ProxyError", "SSLError", "Timeout",
+                           "ConnectTimeout", "ReadTimeout", "OSError", "socket.gaierror"})
+
+
+def _cadena(exc: BaseException) -> list[BaseException]:
+    salida, actual = [], exc
+    while actual is not None and actual not in salida:
+        salida.append(actual)
+        actual = actual.__cause__ or actual.__context__
+    return salida
+
+
 def cmd_search(args) -> int:
     _load_env()
     settings = _settings(args)
+    if args.dias:
+        # La config trae 24h porque esta pensada para una tirada DIARIA. En la
+        # primera ejecucion esa ventana deja casi todo fuera y parece que la
+        # herramienta no encuentra nada, cuando lo que pasa es que solo mira
+        # lo publicado hoy.
+        settings.raw["search"]["date_posted"] = f"r{args.dias * 86400}"
+        print(f"Ventana de publicación: últimos {args.dias} días.")
     queries, blocked = settings.resolvable_queries()
     for message in blocked:
         print(f"[omitida] {message}\n", file=sys.stderr)
@@ -154,6 +179,7 @@ def cmd_search(args) -> int:
     diagnostics = RunDiagnostics()
     record_dir = Path("data/raw") / run_id if args.record else None
 
+    records: list = []
     seen: set[str] = set()
     if args.resume:
         seen = set(cache.load_checkpoint(run_id).get("seen_ids", []))
@@ -183,6 +209,21 @@ def cmd_search(args) -> int:
         print(f"\n{exc}\n", file=sys.stderr)
         cache.save_checkpoint(run_id, {"seen_ids": sorted(seen)})
         return 4
+    except Exception as exc:  # noqa: BLE001
+        # Un cortafuegos o un proxy corporativo son el fallo mas probable en una
+        # maquina nueva, y una traza de 30 lineas no dice cual de los dos es.
+        if not _es_fallo_de_red(exc):
+            raise
+        print(f"\nNo se ha podido conectar con LinkedIn: {type(exc).__name__}.\n"
+              "Suele ser una de estas tres:\n"
+              "  - un proxy o cortafuegos de la empresa que bloquea linkedin.com\n"
+              "  - estar detrás de una VPN que lo filtra\n"
+              "  - no haber salida a internet en esta máquina\n"
+              "Compruébalo abriendo www.linkedin.com en el navegador de esta misma\n"
+              "máquina. Lo descargado hasta ahora queda guardado.\n", file=sys.stderr)
+        cache.save_raw(run_id, records)
+        cache.save_checkpoint(run_id, {"seen_ids": sorted(seen)})
+        return 5
 
     diagnostics.queries_run = labels
     cache.save_raw(run_id, records)
@@ -502,6 +543,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--record", action="store_true", help="guarda el HTML recibido como fixture")
     p.add_argument("--no-details", action="store_true",
                    help="no descarga la descripción de cada oferta (más rápido, clasifica peor)")
+    p.add_argument("--dias", type=int, choices=[1, 7, 14, 30], default=None,
+                   help="ventana de publicación; por defecto la del config (24h). "
+                        "En la PRIMERA tirada usa 7 o más: con 24h casi no hay nada.")
     p.set_defaults(func=cmd_search)
 
     p = sub.add_parser("process", help="analiza una ejecución guardada")

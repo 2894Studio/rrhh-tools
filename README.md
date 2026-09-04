@@ -39,6 +39,29 @@ de UX es información de mercado, no ruido.
 
 ## Puesta en marcha
 
+### Lo más rápido: un solo comando
+
+```bash
+./arrancar.sh
+```
+
+Instala dependencias, comprueba la configuración, lanza la búsqueda contra LinkedIn y
+abre el informe. Usa el modo `guest`, que **no necesita cookie ni navegador**: es el
+endpoint público de ofertas. Si LinkedIn devuelve el muro de login, el script explica
+cómo pasar al modo `session`.
+
+Ventana de 7 días en la primera tirada, porque la del `config.yaml` son 24 h y está
+pensada para una tirada diaria: en la primera ejecución esa ventana deja casi todo fuera.
+Se ajusta con variables de entorno:
+
+```bash
+DIAS=14 MAX=80 ./arrancar.sh          # más histórico y más ofertas
+FUENTE=session ./arrancar.sh          # con sesión iniciada, si guest da login
+```
+
+### A mano
+
+
 ```bash
 uv sync                          # instala dependencias
 uv run playwright install chromium   # solo si vas a usar --source session
