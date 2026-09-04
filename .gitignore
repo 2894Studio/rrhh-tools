@@ -7,4 +7,3 @@ reports/
 .pytest_cache/
 .ruff_cache/
 *.har
-site-publico/

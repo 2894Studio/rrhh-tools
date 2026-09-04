@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2894 — Diseño en España</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css"><style>
+.aviso{
+  background:var(--ink-black);color:#fff;border-radius:var(--radius);
+  padding:30px 32px;margin:8px 0 12px
+}
+.aviso h2{font-weight:700;font-size:21px;margin:0 0 12px;letter-spacing:-.01em}
+.aviso p{font-weight:300;margin:0 0 12px;color:#C7C9D0;font-size:15px;max-width:66ch}
+.aviso p:last-child{margin-bottom:0}
+.aviso strong{color:#fff;font-weight:500}
+.accion{
+  margin-top:14px;padding:13px 16px;background:var(--soft-gray);
+  border-radius:10px;font-size:14px
+}
+.accion b{font-weight:500}
+.dato{border-left:3px solid var(--deep-cobalt);padding-left:16px;margin:12px 0;font-weight:300;color:var(--ink-60)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="wordmark">2894</div>
+    <h1>Diseño de producto en España.</h1>
+    <p class="plain">Empresas con producto digital propio que merece la pena seguir, con
+       enlace directo a sus vacantes de diseño en LinkedIn.</p>
+    <div class="meta">
+      <span>Generado <code>2026-09-04</code></span>
+      <span>Método <code>Búsqueda web. Sin acceso directo a LinkedIn desde el entorno de desarrollo.</code></span>
+    </div>
+  </header>
+
+  <div class="aviso">
+    <h2>Qué fiabilidad tiene esta lista</h2>
+    <p>Esta lista <strong>no sale de LinkedIn</strong>. Se construyó con búsqueda web y
+       conocimiento del mercado español, porque el entorno donde se desarrolló la
+       herramienta no tenía salida a internet y no pudo consultar LinkedIn.</p>
+    <p>Por eso cada empresa lleva su nivel de evidencia, y <strong>no se ha inventado
+       ninguna oferta ni ninguna URL</strong>. Donde la fuente anonimiza el nombre de la
+       empresa, se dice así en vez de adivinarlo.</p>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <div class="tag">Contexto</div>
+      <h2>Cómo está el mercado.</h2>
+      <p>Datos públicos que enmarcan el mercado.</p>
+    </div>
+    <p class="dato">LinkedIn tiene ahora mismo unas 258 ofertas de Product Designer en la Comunidad de Madrid y 174 de UX Designer en toda España.</p>
+    <p class="dato">España crea más de 52.000 puestos ligados a IA en 2026; Madrid concentra el 45% de las ofertas.</p>
+    <p class="dato">El sector que más contrata perfiles de IA es banca y finanzas (22%), seguido de consultoría (19%) y telecomunicaciones (12%).</p>
+  </section>
+
+<div id="filtros" class="filtros"></div>
+<p id="recuento" class="recuento" aria-live="polite"></p>
+<div id="vacio" class="vacio" hidden>
+  <p>Ningún resultado con estos filtros.</p>
+  <button type="button" class="enlace" data-limpiar>Quitar los filtros</button>
+</div>
+
+<script type="application/json" id="facetas">[{"clave": "evidencia", "etiqueta": "Evidencia", "multi": false, "opciones": [{"valor": "oferta", "etiqueta": "Oferta encontrada"}, {"valor": "confirmada", "etiqueta": "Vacante sin empresa"}, {"valor": "estrategica", "etiqueta": "Sin oferta"}]}, {"clave": "ubicacion", "etiqueta": "Dónde", "multi": false, "opciones": [{"valor": "madrid", "etiqueta": "Madrid"}, {"valor": "espana", "etiqueta": "España / remoto"}]}]</script>
+<script>
+// Los controles se pintan arriba, pero las fichas estan mas abajo en el
+// documento: hay que esperar a que el DOM este completo o no se encuentra
+// ninguna y el script se rinde en silencio.
+document.addEventListener("DOMContentLoaded", function () {
+  "use strict";
+  var raiz = document.getElementById("filtros");
+  var facetas = JSON.parse(document.getElementById("facetas").textContent);
+  var fichas = Array.prototype.slice.call(document.querySelectorAll("[data-ficha]"));
+  if (!raiz || !fichas.length) return;
+
+  var estado = {};
+  facetas.forEach(function (f) { estado[f.clave] = f.multi ? [] : ""; });
+  var orden = "reciente";
+
+  // --- construcción de los controles ---
+  facetas.forEach(function (faceta) {
+    var grupo = document.createElement("div");
+    grupo.className = "grupo-filtro";
+    grupo.setAttribute("role", "group");
+    grupo.setAttribute("aria-label", faceta.etiqueta);
+
+    var titulo = document.createElement("span");
+    titulo.className = "grupo-titulo";
+    titulo.textContent = faceta.etiqueta;
+    grupo.appendChild(titulo);
+
+    faceta.opciones.forEach(function (op) {
+      var boton = document.createElement("button");
+      boton.type = "button";
+      boton.className = "chip";
+      boton.textContent = op.etiqueta;
+      boton.setAttribute("aria-pressed", "false");
+      boton.addEventListener("click", function () {
+        if (faceta.multi) {
+          var i = estado[faceta.clave].indexOf(op.valor);
+          if (i === -1) { estado[faceta.clave].push(op.valor); }
+          else { estado[faceta.clave].splice(i, 1); }
+        } else {
+          estado[faceta.clave] = estado[faceta.clave] === op.valor ? "" : op.valor;
+        }
+        pintar();
+      });
+      boton.dataset.faceta = faceta.clave;
+      boton.dataset.valor = op.valor;
+      grupo.appendChild(boton);
+    });
+
+    if (faceta.atajo) {
+      var atajo = document.createElement("button");
+      atajo.type = "button";
+      atajo.className = "atajo";
+      atajo.textContent = faceta.atajo.etiqueta;
+      atajo.addEventListener("click", function () {
+        estado[faceta.clave] = faceta.multi
+          ? faceta.atajo.valores.slice() : faceta.atajo.valores[0];
+        pintar();
+      });
+      grupo.appendChild(atajo);
+    }
+    raiz.appendChild(grupo);
+  });
+
+  if (facetas.some(function (f) { return f.clave === "dias"; })) {
+    var grupoOrden = document.createElement("div");
+    grupoOrden.className = "grupo-filtro";
+    var etiqueta = document.createElement("label");
+    etiqueta.className = "grupo-titulo";
+    etiqueta.setAttribute("for", "selector-orden");
+    etiqueta.textContent = "Orden";
+    var select = document.createElement("select");
+    select.id = "selector-orden";
+    select.className = "selector";
+    [["reciente", "Más recientes"], ["prioridad", "Prioridad"]].forEach(function (o) {
+      var opcion = document.createElement("option");
+      opcion.value = o[0]; opcion.textContent = o[1];
+      select.appendChild(opcion);
+    });
+    select.addEventListener("change", function () { orden = select.value; pintar(); });
+    grupoOrden.appendChild(etiqueta);
+    grupoOrden.appendChild(select);
+    raiz.appendChild(grupoOrden);
+  }
+
+  var limpiar = document.createElement("button");
+  limpiar.type = "button";
+  limpiar.className = "atajo";
+  limpiar.textContent = "Quitar filtros";
+  limpiar.addEventListener("click", reiniciar);
+  raiz.appendChild(limpiar);
+  document.querySelectorAll("[data-limpiar]").forEach(function (b) {
+    b.addEventListener("click", reiniciar);
+  });
+
+  function reiniciar() {
+    facetas.forEach(function (f) { estado[f.clave] = f.multi ? [] : ""; });
+    pintar();
+  }
+
+  // --- filtrado ---
+  function casa(ficha) {
+    return facetas.every(function (faceta) {
+      var elegido = estado[faceta.clave];
+      if (!elegido || (faceta.multi && !elegido.length)) return true;
+      var bruto = ficha.dataset[faceta.clave] || "";
+      if (faceta.tipo === "max") {
+        var dias = parseInt(bruto, 10);
+        return !isNaN(dias) && dias <= parseInt(elegido, 10);
+      }
+      // Una ficha puede llevar varios valores: aparece si CUALQUIERA casa,
+      // porque una empresa puede tener vacantes de varios niveles y roles.
+      var valores = bruto.split(" ").filter(Boolean);
+      var buscados = faceta.multi ? elegido : [elegido];
+      return buscados.some(function (v) { return valores.indexOf(v) !== -1; });
+    });
+  }
+
+  function pintar() {
+    raiz.querySelectorAll(".chip").forEach(function (b) {
+      var elegido = estado[b.dataset.faceta];
+      var activo = Array.isArray(elegido)
+        ? elegido.indexOf(b.dataset.valor) !== -1
+        : elegido === b.dataset.valor;
+      b.setAttribute("aria-pressed", activo ? "true" : "false");
+      b.classList.toggle("activo", activo);
+    });
+
+    var visibles = 0;
+    fichas.forEach(function (ficha) {
+      var ok = casa(ficha);
+      ficha.hidden = !ok;
+      if (ok) visibles++;
+      // Las vacantes que no casan se atenúan en vez de desaparecer: si no,
+      // parecería que la empresa solo tiene una.
+      ficha.querySelectorAll("[data-vacante]").forEach(function (v) {
+        var casaVacante = facetas.every(function (faceta) {
+          if (faceta.clave !== "nivel" && faceta.clave !== "rol") return true;
+          var elegido = estado[faceta.clave];
+          if (!elegido.length) return true;
+          return elegido.indexOf(v.dataset[faceta.clave]) !== -1;
+        });
+        v.classList.toggle("atenuada", !casaVacante);
+      });
+    });
+
+    ordenar();
+
+    document.querySelectorAll("[data-seccion]").forEach(function (sec) {
+      var algo = sec.querySelector("[data-ficha]:not([hidden])");
+      sec.hidden = !algo;
+    });
+
+    var total = fichas.length;
+    document.getElementById("recuento").textContent =
+      visibles === total
+        ? "Mostrando las " + total + " empresas."
+        : "Mostrando " + visibles + " de " + total + " empresas.";
+    document.getElementById("vacio").hidden = visibles !== 0;
+  }
+
+  function ordenar() {
+    document.querySelectorAll("[data-lista]").forEach(function (lista) {
+      var hijos = Array.prototype.slice.call(lista.querySelectorAll("[data-ficha]"));
+      hijos.sort(function (a, b) {
+        if (orden === "prioridad") {
+          return parseFloat(b.dataset.score) - parseFloat(a.dataset.score);
+        }
+        var da = parseInt(a.dataset.dias, 10), db = parseInt(b.dataset.dias, 10);
+        if (da !== db) return da - db;
+        return parseFloat(b.dataset.score) - parseFloat(a.dataset.score);
+      });
+      hijos.forEach(function (h) { lista.appendChild(h); });
+    });
+  }
+
+  pintar();
+});
+</script>
+  <section data-seccion="1">
+    <div class="sec-head">
+      <div class="tag">Oferta encontrada</div>
+      <h2>Vacantes concretas.</h2>
+      <p>Ofertas reales localizadas, con empresa y puesto. No se han podido abrir desde el entorno de desarrollo: comprobad que siguen abiertas antes de actuar.</p>
+    </div>
+    <div data-lista>
+    <article class="card" data-ficha
+             data-evidencia="oferta"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/cabify.com.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>CA</div>'">
+          <div>
+          <h3>Cabify</h3>
+          <div class="badges">
+            <span class="badge brand">
+Oferta encontrada            </span>
+<span class="badge line">Movilidad</span><span class="badge line">Madrid</span><span class="badge line">Product Designer I — Development Program 2026</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Programa de desarrollo para perfil de entrada, en Madrid. Cabify tiene ademas abiertas una Senior Product Designer (publicada hace unos días) y otra Product Designer con banda de 40-49K.</p>      <p class="why" style="font-size:13px">Fuente: Portal de empleo propio de Cabify (Greenhouse).</p>
+      <div class="enlaces">
+        <a class="enlace" href="https://job-boards.greenhouse.io/cabify/jobs/8475047002" target="_blank" rel="noopener">Abrir la oferta</a>
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Cabify+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="oferta"
+             data-ubicacion="espana">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/jobandtalent.com.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>JO</div>'">
+          <div>
+          <h3>Jobandtalent</h3>
+          <div class="badges">
+            <span class="badge brand">
+Oferta encontrada            </span>
+<span class="badge line">Marketplace de empleo</span><span class="badge line">España (remoto EMEA)</span><span class="badge line">HQ — Product Designer (EMEA Remote)</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Pide experiencia diseñando productos y sistemas digitales. Remoto en EMEA.</p>      <p class="why" style="font-size:13px">Fuente: Built In.</p>
+      <div class="enlaces">
+        <a class="enlace" href="https://builtin.com/job/hq-product-designer-emea-remote/3610491" target="_blank" rel="noopener">Abrir la oferta</a>
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Jobandtalent+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=105646813" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="oferta"
+             data-ubicacion="espana">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/glovoapp.com.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>GL</div>'">
+          <div>
+          <h3>Glovo</h3>
+          <div class="badges">
+            <span class="badge brand">
+Oferta encontrada            </span>
+<span class="badge line">Delivery / marketplace</span><span class="badge line">Barcelona</span><span class="badge line">Senior Product Designer</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Se incorpora a un equipo de UX que trabaja junto a UX Research, Content Design, Data, Producto e Ingeniería.</p>      <p class="why" style="font-size:13px">Fuente: Búsqueda web.</p>
+      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Glovo+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=105646813" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="oferta"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <div class="monograma">OJ</div>
+          <div>
+          <h3>Oferta junior de UX/UI en Madrid (empresa por identificar)</h3>
+          <div class="badges">
+            <span class="badge brand">
+Oferta encontrada            </span>
+<span class="badge line">Sin especificar</span><span class="badge line">Madrid</span><span class="badge line">Diseñador/a UX/UI Junior — prácticas</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Contrato de prácticas para empezar carrera profesional en UX/UI.</p>      <p class="why" style="font-size:13px">Fuente: primerempleo.com.</p>
+      <div class="enlaces">
+        <a class="enlace" href="https://www.primerempleo.com/practicas/madrid/disenador-a-ux-ui-junior-madrid/1405518" target="_blank" rel="noopener">Abrir la oferta</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="oferta"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <div class="monograma">YI</div>
+          <div>
+          <h3>Yodel Internacional</h3>
+          <div class="badges">
+            <span class="badge brand">
+Oferta encontrada            </span>
+<span class="badge line">Sin especificar</span><span class="badge line">Madrid</span><span class="badge line">Junior — equipo de diseño gráfico</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Busca perfil junior para el equipo de diseño gráfico, con criterio estético y ganas de aprender en proyectos reales.</p>      <p class="why" style="font-size:13px">Fuente: Búsqueda web.</p>
+      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Yodel+Internacional+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    </div>
+  </section>
+  <section data-seccion="2">
+    <div class="sec-head">
+      <div class="tag">Vacante sin empresa</div>
+      <h2>Hay oferta, falta el nombre.</h2>
+      <p>Hay evidencia de una vacante, pero la fuente no publica quién la ofrece. Se dice así en vez de adivinarlo.</p>
+    </div>
+    <div data-lista>
+    <article class="card" data-ficha
+             data-evidencia="confirmada"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <div class="monograma">PD</div>
+          <div>
+          <h3>Plataforma de beneficios para empleados (nombre no publicado)</h3>
+          <div class="badges">
+            <span class="badge brand">
+Vacante sin empresa            </span>
+<span class="badge line">HR tech / fintech</span><span class="badge line">Madrid</span><span class="badge line">Junior Product Designer</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Pide 1-2 años de experiencia, preferiblemente en fintech, HR tech o beneficios, y &#34;AI-driven mindset&#34;: interes por incorporar herramientas de IA al proceso de diseño, y comprension de viabilidad tecnica (HTML, CSS, JavaScript). La fuente no publica el nombre de la empresa.</p>      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Junior+Product+Designer+benefits+AI-driven+mindset+&amp;geoId=100994331" target="_blank" rel="noopener">Buscar esta oferta en LinkedIn</a>
+      </div>
+    </article>
+    </div>
+  </section>
+  <section data-seccion="3">
+    <div class="sec-head">
+      <div class="tag">Sin oferta encontrada</div>
+      <h2>Por verificar.</h2>
+      <p>Empresas con producto digital propio en España a las que no se les ha encontrado ninguna vacante abierta. Compruébalo en LinkedIn.</p>
+    </div>
+    <div data-lista>
+    <article class="card" data-ficha
+             data-evidencia="estrategica"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/seedtag.com.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>SE</div>'">
+          <div>
+          <h3>Seedtag</h3>
+          <div class="badges">
+            <span class="badge line">
+Sin oferta            </span>
+<span class="badge line">AdTech con IA</span><span class="badge line">Madrid</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Publicidad contextual basada en IA para analizar contenido.</p>      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Seedtag+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="estrategica"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/clarity.ai.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>CA</div>'">
+          <div>
+          <h3>Clarity AI</h3>
+          <div class="badges">
+            <span class="badge line">
+Sin oferta            </span>
+<span class="badge line">IA aplicada a sostenibilidad ESG</span><span class="badge line">Madrid</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">150M de euros levantados y mas de 300 instituciones financieras como clientes.</p>      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Clarity+AI+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="estrategica"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/narrativa.com.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>NA</div>'">
+          <div>
+          <h3>Narrativa</h3>
+          <div class="badges">
+            <span class="badge line">
+Sin oferta            </span>
+<span class="badge line">IA generativa de contenido</span><span class="badge line">Madrid</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Startup madrileña de generación automática de contenido con IA.</p>      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Narrativa+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="estrategica"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/cobee.io.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>CO</div>'">
+          <div>
+          <h3>Cobee</h3>
+          <div class="badges">
+            <span class="badge line">
+Sin oferta            </span>
+<span class="badge line">HR tech / beneficios</span><span class="badge line">Madrid</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Scaleup madrileña de beneficios para empleados, con app y tarjeta propias.</p>      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Cobee+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="estrategica"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/payflow.io.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>PA</div>'">
+          <div>
+          <h3>Payflow</h3>
+          <div class="badges">
+            <span class="badge line">
+Sin oferta            </span>
+<span class="badge line">Fintech / salario bajo demanda</span><span class="badge line">Madrid</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Reconocida en la categoría Growth del Deloitte Technology Fast 50 de 2026.</p>      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Payflow+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="estrategica"
+             data-ubicacion="espana">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/genially.com.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>GE</div>'">
+          <div>
+          <h3>Genially</h3>
+          <div class="badges">
+            <span class="badge line">
+Sin oferta            </span>
+<span class="badge line">SaaS de contenido interactivo</span><span class="badge line">España (remoto)</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Herramienta de creación usada por millones de personas; 17M levantados.</p>      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Genially+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=105646813" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="estrategica"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/carto.com.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>CA</div>'">
+          <div>
+          <h3>Carto</h3>
+          <div class="badges">
+            <span class="badge line">
+Sin oferta            </span>
+<span class="badge line">Geoespacial / analítica</span><span class="badge line">Madrid</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Producto de visualización de datos geoespaciales con base en Madrid.</p>      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Carto+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Ver vacantes en LinkedIn</a>
+      </div>
+    </article>
+    <article class="card" data-ficha
+             data-evidencia="estrategica"
+             data-ubicacion="madrid">
+      <div class="card-top">
+        <div class="marca">
+          <div class="monograma">BY</div>
+          <div>
+          <h3>Banca y seguros: BBVA, Santander, CaixaBank, Bankinter, Mutua Madrileña, Mapfre</h3>
+          <div class="badges">
+            <span class="badge line">
+Sin oferta            </span>
+<span class="badge line">Banca y seguros</span><span class="badge line">Madrid</span>          </div>
+          </div>
+        </div>
+      </div>
+<p class="why">Es el sector que más contrata perfiles ligados a IA en España: 22% de las ofertas.</p>      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=BBVA+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Vacantes de BBVA en LinkedIn</a>
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Banco+Santander+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Vacantes de Banco Santander en LinkedIn</a>
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=CaixaBank+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Vacantes de CaixaBank en LinkedIn</a>
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Bankinter+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Vacantes de Bankinter en LinkedIn</a>
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Mutua+Madrile%C3%B1a+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Vacantes de Mutua Madrileña en LinkedIn</a>
+        <a class="enlace" href="https://www.linkedin.com/jobs/search/?keywords=Mapfre+designer+OR+dise%C3%B1ador+OR+UX+OR+UI&amp;geoId=100994331" target="_blank" rel="noopener">Vacantes de Mapfre en LinkedIn</a>
+      </div>
+    </article>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="tag">Agencias y consultoras</div>
+      <h2>Quién más contrata diseño.</h2>
+      <p>Agencias y consultoras con vacantes de diseño. Se listan como parte de la foto
+         del mercado.</p>
+    </div>
+    <article class="card dark">
+      <div class="card-top">
+        <div class="marca">
+          <img class="logo" src="https://icons.duckduckgo.com/ip3/alkemy.com.ico" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>AE</div>'">
+          <div>
+          <h3>Alkemy España</h3>
+          <div class="badges"><span class="badge line">Consultora digital</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="why">Tenía vacante de Junior UX/UI Designer en Madrid. Es consultora digital con área propia de UX y CRO: 110 empleados en España, grupo cotizado en Milán con 700 empleados.</p>
+      <div class="enlaces">
+        <a class="enlace" href="https://www.linkedin.com/search/results/companies/?keywords=Alkemy+Espa%C3%B1a" target="_blank" rel="noopener">Ver en LinkedIn</a>
+      </div>
+    </article>
+  </section>
+
+  <footer>
+    <p class="poetic">El mercado, en una página.</p>
+    <p class="plain">Quién tiene producto digital propio en España y dónde comprobarlo.</p>
+    <p class="note">
+      6 ofertas localizadas y 8 empresas sin oferta encontrada. Las segundas son hipótesis, no vacantes: comprobadlas en LinkedIn
+      antes de darlas por buenas.
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>
