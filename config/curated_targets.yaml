@@ -83,7 +83,9 @@ empresas:
       candidato a externalizar. Sirve de contraste.
     accion: "Baja prioridad para colocar perfiles. Util como lectura de mercado."
 
-  - nombre: "Oferta junior de UX/UI en Madrid (primerempleo.com)"
+  - nombre: "Oferta junior de UX/UI en Madrid (empresa por identificar)"
+    # No es un nombre de empresa: buscarlo en LinkedIn no daria nada util.
+    sin_busqueda_empresa: true
     evidencia: oferta
     sector: "Sin especificar"
     ubicacion: "Madrid"

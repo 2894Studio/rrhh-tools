@@ -178,18 +178,20 @@
     <p class="poetic">El mercado, en una página.</p>
     <p class="plain">Quién tiene producto digital propio en España y dónde comprobarlo.</p>
     <p class="note">
-      {{ n_confirmadas }} empresas con evidencia de vacante y {{ n_estrategicas }} sin
-      confirmar. Las segundas no son vacantes comprobadas: comprobadlas en LinkedIn antes
-      de darlas por buenas.
+      {{ n_ofertas + n_confirmadas }} ofertas localizadas
+      {%- if n_estrategicas %} y {{ n_estrategicas }}
+      {{- ' empresa' if n_estrategicas == 1 else ' empresas' }} sin oferta encontrada
+      {%- endif %}. Las segundas son hipótesis, no vacantes: comprobadlas en LinkedIn
+      antes de darlas por buenas.
     </p>
     {% else %}
     <p class="poetic">Ellos buscan. Nosotros presentamos.</p>
     <p class="plain">Esta lista prepara la conversación; la llamada la hacéis vosotros.</p>
     <p class="note">
-      {{ n_confirmadas }} empresas con evidencia de vacante y {{ n_estrategicas }} objetivos
-      estratégicos por verificar. Los objetivos estratégicos son hipótesis razonadas sobre
-      el perfil de la empresa, no vacantes comprobadas: confirmadlas antes de invertir
-      tiempo comercial en ellas.
+      {{ n_ofertas }} ofertas concretas localizadas, {{ n_confirmadas }} con vacante pero
+      sin empresa identificada, y {{ n_estrategicas }} empresas sin oferta encontrada.
+      Estas últimas son hipótesis razonadas sobre el perfil de la empresa, no vacantes
+      comprobadas: confirmadlas antes de invertir tiempo comercial en ellas.
     </p>
     {% endif %}
   </footer>

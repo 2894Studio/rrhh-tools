@@ -183,6 +183,7 @@ def render_report(run: ProcessedRun, title: str, source_label: str = "LinkedIn",
 CAMPOS_PUBLICOS_EMPRESA = {
     "nombre", "sector", "ubicacion", "vacante", "evidencia", "detalle",
     "dominio", "empresas", "busqueda", "oferta_url", "oferta_fuente",
+    "sin_busqueda_empresa",
 }
 CAMPOS_PUBLICOS_COMPETENCIA = {"nombre", "tipo", "detalle", "dominio"}
 # Lo que se queda fuera y por que:
@@ -223,6 +224,10 @@ def _enlaces_curados(entrada: dict, geo_id: str | None, geo_es: str | None) -> l
     # Si hay una oferta concreta, va primero: es el dato mas fuerte de la ficha.
     if entrada.get("oferta_url"):
         enlaces.append({"texto": "Abrir la oferta", "url": entrada["oferta_url"]})
+    # Cuando el "nombre" no es una empresa sino una descripcion de la oferta,
+    # buscarlo en LinkedIn no devolveria nada util.
+    if entrada.get("sin_busqueda_empresa"):
+        return enlaces
     enlaces += [
         {"texto": f"Vacantes de {nombre} en LinkedIn" if len(nombres) > 1
                   else "Ver vacantes en LinkedIn",
@@ -314,6 +319,7 @@ def render_curated(data: dict, title: str, geo_id: str | None = None,
              "monograma": _monograma(c.get("nombre", ""))}
             for c in data.get("competencia_detectada", [])
         ],
+        n_ofertas=len(ofertas),
         n_confirmadas=len(confirmadas),
         n_estrategicas=len(estrategicas),
     )
