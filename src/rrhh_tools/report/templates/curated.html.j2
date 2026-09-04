@@ -72,7 +72,14 @@
     {% for e in grupo.empresas %}
     <article class="card">
       <div class="card-top">
-        <div style="flex:1;min-width:230px">
+        <div class="marca">
+          {% if e.logo %}
+          <img class="logo" src="{{ e.logo }}" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>{{ e.monograma }}</div>'">
+          {% else %}
+          <div class="monograma">{{ e.monograma }}</div>
+          {% endif %}
+          <div>
           <h3>{{ e.nombre }}</h3>
           <div class="badges">
             <span class="badge {{ 'brand' if e.evidencia == 'confirmada' else 'line' }}">
@@ -81,6 +88,7 @@
             {% if e.sector %}<span class="badge line">{{ e.sector }}</span>{% endif %}
             {% if e.ubicacion %}<span class="badge line">{{ e.ubicacion }}</span>{% endif %}
             {% if e.vacante %}<span class="badge line">{{ e.vacante }}</span>{% endif %}
+          </div>
           </div>
         </div>
       </div>
@@ -109,9 +117,17 @@
     {% for c in competencia %}
     <article class="card dark">
       <div class="card-top">
-        <div style="flex:1;min-width:230px">
+        <div class="marca">
+          {% if c.logo %}
+          <img class="logo" src="{{ c.logo }}" alt="" loading="lazy"
+               onerror="this.outerHTML='<div class=\'monograma\'>{{ c.monograma }}</div>'">
+          {% else %}
+          <div class="monograma">{{ c.monograma }}</div>
+          {% endif %}
+          <div>
           <h3>{{ c.nombre }}</h3>
           <div class="badges"><span class="badge line">{{ c.tipo }}</span></div>
+          </div>
         </div>
       </div>
       <p class="why">{{ c.detalle }}</p>

@@ -63,11 +63,19 @@
       {% for row in block.rows %}{% set c = row.c %}
       <article class="card {{ 'dark' if block.id == 'C' else '' }}">
         <div class="card-top">
-          <div style="flex:1;min-width:230px">
-            <h3>{% if c.linkedin_url %}<a href="{{ c.linkedin_url }}">{{ c.display_name }}</a>{% else %}{{ c.display_name }}{% endif %}</h3>
+          <div class="marca">
+            {% if c.logo_url %}
+            <img class="logo" src="{{ c.logo_url }}" alt="" loading="lazy"
+                 onerror="this.outerHTML='<div class=\'monograma\'>{{ c.monograma }}</div>'">
+            {% else %}
+            <div class="monograma">{{ c.monograma }}</div>
+            {% endif %}
+            <div>
+            <h3>{% if c.linkedin_url %}<a href="{{ c.linkedin_url }}" target="_blank" rel="noopener">{{ c.display_name }}</a>{% else %}{{ c.display_name }}{% endif %}</h3>
             <div class="badges">
               <span class="badge {{ 'brand' if block.id == 'A' else 'line' }}">{{ c.classification.category_label }}</span>
               {% for b in row.badges %}<span class="badge line">{{ b }}</span>{% endfor %}
+            </div>
             </div>
           </div>
           <div class="score">

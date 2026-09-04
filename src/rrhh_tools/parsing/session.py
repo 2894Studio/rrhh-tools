@@ -138,6 +138,16 @@ def parse_session_cards(html: str) -> list[dict[str, Any]]:
 
         ubicacion = _text(_first(card, _LOCATION_SELECTORS))
 
+        # El logo viene en la tarjeta; LinkedIn lo carga en diferido, asi que
+        # puede estar en data-delayed-url en vez de en src.
+        logo = None
+        img = card.select_one("img.ivm-view-attr__img--centered, img.artdeco-entity-image, img")
+        if img:
+            logo = (img.get("data-delayed-url") or img.get("data-ghost-url")
+                    or img.get("src") or None)
+            if logo and not logo.startswith("http"):
+                logo = None
+
         nodo_fecha = card.select_one("time")
         posted_text = _text(nodo_fecha)
         posted_iso = nodo_fecha.get("datetime", "") if nodo_fecha else ""
@@ -151,6 +161,7 @@ def parse_session_cards(html: str) -> list[dict[str, Any]]:
             "location": ubicacion,
             "posted_text": posted_text or None,
             "posted_iso": posted_iso or None,
+            "company_logo_url": logo,
             "parse_warnings": warnings,
         })
     return resultados

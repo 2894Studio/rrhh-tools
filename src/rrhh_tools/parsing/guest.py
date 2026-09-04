@@ -115,6 +115,16 @@ def parse_search_cards(html: str) -> list[dict[str, Any]]:
         location = _text(_first(card, ["span.job-search-card__location",
                                        ".base-search-card__metadata span", ".job-search-card__location"]))
 
+        # LinkedIn sirve el logo en la propia tarjeta: es la fuente mas fiable.
+        logo = None
+        img = _first(card, ["img.artdeco-entity-image", "img.search-entity-media__image",
+                            ".search-entity-media img", "img"])
+        if img:
+            logo = (img.get("data-delayed-url") or img.get("data-ghost-url")
+                    or img.get("src") or None)
+            if logo and not logo.startswith("http"):
+                logo = None
+
         time_node = _first(card, ["time.job-search-card__listdate",
                                   "time.job-search-card__listdate--new", "time"])
         posted_text = _text(time_node)
@@ -129,6 +139,7 @@ def parse_search_cards(html: str) -> list[dict[str, Any]]:
             "location": location,
             "posted_text": posted_text or None,
             "posted_iso": posted_iso or None,
+            "company_logo_url": logo,
             "parse_warnings": warnings,
         })
     return results

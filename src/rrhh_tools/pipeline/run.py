@@ -49,6 +49,7 @@ def build_job(raw: dict[str, Any], settings: Settings, today: date) -> JobPostin
         company_name_raw=name,
         company_key=slug or normalized.norm or name.lower(),
         company_linkedin_url=company_url,
+        company_logo_url=raw.get("company_logo_url"),
         location_raw=raw.get("location") or "",
         location_bucket=classify_location(
             raw.get("location") or "", raw.get("workplace_type"),

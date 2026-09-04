@@ -49,6 +49,7 @@ def group_into_companies(
             display_name=display,
             aliases=aliases,
             linkedin_url=company_jobs[0].company_linkedin_url,
+            logo_url=next((j.company_logo_url for j in company_jobs if j.company_logo_url), None),
             li_industries=industries,
             classification=classification,
             jobs=sorted(company_jobs, key=lambda j: (j.posted_at or date.min), reverse=True),

@@ -12,6 +12,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
 from ..linkedin_links import company_jobs, company_search, job_search
+from ..logos import por_dominio
 from ..models import Company, ProcessedRun
 
 TEMPLATE_DIR = Path(__file__).parent / "templates"
@@ -94,6 +95,16 @@ def render_report(run: ProcessedRun, title: str, source_label: str = "LinkedIn",
     )
 
 
+def _monograma(nombre: str) -> str:
+    """Iniciales de respaldo cuando no hay logo fiable."""
+    palabras = [p for p in nombre.split() if p[:1].isalnum()]
+    if not palabras:
+        return "?"
+    if len(palabras) == 1:
+        return palabras[0][:2].upper()
+    return (palabras[0][:1] + palabras[1][:1]).upper()
+
+
 def _enlaces_curados(entrada: dict, geo_id: str | None, geo_es: str | None) -> list[dict]:
     """Un enlace de busqueda en LinkedIn por empresa de la ficha.
 
@@ -132,6 +143,8 @@ def render_curated(data: dict, title: str, geo_id: str | None = None,
     empresas = data.get("empresas", [])
     for entrada in empresas:
         entrada["enlaces"] = _enlaces_curados(entrada, geo_id, geo_es)
+        entrada["logo"] = por_dominio(entrada.get("dominio"))
+        entrada["monograma"] = _monograma(entrada.get("nombre", ""))
     confirmadas = [e for e in empresas if e.get("evidencia") == "confirmada"]
     estrategicas = [e for e in empresas if e.get("evidencia") != "confirmada"]
 
@@ -158,8 +171,11 @@ def render_curated(data: dict, title: str, geo_id: str | None = None,
         contexto=data.get("contexto", {}),
         grupos=grupos,
         competencia=[
-            {**c, "enlaces": [{"texto": "Ver en LinkedIn",
-                               "url": company_search(c.get("nombre", ""))}]}
+            {**c,
+             "enlaces": [{"texto": "Ver en LinkedIn",
+                          "url": company_search(c.get("nombre", ""))}],
+             "logo": por_dominio(c.get("dominio")),
+             "monograma": _monograma(c.get("nombre", ""))}
             for c in data.get("competencia_detectada", [])
         ],
         n_confirmadas=len(confirmadas),

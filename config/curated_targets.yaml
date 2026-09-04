@@ -26,6 +26,9 @@ contexto:
     - "El sector que más contrata perfiles de IA es banca y finanzas (22%), seguido de consultoría (19%) y telecomunicaciones (12%)."
     - "Un 25% de las ofertas del ámbito IA son 100% en remoto."
 
+# El campo `dominio` sirve solo para sacar el favicon como logo. Se rellena
+# unicamente cuando hay certeza: una ficha con el logo de otra empresa hace
+# dudar del resto de la ficha. Sin dominio, la tarjeta muestra un monograma.
 empresas:
   # ---------------- EVIDENCIA CONFIRMADA ----------------
   - nombre: "Plataforma de beneficios para empleados (nombre no publicado)"
@@ -46,7 +49,7 @@ empresas:
 
   - nombre: "Fynce"
     evidencia: confirmada
-    sector: "Fintech / gestion patrimonial"
+    sector: "Fintech / gestión patrimonial"
     ubicacion: "España"
     vacante: "Diseñador UI/UX web"
     detalle: "Fintech con producto propio en gestión patrimonial, buscando perfil de diseño UI/UX."
@@ -57,6 +60,7 @@ empresas:
 
   # ---------------- OBJETIVOS ESTRATEGICOS (a verificar) ----------------
   - nombre: "Cobee"
+    dominio: "cobee.io"
     evidencia: estrategica
     sector: "HR tech / beneficios"
     ubicacion: "Madrid"
@@ -64,9 +68,10 @@ empresas:
       Scaleup madrileña de beneficios para empleados, con app y tarjeta propias.
       Producto de consumo con mucha superficie de interfaz y equipo de diseño
       históricamente pequeño para el tamaño del producto.
-    accion: "Verificar vacantes en su pagina de empleo y en LinkedIn."
+    accion: "Verificar vacantes en su página de empleo y en LinkedIn."
 
   - nombre: "Payflow"
+    dominio: "payflow.io"
     evidencia: estrategica
     sector: "Fintech / salario bajo demanda"
     ubicacion: "Madrid"
@@ -77,6 +82,7 @@ empresas:
     accion: "Verificar vacantes. El crecimiento reciente es el gancho de la conversación."
 
   - nombre: "Seedtag"
+    dominio: "seedtag.com"
     evidencia: estrategica
     sector: "AdTech con IA"
     ubicacion: "Madrid"
@@ -87,6 +93,7 @@ empresas:
     accion: "Prioritaria. El argumento de 'diseñadores que entienden IA' aterriza solo."
 
   - nombre: "Clarity AI"
+    dominio: "clarity.ai"
     evidencia: estrategica
     sector: "IA aplicada a sostenibilidad ESG"
     ubicacion: "Madrid"
@@ -97,6 +104,7 @@ empresas:
     accion: "Prioritaria por el mismo motivo que Seedtag."
 
   - nombre: "Genially"
+    dominio: "genially.com"
     evidencia: estrategica
     sector: "SaaS de contenido interactivo"
     ubicacion: "España (remoto)"
@@ -106,6 +114,7 @@ empresas:
     accion: "Verificar vacantes. Trabajan en remoto, lo que amplía el encaje."
 
   - nombre: "Carto"
+    dominio: "carto.com"
     evidencia: estrategica
     sector: "Geoespacial / analítica"
     ubicacion: "Madrid"
@@ -116,6 +125,7 @@ empresas:
     accion: "Verificar vacantes."
 
   - nombre: "Jobandtalent"
+    dominio: "jobandtalent.com"
     evidencia: estrategica
     sector: "Marketplace de empleo"
     ubicacion: "Madrid"
@@ -125,6 +135,7 @@ empresas:
     accion: "Verificar vacantes."
 
   - nombre: "Cabify"
+    dominio: "cabify.com"
     evidencia: estrategica
     sector: "Movilidad"
     ubicacion: "Madrid"
@@ -147,6 +158,7 @@ empresas:
       producto de una línea concreta, no al departamento de compras.
 
   - nombre: "Narrativa"
+    dominio: "narrativa.com"
     evidencia: estrategica
     sector: "IA generativa de contenido"
     ubicacion: "Madrid"
@@ -160,6 +172,7 @@ empresas:
 # Se listan porque son senal de mercado, no porque haya que llamarlas.
 competencia_detectada:
   - nombre: "Alkemy España"
+    dominio: "alkemy.com"
     tipo: "Consultora digital"
     detalle: >-
       Tenía vacante de Junior UX/UI Designer en Madrid. Es consultora digital con

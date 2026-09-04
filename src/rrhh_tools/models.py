@@ -89,6 +89,7 @@ class JobPosting(BaseModel):
     company_name_raw: str = ""
     company_key: str = ""
     company_linkedin_url: str | None = None
+    company_logo_url: str | None = None
 
     location_raw: str = ""
     location_bucket: LocationBucket = LocationBucket.UNKNOWN
@@ -131,6 +132,7 @@ class Company(BaseModel):
     display_name: str
     aliases: list[str] = Field(default_factory=list)
     linkedin_url: str | None = None
+    logo_url: str | None = None
     li_industries: list[str] = Field(default_factory=list)
     classification: Classification
     jobs: list[JobPosting] = Field(default_factory=list)
@@ -142,6 +144,16 @@ class Company(BaseModel):
     @property
     def n_jobs(self) -> int:
         return len(self.jobs)
+
+    @property
+    def monograma(self) -> str:
+        """Iniciales para cuando no hay logo. Nunca inventamos una imagen."""
+        palabras = [p for p in self.display_name.split() if p[:1].isalnum()]
+        if not palabras:
+            return "?"
+        if len(palabras) == 1:
+            return palabras[0][:2].upper()
+        return (palabras[0][:1] + palabras[1][:1]).upper()
 
     @property
     def best_job(self) -> JobPosting | None:
