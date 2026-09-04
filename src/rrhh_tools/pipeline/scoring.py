@@ -33,10 +33,15 @@ _LOCATION_VALUES = {
     LocationBucket.UNKNOWN: (0.3, "ubicación sin determinar"),
 }
 
+# El encaje se mide contra los perfiles de 2894, que son junior. Un senior en
+# la lista no es un error: es contexto de mercado, y puntua bajo en ESTE factor
+# sin dejar de aparecer. Quien quiera la foto completa usa los filtros.
 _SENIORITY_VALUES = {
     SeniorityLabel.JUNIOR: (1.0, "título junior explícito"),
     SeniorityLabel.JUNIOR_BY_DESC: (0.6, "nivel junior deducido del cuerpo de la oferta"),
-    SeniorityLabel.AMBIGUOUS: (0.35, "nivel ambiguo"),
+    SeniorityLabel.MID: (0.3, "nivel intermedio"),
+    SeniorityLabel.SENIOR: (0.05, "nivel senior: no encaja con los perfiles"),
+    SeniorityLabel.LEAD: (0.0, "puesto de responsabilidad: no encaja con los perfiles"),
 }
 
 
@@ -102,11 +107,20 @@ def _first_designer_value(settings: Settings, text: str) -> tuple[float, str]:
     return 0.5, "sin señales sobre la madurez de su equipo de diseño"
 
 
-def _volume_value(n_design_jobs: int) -> tuple[float, str]:
+def _volume_value(n_design_jobs: int, n_junior: int) -> tuple[float, str]:
+    """Cuenta TODAS las vacantes de diseño, de cualquier nivel.
+
+    Antes solo contaba las junior, asi que una empresa con un senior y dos mid
+    figuraba con "1 vacante abierta". El factor decia medir cuanta demanda de
+    diseño tiene la empresa y no lo hacia; ahora si.
+    """
+    detalle = f"{n_design_jobs} vacantes de diseño abiertas"
+    if n_junior and n_junior != n_design_jobs:
+        detalle += f", {n_junior} de ellas junior"
     if n_design_jobs >= 3:
-        return 1.0, f"{n_design_jobs} vacantes de diseño abiertas"
+        return 1.0, detalle
     if n_design_jobs == 2:
-        return 0.7, "2 vacantes de diseño abiertas"
+        return 0.7, detalle
     return 0.3, "1 vacante de diseño abierta"
 
 
@@ -128,14 +142,15 @@ def score_company(
     # --- factores de empresa ---
     ec_value, ec_why = _end_client_value(classification)
     fd_value, fd_why = _first_designer_value(settings, corpus)
-    vol_value, vol_why = _volume_value(len(jobs))
+    n_junior = sum(1 for j in jobs if j.seniority and j.seniority.label.es_junior)
+    vol_value, vol_why = _volume_value(len(jobs), n_junior)
 
     # --- factores de oferta: maximo entre las vacantes ---
     best_sen, best_loc, best_ai, best_rec = (0.0, ""), (0.0, ""), (0.0, ""), (0.0, "")
     best_job_id, best_job_total = None, -1.0
     for job in jobs:
-        label = job.seniority.label if job.seniority else SeniorityLabel.AMBIGUOUS
-        sen = _SENIORITY_VALUES.get(label, (0.35, "nivel ambiguo"))
+        label = job.seniority.label if job.seniority else SeniorityLabel.MID
+        sen = _SENIORITY_VALUES.get(label, (0.3, "nivel intermedio"))
         loc = _LOCATION_VALUES[job.location_bucket]
         ai = _ai_value(settings, normalize_text(job.haystack))
         rec = _recency_value(job, today)

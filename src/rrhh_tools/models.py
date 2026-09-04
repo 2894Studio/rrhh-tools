@@ -31,11 +31,64 @@ class CompanyLabel(StrEnum):
 
 
 class SeniorityLabel(StrEnum):
+    """Nivel de la oferta. Ya no es un filtro de entrada: es una etiqueta.
+
+    Lo unico que abandona el pipeline es NOT_DESIGN. Un senior no se descarta,
+    se marca como senior y el lector decide si lo quiere ver.
+    """
+
     JUNIOR = "JUNIOR"
-    JUNIOR_BY_DESC = "JUNIOR_BY_DESC"
-    AMBIGUOUS = "AMBIGUOUS"
-    NOT_JUNIOR = "NOT_JUNIOR"
+    JUNIOR_BY_DESC = "JUNIOR_BY_DESC"   # junior deducido del cuerpo, menos fiable
+    MID = "MID"                          # sin marca de nivel, o 2-4 anos
+    SENIOR = "SENIOR"
+    LEAD = "LEAD"                        # lead, principal, head, manager, director
     NOT_DESIGN = "NOT_DESIGN"
+
+    @property
+    def es_junior(self) -> bool:
+        return self in (SeniorityLabel.JUNIOR, SeniorityLabel.JUNIOR_BY_DESC)
+
+    @property
+    def etiqueta(self) -> str:
+        return {
+            SeniorityLabel.JUNIOR: "Junior",
+            SeniorityLabel.JUNIOR_BY_DESC: "Junior (deducido)",
+            SeniorityLabel.MID: "Mid",
+            SeniorityLabel.SENIOR: "Senior",
+            SeniorityLabel.LEAD: "Lead",
+            SeniorityLabel.NOT_DESIGN: "No es diseño",
+        }[self]
+
+    @property
+    def clave_filtro(self) -> str:
+        """Valor para los data-* del informe. Los dos junior se unifican."""
+        return "junior" if self.es_junior else self.value.lower()
+
+
+class Rol(StrEnum):
+    """Tipo de rol de diseno. AI gana sobre los demas, a proposito."""
+
+    AI = "AI"
+    PRODUCT = "PRODUCT"
+    UXUI = "UXUI"
+    UX = "UX"
+    UI = "UI"
+    OTRO = "OTRO"
+
+    @property
+    def etiqueta(self) -> str:
+        return {
+            Rol.AI: "Diseño con IA",
+            Rol.PRODUCT: "Producto",
+            Rol.UXUI: "UX/UI",
+            Rol.UX: "UX",
+            Rol.UI: "UI",
+            Rol.OTRO: "Otro diseño",
+        }[self]
+
+    @property
+    def clave_filtro(self) -> str:
+        return self.value.lower()
 
 
 class LocationBucket(StrEnum):
@@ -56,8 +109,26 @@ class SeniorityVerdict(BaseModel):
 
     @property
     def survives(self) -> bool:
-        """Solo NOT_DESIGN y NOT_JUNIOR abandonan el pipeline."""
-        return self.label not in (SeniorityLabel.NOT_DESIGN, SeniorityLabel.NOT_JUNIOR)
+        """Solo NOT_DESIGN abandona el pipeline.
+
+        Antes tambien salia NOT_JUNIOR. Ahora el nivel se etiqueta y se filtra
+        en el informe, para tener la foto completa del mercado.
+        """
+        return self.label != SeniorityLabel.NOT_DESIGN
+
+
+class RolVerdict(BaseModel):
+    label: Rol
+    secundario: Rol | None = None   # "AI Product Designer" es AI, y ademas producto
+    hits: list[str] = Field(default_factory=list)
+    explanation: str = ""
+
+    @property
+    def etiquetas(self) -> list[str]:
+        salida = [self.label.etiqueta]
+        if self.secundario and self.secundario != self.label:
+            salida.append(self.secundario.etiqueta)
+        return salida
 
 
 class Classification(BaseModel):
@@ -104,6 +175,7 @@ class JobPosting(BaseModel):
     li_industries: list[str] = Field(default_factory=list)
 
     seniority: SeniorityVerdict | None = None
+    rol: RolVerdict | None = None
     dedupe_key: str = ""
     merged_ids: list[str] = Field(default_factory=list)
     n_sightings: int = 1
@@ -144,6 +216,23 @@ class Company(BaseModel):
     @property
     def n_jobs(self) -> int:
         return len(self.jobs)
+
+    @property
+    def niveles(self) -> list[str]:
+        return sorted({j.seniority.label.clave_filtro for j in self.jobs if j.seniority})
+
+    @property
+    def roles(self) -> list[str]:
+        return sorted({j.rol.label.clave_filtro for j in self.jobs if j.rol})
+
+    @property
+    def dias_min(self) -> int:
+        """Antiguedad de su oferta mas reciente, para el filtro de frescura."""
+        from datetime import date as _date
+        fechas = [j.posted_at for j in self.jobs if j.posted_at]
+        if not fechas:
+            return 9999
+        return (_date.today() - max(fechas)).days
 
     @property
     def monograma(self) -> str:

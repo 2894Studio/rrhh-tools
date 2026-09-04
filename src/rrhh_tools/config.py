@@ -40,12 +40,19 @@ class CompiledPatterns:
 
     role_positive: list[re.Pattern]
     role_exclude: list[re.Pattern]
-    sen_negative: list[re.Pattern]
-    sen_negative_cased: list[re.Pattern]
+    sen_senior: list[re.Pattern]
+    sen_lead: list[re.Pattern]
+    sen_senior_cased: list[re.Pattern]
     sen_positive: list[re.Pattern]
     sen_weak_positive: list[re.Pattern]
     desc_sen_positive: list[re.Pattern]
     desc_sen_negative: list[re.Pattern]
+    desc_sen_mid: list[re.Pattern]
+    rol_ai: list[re.Pattern]
+    rol_uxui: list[re.Pattern]
+    rol_product: list[re.Pattern]
+    rol_ux: list[re.Pattern]
+    rol_ui: list[re.Pattern]
     ai: list[re.Pattern]
     first_designer_strong: list[re.Pattern]
     first_designer_mature: list[re.Pattern]
@@ -155,14 +162,21 @@ def load_settings(config_dir: Path | str | None = None) -> Settings:
     patterns = CompiledPatterns(
         role_positive=_compile(kw["role"]["positive"]),
         role_exclude=_compile(kw["role"]["exclude"]),
-        sen_negative=_compile(kw["seniority"]["negative"]),
+        sen_senior=_compile(kw["seniority"]["senior"]),
+        sen_lead=_compile(kw["seniority"]["lead"]),
         # Sin IGNORECASE a proposito: los numeros romanos solo cuentan en mayusculas,
         # para que un "ii" minusculo dentro de otra palabra no dispare un falso positivo.
-        sen_negative_cased=_compile(kw["seniority"]["negative_cased"], flags=0),
+        sen_senior_cased=_compile(kw["seniority"]["senior_cased"], flags=0),
         sen_positive=_compile(kw["seniority"]["positive"]),
         sen_weak_positive=_compile(kw["seniority"]["weak_positive"]),
         desc_sen_positive=_compile(kw["description_seniority"]["positive"]),
         desc_sen_negative=_compile(kw["description_seniority"]["negative"]),
+        desc_sen_mid=_compile(kw["description_seniority"]["mid"]),
+        rol_ai=_compile(kw["rol"]["ai"]),
+        rol_uxui=_compile(kw["rol"]["uxui"]),
+        rol_product=_compile(kw["rol"]["product"]),
+        rol_ux=_compile(kw["rol"]["ux"]),
+        rol_ui=_compile(kw["rol"]["ui"]),
         ai=_compile(kw["ai_relevance"]["patterns"]),
         first_designer_strong=_compile(kw["first_designer"]["strong"]),
         first_designer_mature=_compile(kw["first_designer"]["mature"]),

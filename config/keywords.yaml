@@ -34,23 +34,29 @@ role:
     - "\\bpaisaj"
 
 seniority:
-  # Puerta B: NEGATIVA. Tiene prioridad sobre la positiva.
+  # El nivel ya NO es una puerta: es una etiqueta. Lo unico que sale del
+  # pipeline es lo que no es diseno digital. Por eso "senior" y "lead" viven
+  # ahora en listas separadas: antes daba igual, las dos solo servian para
+  # descartar; ahora la diferencia se muestra y se filtra.
+  #
   # Notas de regex que importan:
   #  - (?<![a-z]) y (?![a-z]) evitan que "head" case dentro de "headless"
   #    y que "intern" case dentro de "internal".
-  #  - "senior" ya cubre "senior" tras quitar acentos.
-  negative:
+  #  - quitar acentos hace que "senior" colapse a "senior" sin regla extra.
+  senior:
     - "(?<![a-z])(sr|senior|snr)(?![a-z])"
+    - "\\bespecialista senior\\b"
+    - "\\bexperto\\b"
+    - "(?<![a-z])(architect|arquitect[oa])(?![a-z])"
+  lead:
     - "(?<![a-z])(lead|leader|principal|staff)(?![a-z])"
     - "(?<![a-z])(head|chief|vp)(?![a-z])"
     - "(?<![a-z])(manager|mgr|director[ae]?)(?![a-z])"
     - "(?<![a-z])(jefe|jefa|responsable|coordinador[ae]?)(?![a-z])"
-    - "(?<![a-z])(architect|arquitect[oa])(?![a-z])"
-    - "\\bespecialista senior\\b"
-    - "\\bexperto\\b"
   # Se aplica sobre el titulo con su CAJA ORIGINAL, para que "ii" en minusculas
   # dentro de una palabra cualquiera no dispare un falso positivo.
-  negative_cased:
+  # Un "Product Designer II" es senior, no lead.
+  senior_cased:
     - "\\b(II|III|IV)\\b"
   # Puerta C: POSITIVA.
   positive:
@@ -74,7 +80,9 @@ seniority:
     - "\\basociad[oa]\\b"
 
 description_seniority:
-  # Rescate cuando el titulo no dice nada del nivel.
+  # Rescate cuando el titulo no dice nada del nivel. Un titulo mudo ya no es
+  # "ambiguo": es MID, que es lo que significa en la practica. Estos patrones
+  # solo lo corrigen hacia junior o hacia senior cuando el cuerpo lo aclara.
   positive:
     - "\\b(0|1)\\s*[-–a]\\s*2\\s*(anos|years)"
     - "\\bmenos de 2 anos\\b"
@@ -84,9 +92,13 @@ description_seniority:
     - "\\bprimer empleo\\b"
     - "\\bno experience required\\b"
   negative:
-    - "\\b([3-9]|1[0-9])\\s*\\+?\\s*(anos|years)"
-    - "\\bminimo (3|4|5|6|7|8|9|10) anos\\b"
-    - "\\bat least (3|4|5|6|7|8|9|10) years\\b"
+    - "\\b([5-9]|1[0-9])\\s*\\+?\\s*(anos|years)"
+    - "\\bminimo (5|6|7|8|9|10) anos\\b"
+    - "\\bat least (5|6|7|8|9|10) years\\b"
+  # 2-4 anos: ni junior ni senior. Sirve para confirmar MID, no para descartar.
+  mid:
+    - "\\b[2-4]\\s*[-–a]\\s*[3-6]\\s*(anos|years)"
+    - "\\b(3|4)\\s*\\+?\\s*(anos|years)"
 
 ai_relevance:
   # El diferencial de los perfiles de 2894. Su ausencia no descalifica
@@ -105,6 +117,40 @@ ai_relevance:
     - "\\bdesign with ai\\b"
     - "\\bchatgpt\\b"
     - "\\bmidjourney\\b"
+
+# Rol de la oferta. El orden de comprobacion importa y es intencionado:
+# AI se mira PRIMERO y gana. Un "AI Product Designer" se etiqueta AI, no
+# PRODUCT, porque poder aislar el diseno con IA de un vistazo es el objetivo
+# de tener este clasificador. La ficha muestra ambas cosas igualmente.
+rol:
+  ai:
+    - "\\bai\\s+(product\\s+)?design(er)?\\b"
+    - "\\bdesign(er)?\\s+.{0,12}\\bai\\b"
+    - "\\bdise[nñ]ador[ae]?\\s+.{0,14}\\b(ia|inteligencia artificial)\\b"
+    - "\\bdise[nñ]o\\s+.{0,14}\\b(ia|inteligencia artificial)\\b"
+    - "\\bprompt\\s+(design(er)?|engineer)\\b"
+    - "\\bconversational\\s+design(er)?\\b"
+    - "\\bdise[nñ]o conversacional\\b"
+    - "\\bdesign technologist\\b"
+    - "\\bgen ?ai design(er)?\\b"
+  uxui:
+    - "\\bux\\s*[/y+&-]?\\s*ui\\b"
+    - "\\bui\\s*[/y+&-]?\\s*ux\\b"
+  product:
+    - "\\bproduct design(er)?\\b"
+    - "\\bdise[nñ]ador[ae]?\\s+de\\s+producto\\b"
+    - "\\bdise[nñ]o de producto\\b"
+  ux:
+    - "\\bux\\b"
+    - "\\bexperiencia de usuario\\b"
+    - "\\bux (writer|research(er)?)\\b"
+    - "\\barquitectura de informacion\\b"
+    - "\\binteraction design(er)?\\b"
+  ui:
+    - "\\bui\\b"
+    - "\\bvisual design(er)?\\b"
+    - "\\bdise[nñ]ador[ae]?\\s+de\\s+interfa[cz]"
+    - "\\binterfa[cz]"
 
 first_designer:
   # SOLO evidencia textual explicita. Nunca inferido del numero de vacantes:

@@ -21,7 +21,15 @@ def group_into_companies(
     classifier: CompanyClassifier,
     settings: Settings,
     today: date | None = None,
+    orden: str = "reciente",
 ) -> dict[Block, list[Company]]:
+    """Agrupa por empresa y ordena cada bloque.
+
+    `orden="reciente"` (por defecto) pone primero a quien acaba de publicar:
+    para actuar sobre una vacante lo primero es que siga abierta. `"prioridad"`
+    recupera el orden por puntuacion. El orden se decide AQUI, en el servidor,
+    para que quien abra el informe sin JavaScript vea el orden anunciado.
+    """
     by_key: dict[str, list[JobPosting]] = defaultdict(list)
     for job in jobs:
         by_key[job.company_key].append(job)
@@ -61,10 +69,21 @@ def group_into_companies(
         blocks[classification.block].append(company)
 
     for block in blocks:
-        # Desempate determinista: sin esto, dos ejecuciones iguales podrian
-        # ordenar distinto y el informe pareceria cambiar sin motivo.
-        blocks[block].sort(key=lambda c: (-c.score, c.key))
+        # Desempate determinista en los dos ordenes: sin esto, dos ejecuciones
+        # iguales podrian ordenar distinto y el informe pareceria cambiar sin
+        # motivo.
+        if orden == "prioridad":
+            blocks[block].sort(key=lambda c: (-c.score, c.key))
+        else:
+            blocks[block].sort(
+                key=lambda c: (-_fecha_orden(c), -c.score, c.key))
     return blocks
+
+
+def _fecha_orden(company: Company) -> float:
+    """Fecha de la oferta mas reciente de la empresa, como numero ordenable."""
+    fechas = [j.posted_at for j in company.jobs if j.posted_at]
+    return max(fechas).toordinal() if fechas else 0
 
 
 def _most_common_spelling(jobs: list[JobPosting]) -> str:

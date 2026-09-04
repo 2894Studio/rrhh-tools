@@ -45,15 +45,40 @@ def test_las_agencias_no_se_tiran_sino_que_se_separan(run):
         assert c.score > 0
 
 
-def test_los_senior_y_los_no_disenadores_quedan_fuera_pero_visibles(run):
+def test_los_senior_ya_no_se_descartan(run):
+    """Cambio de criterio: antes salían del pipeline, ahora se etiquetan.
+
+    El objetivo pasó a ser la foto completa del mercado, con el nivel como
+    filtro en el informe.
+    """
+    todas = [j for c in (run.targets + run.competition + run.intermediaries + run.review)
+             for j in c.jobs]
+    senior = next(j for j in todas if j.title_raw == "Senior Product Designer")
+    assert senior.seniority.label.value == "SENIOR"
+
+
+def test_solo_el_no_diseno_queda_fuera_y_sigue_visible(run):
     motivos = {f.title_raw: f.reason for f in run.filtered_jobs}
-    assert motivos["Senior Product Designer"] == "NOT_JUNIOR"
-    assert motivos["Diseñador Industrial Junior"] == "NOT_DESIGN"
+    assert motivos == {"Diseñador Industrial Junior": "NOT_DESIGN"}
     for f in run.filtered_jobs:
         assert f.detail, "todo descarte debe explicar por qué"
 
 
-def test_el_orden_prioriza_clientes_finales_con_encaje(run):
+def test_por_defecto_ordena_por_la_oferta_mas_reciente(run):
+    """Cambio de criterio: para actuar sobre una vacante, lo primero es que
+    siga abierta. La prioridad sigue disponible, pero ya no decide qué se ve
+    primero."""
+    fechas = [c.jobs[0].posted_at for c in run.targets]
+    assert fechas == sorted(fechas, reverse=True), [
+        (c.display_name, c.jobs[0].posted_at) for c in run.targets]
+
+
+def test_el_orden_por_prioridad_sigue_disponible(settings, fixtures_dir):
+    from rrhh_tools.http import FixtureFetcher
+    f = FixtureFetcher(fixtures_dir)
+    queries, _ = settings.resolvable_queries()
+    registros, _ = guest.collect(f, queries, settings, 250)
+    run = process(registros, settings, "t", today=HOY, orden="prioridad")
     puntuaciones = [c.score for c in run.targets]
     assert puntuaciones == sorted(puntuaciones, reverse=True)
     assert run.targets[0].display_name == "Bankinter"

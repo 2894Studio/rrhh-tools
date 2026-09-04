@@ -2,7 +2,12 @@
 # Todo lo ajustable vive aqui: no hace falta tocar codigo para cambiar el criterio.
 
 run:
-  max_jobs_per_run: 250        # tope duro por ejecucion (volumen bajo = menos riesgo de bloqueo)
+  # Tope pensado para TIRADAS DIARIAS PEQUENAS, no para una semanal grande.
+  # Con ~14 busquedas sin filtro de nivel, una tirada completa serian del orden
+  # de 500 peticiones y mas de media hora contra vuestra cuenta. Ejecutar a
+  # diario con ventana de 24h cubre el mercado igual, dura minutos, y el
+  # volumen se parece al de una persona mirando ofertas.
+  max_jobs_per_run: 120
   max_pages_per_query: 5
   min_delay_seconds: 4.0       # ritmo fijo entre peticiones
   jitter_seconds: 0.5          # solo para no ir en lockstep; NO es evasion de deteccion
@@ -10,8 +15,13 @@ run:
   max_retries_on_throttle: 3
 
 search:
-  date_posted: "r604800"       # f_TPR: ultimos 7 dias
-  experience_levels: ["1", "2"]  # f_E: 1=practicas, 2=nivel inicial
+  date_posted: "r86400"        # f_TPR: ultimas 24h. Pensado para tirada diaria.
+                               # r604800 = 7 dias, si preferis tirada semanal.
+  # Vacio a proposito. Antes se fijaba en ["1","2"] (practicas y nivel inicial)
+  # y LinkedIn solo devolvia junior. Ahora queremos la foto completa: el nivel
+  # lo decide nuestro clasificador, que es mas fiable que este campo, porque lo
+  # autodeclara quien publica la oferta y se equivoca a menudo.
+  experience_levels: []
   geo:
     # 105646813 = Espana. VERIFICADO en URLs publicas de LinkedIn.
     spain: "105646813"
@@ -22,14 +32,25 @@ search:
     # aqui; un geoId equivocado busca en otra region sin dar ningun error.
     comunidad_madrid: "100994331"
 
+# Busquedas por ROL, no por nivel: el nivel se etiqueta despues. Asi una misma
+# tirada da junior, mid, senior y lead, y el informe los separa con un filtro.
 queries:
-  - {id: junior_ux_madrid,      keywords: "junior UX UI designer",   geo: comunidad_madrid}
-  - {id: junior_product_madrid, keywords: "junior product designer", geo: comunidad_madrid}
-  - {id: disenador_junior,      keywords: "disenador junior",        geo: comunidad_madrid}
-  - {id: becario_ux,            keywords: "becario UX",              geo: comunidad_madrid}
-  - {id: practicas_diseno,      keywords: "practicas diseno UX",     geo: comunidad_madrid}
-  - {id: remote_junior_ux,      keywords: "junior UX designer",      geo: spain, workplace: remote}
-  - {id: remote_junior_product, keywords: "junior product designer", geo: spain, workplace: remote}
+  # --- Madrid ---
+  - {id: product_madrid,   keywords: "product designer",              geo: comunidad_madrid}
+  - {id: uxui_madrid,      keywords: "UX UI designer",                geo: comunidad_madrid}
+  - {id: ux_madrid,        keywords: "UX designer",                   geo: comunidad_madrid}
+  - {id: ui_madrid,        keywords: "UI designer",                   geo: comunidad_madrid}
+  - {id: ai_madrid,        keywords: "AI designer",                   geo: comunidad_madrid}
+  - {id: producto_madrid,  keywords: "disenador de producto",         geo: comunidad_madrid}
+  - {id: diseno_ia_madrid, keywords: "diseno inteligencia artificial", geo: comunidad_madrid}
+  - {id: becario_madrid,   keywords: "becario diseno UX",             geo: comunidad_madrid}
+  # --- remoto desde Espana ---
+  - {id: product_remoto,   keywords: "product designer",   geo: spain, workplace: remote}
+  - {id: uxui_remoto,      keywords: "UX UI designer",     geo: spain, workplace: remote}
+  - {id: ux_remoto,        keywords: "UX designer",        geo: spain, workplace: remote}
+  - {id: ui_remoto,        keywords: "UI designer",        geo: spain, workplace: remote}
+  - {id: ai_remoto,        keywords: "AI designer",        geo: spain, workplace: remote}
+  - {id: producto_remoto,  keywords: "disenador de producto", geo: spain, workplace: remote}
 
 scoring:
   # Deben sumar 100. config.py lo valida al cargar y aborta si no cuadra.
@@ -65,5 +86,8 @@ locations:
      murcia, palma, alicante, vigo, gijon, coruna, valladolid, granada, santander]
 
 report:
-  title: "2894 — Radar de diseño junior"
+  title: "2894 — Radar de diseño"
   max_companies_per_block: 60
+  # "reciente" (por defecto) o "prioridad". Para actuar sobre una vacante, lo
+  # primero que importa es que siga abierta.
+  orden: reciente

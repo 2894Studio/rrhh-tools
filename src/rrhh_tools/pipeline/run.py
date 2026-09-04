@@ -19,6 +19,7 @@ from ..normalize import normalize_company_name, normalize_title
 from .classifier import CompanyClassifier
 from .dedupe import dedupe_jobs, find_alias_suspicions
 from .location import classify_location
+from .rol import classify_rol
 from .seniority import classify_seniority
 
 
@@ -72,6 +73,7 @@ def process(
     run_id: str,
     diagnostics: RunDiagnostics | None = None,
     today: date | None = None,
+    orden: str = "reciente",
 ) -> ProcessedRun:
     from .aggregate import group_into_companies
 
@@ -85,8 +87,8 @@ def process(
     diagnostics.duplicates_merged = merged
     diagnostics.alias_suspicions = find_alias_suspicions(surviving)
 
-    # Filtro de nivel. Solo NOT_DESIGN y NOT_JUNIOR salen del pipeline, y salen
-    # a una lista visible: nada se descarta en silencio.
+    # Nivel y rol. Ya solo NOT_DESIGN sale del pipeline: el resto se etiqueta
+    # y se filtra en el informe, para tener la foto completa del mercado.
     kept: list[JobPosting] = []
     filtered: list[FilteredJob] = []
     for job in surviving:
@@ -95,6 +97,7 @@ def process(
         )
         job.seniority = verdict
         if verdict.survives:
+            job.rol = classify_rol(job.title_raw, job.description_text, settings.patterns)
             kept.append(job)
         else:
             filtered.append(FilteredJob(
@@ -104,7 +107,7 @@ def process(
             ))
 
     classifier = CompanyClassifier(settings)
-    blocks = group_into_companies(kept, classifier, settings, today)
+    blocks = group_into_companies(kept, classifier, settings, today, orden)
 
     run = ProcessedRun(
         run_id=run_id,

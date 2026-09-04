@@ -103,9 +103,14 @@ def test_el_pipeline_completo_funciona_con_datos_de_sesion(settings):
     run = process(cards, settings, "sesion", today=date(2026, 9, 4))
     ok, mensaje = run.reconcile()
     assert ok, mensaje
-    # Payflow es cliente final; el "Diseñador/a UX Senior" debe quedar fuera.
+    # Payflow es cliente final. El "Diseñador/a UX Senior" ya no se descarta:
+    # se etiqueta como senior y se queda, para tener la foto completa.
     assert any(c.display_name == "Payflow" for c in run.targets)
-    assert any(f.reason == "NOT_JUNIOR" for f in run.filtered_jobs)
+    assert not run.filtered_jobs, "aquí no hay nada que no sea diseño digital"
+    todas = [j for c in (run.targets + run.review + run.competition
+                         + run.intermediaries) for j in c.jobs]
+    senior = next(j for j in todas if "Senior" in j.title_raw)
+    assert senior.seniority.label.value == "SENIOR"
     payflow = next(c for c in run.targets if c.display_name == "Payflow")
     señal = next(c for c in payflow.components if c.name == "first_designer_signal")
     assert señal.value == 1.0, "la descripción decía que sería su primera persona de diseño"

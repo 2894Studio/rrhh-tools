@@ -28,6 +28,7 @@ from rrhh_tools.http import url_key  # noqa: E402
 from rrhh_tools.sources.base import guest_detail_url, guest_search_url  # noqa: E402
 
 HTTP_DIR = Path(__file__).parent / "http"
+DEMO_DIR = Path(__file__).parent / "demo"
 
 CARD = """
 <li>
@@ -127,42 +128,110 @@ JOBS = [
 ]
 
 
+# Empresas INVENTADAS para la muestra publicada.
+#
+# Existen por dos motivos. El primero: el sitio publico no debe juzgar a
+# empresas reales — decir de una empresa real que "no es cliente final" o
+# puntuarla con un 92 bajo nuestra marca, en internet abierto, no procede.
+# El segundo: desaparece la trampa de "empresas reales con ofertas falsas",
+# que hasta ahora habia que compensar con un aviso.
+#
+# Los bloques B y C se consiguen con las HEURISTICAS DE DESCRIPCION, sin tocar
+# la denylist, lo que ademas demuestra mejor el clasificador que un acierto de
+# lista. Hay variedad de nivel y de rol para que se vean los filtros.
+DEMO = [
+    ("5001000001", "Junior Product Designer", "Vela Health", "vela-health",
+     "Madrid, Comunidad de Madrid, España", "2026-09-04", "hace 1 día",
+     "Prácticas", "Hospitals and Health Care",
+     "Buscamos Junior Product Designer para nuestro producto. Trabajarás con "
+     "nuestros usuarios y con inteligencia artificial aplicada al diagnostico. "
+     "Usamos IA generativa en el dia a dia. 0-2 anos de experiencia."),
+
+    ("5001000002", "AI Designer", "Bruma Finanzas", "bruma-finanzas",
+     "Madrid, Comunidad de Madrid, España", "2026-09-03", "hace 2 días",
+     "Sin experiencia", "Financial Services",
+     "Seras la primera persona de diseno de la empresa. Nuestra plataforma usa "
+     "machine learning e inteligencia artificial. Nuestro producto crece rapido."),
+
+    ("5001000003", "Senior UX/UI Designer", "Bruma Finanzas", "bruma-finanzas",
+     "Madrid, Comunidad de Madrid, España", "2026-09-02", "hace 3 días",
+     "Intermedio", "Financial Services",
+     "Buscamos Senior UX/UI Designer con minimo 6 anos para nuestro producto."),
+
+    ("5001000004", "Diseñador/a de Producto", "Ánfora Retail", "anfora-retail",
+     "España (En remoto)", "2026-09-01", "hace 4 días",
+     "Sin experiencia", "Retail",
+     "Incorporamos diseno a nuestro equipo. Nuestra plataforma de comercio "
+     "necesita a alguien que cuide la experiencia de nuestros usuarios."),
+
+    ("5001000005", "Becario Diseño UX", "Estudio Marea", "estudio-marea",
+     "Madrid, Comunidad de Madrid, España", "2026-08-31", "hace 5 días",
+     "Prácticas", "Design Services",
+     "Somos una agencia y trabajamos con nuestros clientes de diferentes "
+     "sectores en proyectos de cliente muy variados. Buscamos becario de UX."),
+
+    ("5001000006", "Junior UI Designer", "Selección Aurora", "seleccion-aurora",
+     "España (En remoto)", "2026-08-30", "hace 6 días",
+     "Sin experiencia", "Staffing and Recruiting",
+     "Para uno de nuestros clientes, importante empresa del sector, "
+     "seleccionamos un Junior UI Designer. Proceso confidencial."),
+
+    ("5001000007", "Head of Design", "Talleres Nube", "talleres-nube",
+     "Madrid, Comunidad de Madrid, España", "2026-08-29", "hace 1 semana",
+     "Directivo", "",
+     "Buscamos Head of Design para liderar el area."),
+
+    ("5001000008", "Diseñador Industrial", "Ánfora Retail", "anfora-retail",
+     "Madrid, Comunidad de Madrid, España", "2026-08-28", "hace 1 semana",
+     "Sin experiencia", "Retail",
+     "Diseno industrial de mobiliario de tienda. Se requiere CAD."),
+]
+
+
 def build() -> None:
     settings = load_settings(ROOT / "config")
-    HTTP_DIR.mkdir(parents=True, exist_ok=True)
-    query = Query(id="fixture", keywords="junior UX designer", geo="spain", workplace="remote")
+    lanzables, _ = settings.resolvable_queries()
+    if not lanzables:
+        raise SystemExit("No hay ninguna busqueda lanzable en config/config.yaml")
+    # Se ancla a la primera busqueda configurada. Si se hubiera fijado una query
+    # inventada, cambiar las queries del YAML dejaria las fixtures colgando de
+    # una URL que nadie pide y el pipeline no encontraria nada.
+    query = lanzables[0]
 
+    _build_set(settings, HTTP_DIR, JOBS, query)
+    _build_set(settings, DEMO_DIR, DEMO, query)
+
+    print(f"Generados {len(JOBS) + 2} fixtures de test en {HTTP_DIR}")
+    print(f"Generados {len(DEMO) + 2} fixtures de muestra en {DEMO_DIR}")
+    print(f"  ancladas a la busqueda: {query.id} ({query.keywords})")
+
+
+def _build_set(settings, directory: Path, jobs: list, query: Query) -> None:
+    """Escribe un juego completo de fixtures para una query dada."""
+    directory.mkdir(parents=True, exist_ok=True)
     cards = "".join(
         CARD.format(job_id=j[0], title=j[1], company=j[2], company_slug=j[3],
                     location=j[4], iso=j[5], posted=j[6],
                     slug=j[1].lower().replace(" ", "-").replace("/", "-"))
-        for j in JOBS
+        for j in jobs
     )
     page0 = guest_search_url(query, settings, 0)
-    (HTTP_DIR / f"{url_key(page0)}.html").write_text(f"<ul>{cards}</ul>", encoding="utf-8")
+    (directory / f"{url_key(page0)}.html").write_text(f"<ul>{cards}</ul>", encoding="utf-8")
+    (directory / f"{url_key(guest_search_url(query, settings, 10))}.html").write_text(
+        "<ul></ul>", encoding="utf-8")
 
-    # Pagina siguiente vacia: es lo que termina la paginacion.
-    page1 = guest_search_url(query, settings, 10)
-    (HTTP_DIR / f"{url_key(page1)}.html").write_text("<ul></ul>", encoding="utf-8")
+    for job in jobs:
+        url = guest_detail_url(job[0])
+        (directory / f"{url_key(url)}.html").write_text(
+            DETAIL.format(company=job[2], company_slug=job[3], description=job[9],
+                          seniority=job[7], industries=job[8]),
+            encoding="utf-8")
 
-    # El resto de queries lanzables tienen fixture vacio, para que `replay`
-    # funcione tal cual sin inventarse resultados que no existen. Una busqueda
-    # que no devuelve nada es un caso perfectamente real.
     resolvable, _ = settings.resolvable_queries()
     for other in resolvable:
-        url = guest_search_url(other, settings, 0)
-        path = HTTP_DIR / f"{url_key(url)}.html"
+        path = directory / f"{url_key(guest_search_url(other, settings, 0))}.html"
         if not path.exists():
             path.write_text("<ul></ul>", encoding="utf-8")
-
-    for job in JOBS:
-        url = guest_detail_url(job[0])
-        html = DETAIL.format(company=job[2], company_slug=job[3], description=job[9],
-                             seniority=job[7], industries=job[8])
-        (HTTP_DIR / f"{url_key(url)}.html").write_text(html, encoding="utf-8")
-
-    print(f"Generados {len(JOBS) + 2} fixtures en {HTTP_DIR}")
-    print(f"  busqueda pagina 0: {page0}")
 
 
 if __name__ == "__main__":
