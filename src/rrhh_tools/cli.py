@@ -303,6 +303,7 @@ def cmd_site(args) -> int:
     # cada una para que el fichero suelto siga siendo autocontenido. En el sitio
     # se extrae a styles.css: el navegador la descarga una vez y la cachea.
     _share_stylesheet(out)
+    _share_script(out)
     print(f"Sitio montado en {out}/")
     return 0
 
@@ -327,6 +328,32 @@ def _generar_muestra(settings, destino: Path) -> None:
                       source_label="datos de muestra", es_muestra=True,
                       geo_id=_geo_madrid(settings)),
         encoding="utf-8")
+
+
+def _share_script(out: Path) -> None:
+    """El script de filtros es identico en los dos informes: se extrae a un
+    fichero para que el navegador lo descargue una vez y lo cachee.
+
+    Igual que con la hoja de estilos, cada informe suelto lo sigue llevando
+    embebido para seguir siendo autocontenido; solo el sitio lo separa.
+    """
+    import re
+    paginas = sorted(out.glob("*.html"))
+    cuerpo = None
+    for pagina in paginas:
+        html = pagina.read_text(encoding="utf-8")
+        bloques = [b for b in re.findall(r"<script>.*?</script>", html, re.S)
+                   if "getElementById(\"filtros\")" in b]
+        if not bloques:
+            continue
+        if cuerpo is None:
+            cuerpo = bloques[0]
+            (out / "filtros.js").write_text(
+                cuerpo[len("<script>"):-len("</script>")].strip() + "\n", encoding="utf-8")
+        if bloques[0] == cuerpo:
+            pagina.write_text(
+                html.replace(cuerpo, '<script src="filtros.js" defer></script>', 1),
+                encoding="utf-8")
 
 
 def _share_stylesheet(out: Path) -> None:
