@@ -36,7 +36,7 @@ def classify_seniority(
         return SeniorityVerdict(
             label=SeniorityLabel.NOT_DESIGN,
             confidence=1.0,
-            explanation="El titulo no menciona ningun rol de diseno.",
+            explanation="El título no menciona ningún rol de diseño.",
         )
     role_excluded = _hits(patterns.role_exclude, title)
     if role_excluded:
@@ -44,7 +44,7 @@ def classify_seniority(
             label=SeniorityLabel.NOT_DESIGN,
             confidence=1.0,
             role_hits=role_hits,
-            explanation=f"Diseno, pero no del que buscamos: {', '.join(role_excluded)}.",
+            explanation=f"Diseño, pero no del que buscamos: {', '.join(role_excluded)}.",
         )
 
     # --- Puerta B: negativa (la critica) ---
@@ -66,8 +66,8 @@ def classify_seniority(
             negative_hits=negative,
             role_hits=role_hits,
             explanation=(
-                f"El titulo mezcla niveles: {', '.join(positive)} junto a "
-                f"{', '.join(negative)}. Requiere revision humana."
+                f"El título mezcla niveles: {', '.join(positive)} junto a "
+                f"{', '.join(negative)}. Requiere revisión humana."
             ),
         )
     if negative:
@@ -76,7 +76,7 @@ def classify_seniority(
             confidence=0.95,
             negative_hits=negative,
             role_hits=role_hits,
-            explanation=f"Titulo de nivel superior: {', '.join(negative)}.",
+            explanation=f"Título de nivel superior: {', '.join(negative)}.",
         )
     if positive:
         return SeniorityVerdict(
@@ -84,7 +84,7 @@ def classify_seniority(
             confidence=0.95,
             positive_hits=positive,
             role_hits=role_hits,
-            explanation=f"Titulo junior explicito: {', '.join(positive)}.",
+            explanation=f"Título junior explícito: {', '.join(positive)}.",
         )
 
     # --- El titulo calla: rescate por descripcion y por el campo de LinkedIn ---
@@ -111,7 +111,7 @@ def classify_seniority(
             positive_hits=evidence,
             role_hits=role_hits,
             explanation=(
-                "El titulo no indica nivel, pero el cuerpo si: "
+                "El título no indica nivel, pero el cuerpo sí: "
                 f"{', '.join(str(e) for e in evidence)}."
             ),
         )
@@ -122,12 +122,12 @@ def classify_seniority(
             confidence=0.35,
             positive_hits=weak,
             role_hits=role_hits,
-            explanation=f"Solo una senal debil de nivel: {', '.join(weak)}.",
+            explanation=f"Solo una señal débil de nivel: {', '.join(weak)}.",
         )
 
     return SeniorityVerdict(
         label=SeniorityLabel.AMBIGUOUS,
         confidence=0.3,
         role_hits=role_hits,
-        explanation="Oferta de diseno sin ninguna indicacion de nivel.",
+        explanation="Oferta de diseño sin ninguna indicación de nivel.",
     )

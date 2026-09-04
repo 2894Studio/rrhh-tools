@@ -73,7 +73,7 @@ class Classification(BaseModel):
             CompanyLabel.END_CLIENT: "Cliente final",
             CompanyLabel.AGENCY: "Agencia / estudio digital",
             CompanyLabel.CONSULTANCY: "Consultora IT / ESN",
-            CompanyLabel.STAFFING: "Seleccion / ETT",
+            CompanyLabel.STAFFING: "Selección / ETT",
             CompanyLabel.UNKNOWN: "Sin clasificar",
         }[self.label]
 
@@ -188,19 +188,19 @@ class ProcessedRun(BaseModel):
         """Los cuatro bloques con su titulo y su lectura, en orden de informe."""
         return [
             (Block.TARGET, "Cuentas objetivo",
-             "Clientes finales. A quien podeis llamar para colocar los perfiles.",
+             "Clientes finales. A quién podéis llamar para colocar los perfiles.",
              self.targets),
-            (Block.COMPETITION, "Senal de competencia",
+            (Block.COMPETITION, "Señal de competencia",
              "Agencias y estudios. Que contraten junior significa que hay demanda "
-             "y que estan ganando proyectos.",
+             "y que están ganando proyectos.",
              self.competition),
             (Block.INTERMEDIARY, "Intermediarios",
-             "Consultoras y empresas de seleccion. Ocultan al cliente final, "
+             "Consultoras y empresas de selección. Ocultan al cliente final, "
              "aunque a veces la oferta lo deja entrever.",
              self.intermediaries),
             (Block.REVIEW, "Por revisar",
-             "Clasificacion ambigua o nivel dudoso. Aqui estan las oportunidades "
-             "que ni la heuristica ni nosotros conocemos todavia.",
+             "Clasificación ambigua o nivel dudoso. Aquí están las oportunidades "
+             "que ni la heurística ni nosotros conocemos todavía.",
              self.review),
         ]
 

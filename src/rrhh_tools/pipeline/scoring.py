@@ -26,15 +26,15 @@ from ..models import (
 from ..normalize import normalize_text
 
 _LOCATION_VALUES = {
-    LocationBucket.MADRID: (1.0, "Madrid, donde esta el equipo"),
-    LocationBucket.REMOTE_ES: (0.85, "remoto desde Espana"),
-    LocationBucket.REST_ES: (0.4, "resto de Espana"),
-    LocationBucket.OUTSIDE_ES: (0.0, "fuera de Espana"),
-    LocationBucket.UNKNOWN: (0.3, "ubicacion sin determinar"),
+    LocationBucket.MADRID: (1.0, "Madrid, donde está el equipo"),
+    LocationBucket.REMOTE_ES: (0.85, "remoto desde España"),
+    LocationBucket.REST_ES: (0.4, "resto de España"),
+    LocationBucket.OUTSIDE_ES: (0.0, "fuera de España"),
+    LocationBucket.UNKNOWN: (0.3, "ubicación sin determinar"),
 }
 
 _SENIORITY_VALUES = {
-    SeniorityLabel.JUNIOR: (1.0, "titulo junior explicito"),
+    SeniorityLabel.JUNIOR: (1.0, "título junior explícito"),
     SeniorityLabel.JUNIOR_BY_DESC: (0.6, "nivel junior deducido del cuerpo de la oferta"),
     SeniorityLabel.AMBIGUOUS: (0.35, "nivel ambiguo"),
 }
@@ -62,23 +62,27 @@ def _ai_value(settings: Settings, text: str) -> tuple[float, str]:
     if unique:
         return 0.6, f"la oferta menciona IA ({', '.join(unique)})"
     # 0.2 de base: que no mencione IA no descalifica a la empresa como objetivo.
-    return 0.2, "sin mencion de IA"
+    return 0.2, "sin mención de IA"
+
+
+def _plural_days(days: int) -> str:
+    return "1 día" if days == 1 else f"{days} días"
 
 
 def _recency_value(job: JobPosting, today: date) -> tuple[float, str]:
     days = days_since(job.posted_at, today)
     if days is None:
-        return 0.5, "sin fecha de publicacion"
+        return 0.5, "sin fecha de publicación"
     if days <= 3:
-        base, label = 1.0, f"publicada hace {days} dias"
+        base, label = 1.0, f"publicada hace {_plural_days(days)}"
     elif days <= 7:
-        base, label = 0.9, f"publicada hace {days} dias"
+        base, label = 0.9, f"publicada hace {_plural_days(days)}"
     elif days <= 14:
-        base, label = 0.7, f"publicada hace {days} dias"
+        base, label = 0.7, f"publicada hace {_plural_days(days)}"
     elif days <= 30:
-        base, label = 0.4, f"publicada hace {days} dias"
+        base, label = 0.4, f"publicada hace {_plural_days(days)}"
     else:
-        base, label = 0.15, f"publicada hace {days} dias, puede estar cerrada"
+        base, label = 0.15, f"publicada hace {_plural_days(days)}, puede estar cerrada"
     # Se mezcla hacia el valor neutro segun la confianza de la fecha: "hace 2
     # semanas" es un rango, no un instante, y no debe pesar como uno.
     confidence = job.posted_confidence
@@ -91,19 +95,19 @@ def _recency_value(job: JobPosting, today: date) -> tuple[float, str]:
 def _first_designer_value(settings: Settings, text: str) -> tuple[float, str]:
     strong = _count_matches(settings.patterns.first_designer_strong, text)
     if strong:
-        return 1.0, f'busca su primera persona de diseno ("{strong[0].strip()}")'
+        return 1.0, "la oferta dice que será su primera persona de diseño"
     mature = _count_matches(settings.patterns.first_designer_mature, text)
     if mature:
-        return 0.2, f"ya tiene una organizacion de diseno montada ({mature[0].strip()})"
-    return 0.5, "sin senales sobre la madurez de su equipo de diseno"
+        return 0.2, "ya tiene una organización de diseño montada"
+    return 0.5, "sin señales sobre la madurez de su equipo de diseño"
 
 
 def _volume_value(n_design_jobs: int) -> tuple[float, str]:
     if n_design_jobs >= 3:
-        return 1.0, f"{n_design_jobs} vacantes de diseno abiertas"
+        return 1.0, f"{n_design_jobs} vacantes de diseño abiertas"
     if n_design_jobs == 2:
-        return 0.7, "2 vacantes de diseno abiertas"
-    return 0.3, "1 vacante de diseno abierta"
+        return 0.7, "2 vacantes de diseño abiertas"
+    return 0.3, "1 vacante de diseño abierta"
 
 
 def score_company(
@@ -149,13 +153,13 @@ def score_company(
                        weight=weights["end_client_confidence"], value=ec_value, explanation=ec_why),
         ScoreComponent(name="seniority_match", label="Encaje de nivel",
                        weight=weights["seniority_match"], value=best_sen[0], explanation=best_sen[1]),
-        ScoreComponent(name="location_fit", label="Encaje de ubicacion",
+        ScoreComponent(name="location_fit", label="Encaje de ubicación",
                        weight=weights["location_fit"], value=best_loc[0], explanation=best_loc[1]),
         ScoreComponent(name="ai_relevance", label="Relevancia de IA",
                        weight=weights["ai_relevance"], value=best_ai[0], explanation=best_ai[1]),
         ScoreComponent(name="recency", label="Frescura",
                        weight=weights["recency"], value=best_rec[0], explanation=best_rec[1]),
-        ScoreComponent(name="first_designer_signal", label="Equipo de diseno por construir",
+        ScoreComponent(name="first_designer_signal", label="Equipo de diseño por construir",
                        weight=weights["first_designer_signal"], value=fd_value, explanation=fd_why),
         ScoreComponent(name="multiple_open_design_roles", label="Vacantes abiertas",
                        weight=weights["multiple_open_design_roles"], value=vol_value, explanation=vol_why),
@@ -170,7 +174,7 @@ def _build_why(score: float, components: list[ScoreComponent]) -> str:
     top = [c for c in ranked if c.value >= 0.6][:2]
     # El lastre se mide por puntos perdidos frente al maximo del factor.
     drag = max(components, key=lambda c: c.weight * (1 - c.value))
-    parts = [f"{score:.1f}"]
+    parts = []
     if top:
         parts.append(" · ".join(c.explanation.capitalize() for c in top) + ".")
     else:

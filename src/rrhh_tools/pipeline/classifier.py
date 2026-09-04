@@ -123,7 +123,7 @@ class CompanyClassifier:
                 note = override.get("note", "")
                 return Classification(
                     label=label, confidence=1.0, block=_block_for(label, self.settings),
-                    reasons=[f"Decision manual del equipo: {label.value}." + (f" {note}" if note else "")],
+                    reasons=[f"Decisión manual del equipo: {label.value}." + (f" {note}" if note else "")],
                     rule_source="manual_override",
                 )
 
@@ -145,7 +145,7 @@ class CompanyClassifier:
         if norm.norm in self.allow:
             sector = self.allow[norm.norm]
             reasons.append(
-                f"Esta en la allowlist de clientes finales conocidos"
+                f"Está en la allowlist de clientes finales conocidos"
                 + (f" (sector: {sector})." if sector else ".")
             )
             return Classification(
@@ -157,7 +157,7 @@ class CompanyClassifier:
         for entry in self.deny:
             if len(entry.tokens) >= 2 and entry.tokens and entry.tokens <= norm.tokens:
                 return self._deny(entry, 0.90, "token_subset",
-                                  reasons + [f"El nombre contiene todos los terminos de {entry.name}."])
+                                  reasons + [f"El nombre contiene todos los términos de {entry.name}."])
 
         # --- Reglas 5 y 6: fuzzy, con las tres protecciones puestas ---
         best, best_ratio = None, 0.0
@@ -203,7 +203,7 @@ class CompanyClassifier:
         )
 
         if label == CompanyLabel.UNKNOWN:
-            reasons.append("Ninguna regla identifico el tipo de empresa.")
+            reasons.append("Ninguna regla identificó el tipo de empresa.")
             return Classification(
                 label=CompanyLabel.UNKNOWN, confidence=0.0, block=Block.REVIEW,
                 reasons=reasons, rule_source="default",
@@ -268,7 +268,7 @@ class CompanyClassifier:
                 # Nunca decisivo: las empresas de producto se auto-etiquetan asi
                 # constantemente y perderiamos clientes finales buenos.
                 reasons.append(
-                    f"Sector declarado: {industry} (indicio debil, no concluyente)."
+                    f"Sector declarado: {industry} (indicio débil, no concluyente)."
                 )
                 return CompanyLabel.CONSULTANCY, 0.60, reasons
         for industry in industries:

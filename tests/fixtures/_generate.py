@@ -145,6 +145,16 @@ def build() -> None:
     page1 = guest_search_url(query, settings, 10)
     (HTTP_DIR / f"{url_key(page1)}.html").write_text("<ul></ul>", encoding="utf-8")
 
+    # El resto de queries lanzables tienen fixture vacio, para que `replay`
+    # funcione tal cual sin inventarse resultados que no existen. Una busqueda
+    # que no devuelve nada es un caso perfectamente real.
+    resolvable, _ = settings.resolvable_queries()
+    for other in resolvable:
+        url = guest_search_url(other, settings, 0)
+        path = HTTP_DIR / f"{url_key(url)}.html"
+        if not path.exists():
+            path.write_text("<ul></ul>", encoding="utf-8")
+
     for job in JOBS:
         url = guest_detail_url(job[0])
         html = DETAIL.format(company=job[2], company_slug=job[3], description=job[9],

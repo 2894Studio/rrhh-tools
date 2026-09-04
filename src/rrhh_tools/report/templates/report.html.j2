@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* Sistema de marca 2894 / AZ.
+   Paleta deliberadamente fria: no hay ni un acento calido en toda la hoja.
+   La prioridad se codifica con INTENSIDAD DE COBALTO, no con rojo/ambar/verde,
+   porque el sistema prohibe los tonos calidos.
+   sky-blue nunca se usa como texto sobre fondo claro: da 1.96:1 de contraste,
+   muy por debajo del minimo AA. Solo aparece como elemento grafico. */
+:root{
+  --cloud-white:#F7F8FA;
+  --sky-blue:#7DB7FF;
+  --deep-cobalt:#0A46FF;
+  --soft-gray:#E6E8EC;
+  --ink-black:#0B0B0D;
+  --ink-60:#5B5C61;
+  --radius:14px;
+  --max:1080px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--cloud-white);
+  color:var(--ink-black);
+  font-family:"DM Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-weight:400;
+  font-size:16px;
+  line-height:1.55;
+}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+
+/* --- Portada: titular editorial grande, alineado a la izquierda, con aire --- */
+.hero{padding:88px 0 56px}
+.wordmark{
+  font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  font-size:14px;color:var(--deep-cobalt);margin:0 0 40px
+}
+.hero h1{
+  font-weight:700;font-size:clamp(38px,6.2vw,68px);line-height:1.02;
+  letter-spacing:-.025em;margin:0 0 18px;max-width:15ch
+}
+/* La voz de marca empareja una linea evocadora con una funcional. */
+.hero .plain{font-weight:300;font-size:clamp(17px,2.1vw,21px);color:var(--ink-60);margin:0;max-width:52ch}
+.meta{margin-top:36px;font-size:13px;color:var(--ink-60);display:flex;flex-wrap:wrap;gap:8px 22px}
+.meta code{font-family:inherit;font-weight:500;color:var(--ink-black)}
+
+/* --- Panel de datos en cobalto. Es el UNICO bloque cobalto solido del
+       informe: la regla de marca permite un solo elemento destacado. --- */
+.temp{
+  background:var(--deep-cobalt);color:#fff;border-radius:var(--radius);
+  padding:34px 32px;margin:8px 0 12px
+}
+.temp h2{font-weight:700;font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+.temp .plain{font-weight:300;margin:0 0 26px;opacity:.85;font-size:15px}
+.temp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:12px}
+.stat{background:rgba(255,255,255,.12);border-radius:10px;padding:16px 18px}
+.stat .n{font-weight:700;font-size:30px;line-height:1;letter-spacing:-.02em}
+.stat .l{font-weight:400;font-size:12.5px;opacity:.88;margin-top:7px;line-height:1.35}
+
+/* --- Secciones --- */
+section{margin:64px 0}
+.sec-head{margin-bottom:26px;border-top:1px solid var(--soft-gray);padding-top:26px}
+.sec-head .tag{
+  font-weight:700;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--deep-cobalt);margin-bottom:10px
+}
+.sec-head h2{font-weight:700;font-size:clamp(26px,3.4vw,38px);letter-spacing:-.02em;margin:0 0 10px}
+.sec-head p{font-weight:300;color:var(--ink-60);margin:0;max-width:62ch;font-size:15.5px}
+
+/* --- Tarjetas de empresa --- */
+.card{
+  background:#fff;border:1px solid var(--soft-gray);border-radius:var(--radius);
+  padding:24px 26px;margin-bottom:14px
+}
+.card.dark{background:var(--ink-black);border-color:var(--ink-black);color:#fff}
+.card.dark .why,.card.dark .muted{color:#B9BBC2}
+.card.dark .job{border-color:rgba(255,255,255,.16)}
+.card.dark a{color:var(--sky-blue)}   /* sky-blue solo sobre ink-black: 9.45:1 */
+.card-top{display:flex;gap:20px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.card h3{font-weight:700;font-size:20px;margin:0 0 6px;letter-spacing:-.012em}
+.card h3 a{color:inherit;text-decoration:none;border-bottom:2px solid var(--sky-blue)}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+.badge{
+  font-size:11.5px;font-weight:500;padding:4px 10px;border-radius:6px;
+  background:var(--soft-gray);color:var(--ink-black)
+}
+.badge.brand{background:var(--deep-cobalt);color:#fff}
+.badge.line{background:transparent;border:1px solid var(--soft-gray);color:var(--ink-60)}
+.why{font-weight:300;color:var(--ink-60);margin:14px 0 0;font-size:15px}
+
+/* Puntuacion: intensidad de cobalto, nunca semaforo de colores calidos. */
+.score{text-align:right;flex-shrink:0;min-width:76px}
+.score .n{font-weight:700;font-size:34px;line-height:1;letter-spacing:-.03em;color:var(--deep-cobalt)}
+.card.dark .score .n{color:var(--sky-blue)}
+.score .l{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-60);margin-top:5px;font-weight:500}
+.bar{height:5px;background:var(--soft-gray);border-radius:3px;overflow:hidden;margin-top:16px}
+.bar span{display:block;height:100%;background:var(--deep-cobalt);border-radius:3px}
+.card.dark .bar{background:rgba(255,255,255,.18)}
+.card.dark .bar span{background:var(--sky-blue)}
+
+details{margin-top:16px}
+summary{
+  cursor:pointer;font-weight:500;font-size:13.5px;color:var(--deep-cobalt);
+  list-style:none;padding:6px 0
+}
+.card.dark summary{color:var(--sky-blue)}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+ ";font-weight:700}
+details[open] summary::before{content:"– "}
+
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13.5px}
+th{
+  text-align:left;font-weight:500;color:var(--ink-60);border-bottom:1px solid var(--soft-gray);
+  padding:8px 10px 8px 0;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase
+}
+td{padding:9px 10px 9px 0;border-bottom:1px solid var(--soft-gray);vertical-align:top}
+td.num{text-align:right;font-weight:500;white-space:nowrap}
+.card.dark th,.card.dark td{border-color:rgba(255,255,255,.14)}
+
+.job{border-top:1px solid var(--soft-gray);padding:13px 0 0;margin-top:13px}
+.job a{color:var(--ink-black);font-weight:500;text-decoration:none;border-bottom:1px solid var(--sky-blue)}
+.job .muted{color:var(--ink-60);font-size:13px;margin-top:3px;font-weight:300}
+.reasons{margin:10px 0 0;padding-left:18px;font-size:13.5px;color:var(--ink-60);font-weight:300}
+.reasons li{margin:3px 0}
+.empty{
+  border:1px dashed var(--soft-gray);border-radius:var(--radius);
+  padding:30px;text-align:center;color:var(--ink-60);font-weight:300
+}
+.scroll{overflow-x:auto}
+footer{
+  margin:88px 0 64px;padding-top:32px;border-top:1px solid var(--soft-gray)
+}
+footer .poetic{font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 6px}
+footer .plain{font-weight:300;color:var(--ink-60);margin:0 0 26px}
+footer .note{font-size:12.5px;color:var(--ink-60);font-weight:300;max-width:74ch}
+@media print{
+  body{background:#fff}
+  .card,.temp{break-inside:avoid}
+  details{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="wordmark">2894</div>
+    <h1>Quién busca diseño junior.</h1>
+    <p class="plain">Ofertas de LinkedIn en España, filtradas a nivel junior y ordenadas por
+       lo útil que es cada empresa como cuenta a la que llamar.</p>
+    <div class="meta">
+      <span>Generado <code>{{ generated }}</code></span>
+      <span>Ejecución <code>{{ run_id }}</code></span>
+      <span>Configuración <code>{{ config_hash }}</code></span>
+      <span>Fuente <code>{{ source_label }}</code></span>
+    </div>
+  </header>
+
+  <div class="temp">
+    <h2>Temperatura del mercado</h2>
+    <p class="plain">Cuántas vacantes de diseño junior hay ahora mismo, y de quién son.</p>
+    <div class="temp-grid">
+      <div class="stat"><div class="n">{{ counts.A }}</div><div class="l">en clientes finales</div></div>
+      <div class="stat"><div class="n">{{ counts.B }}</div><div class="l">en agencias</div></div>
+      <div class="stat"><div class="n">{{ counts.C }}</div><div class="l">en intermediarios</div></div>
+      <div class="stat"><div class="n">{{ counts.D }}</div><div class="l">por revisar</div></div>
+      <div class="stat"><div class="n">{{ counts.filtered }}</div><div class="l">descartadas por nivel o rol</div></div>
+    </div>
+  </div>
+
+  {% for block in blocks %}
+  <section>
+    <div class="sec-head">
+      <div class="tag">Bloque {{ block.id }}</div>
+      <h2>{{ block.title }}.</h2>
+      <p>{{ block.description }}</p>
+    </div>
+
+    {% if not block.rows %}
+      <div class="empty">Ninguna empresa en este bloque en esta ejecución.</div>
+    {% else %}
+      {% for row in block.rows %}{% set c = row.c %}
+      <article class="card {{ 'dark' if block.id == 'C' else '' }}">
+        <div class="card-top">
+          <div style="flex:1;min-width:230px">
+            <h3>{% if c.linkedin_url %}<a href="{{ c.linkedin_url }}">{{ c.display_name }}</a>{% else %}{{ c.display_name }}{% endif %}</h3>
+            <div class="badges">
+              <span class="badge {{ 'brand' if block.id == 'A' else 'line' }}">{{ c.classification.category_label }}</span>
+              {% for b in row.badges %}<span class="badge line">{{ b }}</span>{% endfor %}
+            </div>
+          </div>
+          <div class="score">
+            <div class="n">{{ '%.0f'|format(c.score) }}</div>
+            <div class="l">prioridad</div>
+          </div>
+        </div>
+
+        <div class="bar"><span style="width:{{ c.score }}%"></span></div>
+        <p class="why">{{ c.why }}</p>
+
+        <details>
+          <summary>Por qué puntúa así</summary>
+          <div class="scroll">
+          <table>
+            <thead><tr><th>Factor</th><th>Lectura</th><th style="text-align:right">Peso</th><th style="text-align:right">Puntos</th></tr></thead>
+            <tbody>
+            {% for comp in c.components %}
+              <tr>
+                <td>{{ comp.label }}</td>
+                <td>{{ comp.explanation }}</td>
+                <td class="num">{{ '%.0f'|format(comp.weight) }}</td>
+                <td class="num">{{ '%.1f'|format(comp.points) }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          </div>
+          {% if c.classification.reasons %}
+          <ul class="reasons">
+            {% for r in c.classification.reasons %}<li>{{ r }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+        </details>
+
+        {% for j in c.jobs %}
+        <div class="job">
+          <a href="{{ j.url }}">{{ j.title_raw }}</a>
+          <div class="muted">
+            {{ j.location_raw or 'ubicación sin determinar' }}
+            {%- if j.posted_text %} · {{ j.posted_text }}{% endif %}
+            {%- if j.seniority %} · {{ j.seniority.explanation }}{% endif %}
+            {%- if j.n_sightings > 1 %} · vista {{ j.n_sightings }} veces{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </article>
+      {% endfor %}
+    {% endif %}
+  </section>
+  {% endfor %}
+
+  <section>
+    <div class="sec-head">
+      <div class="tag">Control</div>
+      <h2>Qué quedó fuera.</h2>
+      <p>Nada se descarta en silencio. Aquí está todo lo que el filtro apartó y por qué,
+         para poder corregir las reglas si algo se fue por error.</p>
+    </div>
+    <article class="card">
+      <details {% if filtered %}open{% endif %}>
+        <summary>{{ filtered|length }} ofertas apartadas por nivel o por rol</summary>
+        <div class="scroll">
+        <table>
+          <thead><tr><th>Oferta</th><th>Empresa</th><th>Motivo</th></tr></thead>
+          <tbody>
+          {% for f in filtered %}
+            <tr><td>{{ f.title_raw }}</td><td>{{ f.company_name_raw }}</td><td>{{ f.detail }}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        </div>
+      </details>
+      <details>
+        <summary>Diagnóstico de la ejecución</summary>
+        <ul class="reasons">
+          <li>Reconciliación: {{ reconcile_msg }}</li>
+          <li>Páginas descargadas: {{ diagnostics.pages_fetched }}</li>
+          <li>Duplicadas fusionadas: {{ diagnostics.duplicates_merged }}</li>
+          {% for q in diagnostics.queries_run %}<li>Búsqueda: {{ q }}</li>{% endfor %}
+          {% for a in diagnostics.alias_suspicions %}<li>Posible alias sin unir: {{ a }}</li>{% endfor %}
+          {% for e in diagnostics.errors %}<li>Error: {{ e }}</li>{% endfor %}
+          {% if diagnostics.stopped_early %}<li>Ejecución detenida antes de tiempo: {{ diagnostics.stop_reason }}</li>{% endif %}
+        </ul>
+      </details>
+    </article>
+  </section>
+
+  <footer>
+    <p class="poetic">Ellos buscan. Nosotros presentamos.</p>
+    <p class="plain">Esta lista prepara la conversación; la llamada la hacéis vosotros.</p>
+    <p class="note">
+      El listado recoge lo que se vio en {{ diagnostics.queries_run|length }} búsquedas de LinkedIn,
+      no todas las ofertas de diseño junior que existen en España. Las fechas de publicación son
+      aproximadas cuando LinkedIn solo da una referencia relativa. La clasificación de empresa es
+      automática y revisable: el bloque «Por revisar» existe precisamente para las que el sistema
+      no supo resolver.
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>
