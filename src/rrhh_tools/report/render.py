@@ -124,8 +124,29 @@ def _enlace_empresa(company: Company, geo_id: str | None) -> str:
     return job_search(company.display_name, geo_id)
 
 
+# Encabezados de bloque para la version publica. Los del dominio (models.py)
+# dicen para que sirve cada bloque en la conversacion comercial ("a quien podeis
+# llamar", "estan ganando proyectos"): es nuestra estrategia y no se publica.
+# Aqui se sustituyen por el hecho desnudo, que es lo que aporta la muestra.
+# Se hace en el renderer, no en la plantilla, por el mismo motivo que la lista
+# curada: lo que no este explicitamente traducido no llega al publico por error.
+BLOQUES_PUBLICOS = {
+    "A": ("Empresas con producto propio",
+          "Empresas que contratan diseño para su propio producto."),
+    "B": ("Agencias y estudios",
+          "Agencias y estudios de diseño con vacantes abiertas."),
+    "C": ("Intermediarios",
+          "Consultoras y empresas de selección. La oferta no dice para quién es "
+          "el puesto, aunque a veces se deja entrever."),
+    "D": ("Por revisar",
+          "Clasificación ambigua: el sistema no supo resolver de qué tipo de "
+          "empresa se trata."),
+}
+
+
 def render_report(run: ProcessedRun, title: str, source_label: str = "LinkedIn",
-                  es_muestra: bool = False, geo_id: str | None = None) -> str:
+                  es_muestra: bool = False, geo_id: str | None = None,
+                  publico: bool = False) -> str:
     env = Environment(
         loader=FileSystemLoader(TEMPLATE_DIR),
         # autoescape=True explicito, NO select_autoescape(["html"]): esa funcion
@@ -142,6 +163,8 @@ def render_report(run: ProcessedRun, title: str, source_label: str = "LinkedIn",
     # viajan aparte, sin ensuciar el modelo Company.
     blocks = []
     for block_id, block_title, description, companies in run.blocks:
+        if publico:
+            block_title, description = BLOQUES_PUBLICOS[block_id.value]
         blocks.append({
             "id": block_id.value,
             "title": block_title,
@@ -167,6 +190,7 @@ def render_report(run: ProcessedRun, title: str, source_label: str = "LinkedIn",
         # Un informe generado contra fixtures lleva empresas reales con ofertas
         # inventadas. Sin un aviso dentro de la propia pagina se lee como real.
         es_muestra=es_muestra,
+        publico=publico,
         counts=run.count_jobs(),
         niveles=_reparto_niveles(run),
         blocks=blocks,

@@ -285,9 +285,14 @@ def cmd_site(args) -> int:
 
     # Por defecto la muestra sale de las fixtures FICTICIAS: el sitio publicado
     # no debe juzgar a empresas reales en internet abierto.
-    radar = Path(args.radar) if args.radar else Path("reports/muestra.html")
-    if not radar.is_file() and radar.name == "muestra.html":
-        _generar_muestra(settings, radar)
+    # La muestra publica y la interna van a ficheros DISTINTOS a proposito: si
+    # compartieran nombre, una muestra generada antes en modo interno se
+    # reutilizaria tal cual y el sitio publico saldria con el razonamiento
+    # comercial dentro sin que nada avisara.
+    por_defecto = "muestra-publica.html" if args.publico else "muestra.html"
+    radar = Path(args.radar) if args.radar else Path("reports") / por_defecto
+    if not radar.is_file() and radar.name == por_defecto and not args.radar:
+        _generar_muestra(settings, radar, publico=args.publico)
     if radar.is_file():
         shutil.copy(radar, out / "radar.html")
     else:
@@ -308,7 +313,7 @@ def cmd_site(args) -> int:
     return 0
 
 
-def _generar_muestra(settings, destino: Path) -> None:
+def _generar_muestra(settings, destino: Path, publico: bool = False) -> None:
     """Genera la muestra del radar desde las fixtures ficticias."""
     from .http import FixtureFetcher
     from .sources import guest
@@ -326,7 +331,7 @@ def _generar_muestra(settings, destino: Path) -> None:
     destino.write_text(
         render_report(run, settings.report["title"],
                       source_label="datos de muestra", es_muestra=True,
-                      geo_id=_geo_madrid(settings)),
+                      geo_id=_geo_madrid(settings), publico=publico),
         encoding="utf-8")
 
 

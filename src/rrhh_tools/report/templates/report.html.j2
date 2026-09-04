@@ -196,8 +196,13 @@
   </section>
 
   <footer>
+{% if publico %}
+    <p class="poetic">El mercado, en una página.</p>
+    <p class="plain">Quién contrata diseño en España, y de qué nivel.</p>
+{% else %}
     <p class="poetic">Ellos buscan. Nosotros presentamos.</p>
     <p class="plain">Esta lista prepara la conversación; la llamada la hacéis vosotros.</p>
+{% endif %}
     <p class="note">
       El listado recoge lo que se vio en {{ diagnostics.queries_run|length }} búsquedas de LinkedIn,
       no todas las ofertas de diseño que existen en España. Las fechas de publicación son

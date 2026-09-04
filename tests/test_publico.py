@@ -207,3 +207,50 @@ def test_ninguna_ficha_sin_oferta_aparenta_tener_una():
         if entrada.get("evidencia") == "estrategica":
             assert not entrada.get("oferta_url"), entrada["nombre"]
             assert not entrada.get("vacante"), entrada["nombre"]
+
+
+def _muestra(settings, publico: bool) -> str:
+    from datetime import date
+    from rrhh_tools.http import FixtureFetcher
+    from rrhh_tools.pipeline.run import process
+    from rrhh_tools.report.render import render_report
+    from rrhh_tools.sources import guest
+
+    fetcher = FixtureFetcher(Path(__file__).parent / "fixtures" / "demo")
+    queries, _ = settings.resolvable_queries()
+    registros, _ = guest.collect(fetcher, queries, settings, 250)
+    return render_report(process(registros, settings, "m", today=date(2026, 9, 5)),
+                         "t", es_muestra=True, publico=publico)
+
+
+# Empresas inventadas evitan juzgar a nadie real, pero no tapan la otra fuga:
+# los encabezados del radar explican para qué sirve cada bloque en NUESTRA
+# conversación comercial. Eso es estrategia, y en abierto sobra.
+FRASES_DE_ESTRATEGIA_DEL_RADAR = [
+    "A quién podéis llamar",
+    "colocar los perfiles",
+    "Señal de competencia",
+    "están ganando proyectos",
+    "Ellos buscan. Nosotros presentamos.",
+    "prepara la conversación",
+]
+
+
+@pytest.mark.parametrize("frase", FRASES_DE_ESTRATEGIA_DEL_RADAR)
+def test_el_radar_publico_no_explica_nuestra_estrategia(settings, frase):
+    assert _plano(frase) not in _plano(_muestra(settings, publico=True))
+
+
+@pytest.mark.parametrize("frase", FRASES_DE_ESTRATEGIA_DEL_RADAR)
+def test_el_radar_interno_si_la_explica(settings, frase):
+    """El informe de trabajo no se toca: es donde vive el razonamiento."""
+    assert _plano(frase) in _plano(_muestra(settings, publico=False))
+
+
+def test_el_radar_publico_conserva_los_hechos(settings):
+    """Se recorta la lectura comercial, no el dato ni el formato."""
+    html = _muestra(settings, publico=True)
+    assert "Vela Health" in html          # las fichas siguen ahí
+    assert "Junior Product Designer" in html
+    assert "data-nivel=" in html          # y los filtros también
+    assert "inventadas" in html           # con su aviso de muestra
