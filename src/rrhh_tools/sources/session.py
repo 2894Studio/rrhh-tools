@@ -18,7 +18,7 @@ from typing import Any
 from ..config import Query, Settings
 from ..http import AuthWall
 from ..parsing.session import parse_session_cards, parse_session_detail
-from .base import session_search_url
+from .base import rotacion, session_search_url
 
 PAGE_SIZE = 25
 COOKIE_ENV = "LINKEDIN_LI_AT"
@@ -63,47 +63,53 @@ def collect(
         }])
         page = context.new_page()
         try:
-            for query in queries:
-                labels.append(f"{query.keywords} / {query.geo}"
-                              + (f" / {query.workplace}" if query.workplace else ""))
-                for page_index in range(settings.run["max_pages_per_query"]):
-                    if len(records) >= max_jobs:
-                        return records, labels
-                    url = session_search_url(query, settings, page_index * PAGE_SIZE)
-                    page.goto(url, wait_until="domcontentloaded",
-                              timeout=settings.run["request_timeout_seconds"] * 1000)
-                    time.sleep(delay)
-                    if any(marker in page.url for marker in
-                           ("/authwall", "/uas/login", "/checkpoint/")):
-                        raise AuthWall(
-                            "LinkedIn ha redirigido al muro de login. Tu cookie li_at ha "
-                            "caducado o la sesión está restringida.\n"
-                            "Copia una cookie nueva a .env, o cambia a --source guest."
-                        )
-                    # Carga diferida: el listado solo pinta al hacer scroll.
-                    for _ in range(3):
-                        page.mouse.wheel(0, 2200)
-                        time.sleep(1.0)
-                    html = page.content()
-                    if record_dir:
-                        from ..http import url_key
-                        record_dir.mkdir(parents=True, exist_ok=True)
-                        (record_dir / f"{url_key(url)}.html").write_text(html, encoding="utf-8")
-                    cards = parse_session_cards(html)
-                    if not cards:
-                        break
-                    for card in cards:
-                        if card["job_id"] in seen or len(records) >= max_jobs:
-                            continue
-                        seen.add(card["job_id"])
-                        card["source"] = "session"
-                        # La descripcion es lo que mas le importa al
-                        # clasificador: sin ella no hay frases de
-                        # intermediario, ni menciones de IA, ni senal de
-                        # "primer disenador". Vale la peticion extra.
-                        if fetch_details:
-                            _cargar_detalle(page, card, settings, delay, record_dir)
-                        records.append(card)
+            agotadas: set[int] = set()
+            for page_index, query in rotacion(queries,
+                                              settings.run["max_pages_per_query"]):
+                if len(records) >= max_jobs:
+                    break
+                if id(query) in agotadas:
+                    continue
+                etiqueta = (f"{query.keywords} / {query.geo}"
+                            + (f" / {query.workplace}" if query.workplace else ""))
+                if etiqueta not in labels:
+                    labels.append(etiqueta)
+                url = session_search_url(query, settings, page_index * PAGE_SIZE)
+                page.goto(url, wait_until="domcontentloaded",
+                          timeout=settings.run["request_timeout_seconds"] * 1000)
+                time.sleep(delay)
+                if any(marker in page.url for marker in
+                       ("/authwall", "/uas/login", "/checkpoint/")):
+                    raise AuthWall(
+                        "LinkedIn ha redirigido al muro de login. Tu cookie li_at ha "
+                        "caducado o la sesión está restringida.\n"
+                        "Copia una cookie nueva a .env, o cambia a --source guest."
+                    )
+                # Carga diferida: el listado solo pinta al hacer scroll.
+                for _ in range(3):
+                    page.mouse.wheel(0, 2200)
+                    time.sleep(1.0)
+                html = page.content()
+                if record_dir:
+                    from ..http import url_key
+                    record_dir.mkdir(parents=True, exist_ok=True)
+                    (record_dir / f"{url_key(url)}.html").write_text(html, encoding="utf-8")
+                cards = parse_session_cards(html)
+                if not cards:
+                    agotadas.add(id(query))
+                    continue
+                for card in cards:
+                    if card["job_id"] in seen or len(records) >= max_jobs:
+                        continue
+                    seen.add(card["job_id"])
+                    card["source"] = "session"
+                    # La descripcion es lo que mas le importa al
+                    # clasificador: sin ella no hay frases de
+                    # intermediario, ni menciones de IA, ni senal de
+                    # "primer disenador". Vale la peticion extra.
+                    if fetch_details:
+                        _cargar_detalle(page, card, settings, delay, record_dir)
+                    records.append(card)
         finally:
             context.close()
             browser.close()

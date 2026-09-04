@@ -108,3 +108,32 @@ def test_el_tope_de_ofertas_se_respeta(settings, fixtures_dir):
     queries, _ = settings.resolvable_queries()
     registros, _ = guest.collect(f, queries, settings, max_jobs=3)
     assert len(registros) <= 3
+
+
+def test_el_tope_se_reparte_entre_todas_las_busquedas(settings, fixtures_dir):
+    """El tope es GLOBAL, y antes se gastaba en orden.
+
+    Con 14 búsquedas y un tope de 40, la primera se comía el presupuesto entero
+    y las otras 13 no llegaban a lanzarse nunca: el informe salía sesgado a
+    "product designer / Madrid" sin que nada lo dijera. Ahora se rota por
+    páginas, así que todas aportan antes de que ninguna pase a la segunda.
+    """
+    from rrhh_tools.http import FixtureFetcher
+    from rrhh_tools.sources import guest
+
+    lanzables, _ = settings.resolvable_queries()
+    assert len(lanzables) > 1, "hacen falta varias búsquedas para que esto tenga sentido"
+
+    # Tope pequeño a propósito: es donde se notaba el sesgo.
+    _, labels = guest.collect(FixtureFetcher(fixtures_dir), lanzables, settings, 12)
+    assert len(labels) > 1, "el tope se agotó en la primera búsqueda"
+
+
+def test_la_rotacion_va_por_paginas_no_por_busqueda():
+    from rrhh_tools.sources.base import rotacion
+
+    pares = list(rotacion(["a", "b", "c"], 2))
+    assert pares == [(0, "a"), (0, "b"), (0, "c"), (1, "a"), (1, "b"), (1, "c")]
+    # La clave: ninguna búsqueda llega a su página 1 antes de que todas hayan
+    # hecho su página 0.
+    assert [p for p, _ in pares] == sorted(p for p, _ in pares)

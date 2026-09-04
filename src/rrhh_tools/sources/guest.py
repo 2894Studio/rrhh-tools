@@ -7,7 +7,7 @@ from typing import Any
 from ..config import Query, Settings
 from ..http import Fetcher
 from ..parsing.guest import parse_job_detail, parse_search_cards
-from .base import guest_detail_url, guest_search_url
+from .base import guest_detail_url, guest_search_url, rotacion
 
 PAGE_SIZE = 10
 
@@ -29,29 +29,34 @@ def collect(
     records: list[dict[str, Any]] = []
     labels: list[str] = []
 
-    for query in queries:
-        labels.append(f"{query.keywords} / {query.geo}"
-                      + (f" / {query.workplace}" if query.workplace else ""))
-        for page in range(settings.run["max_pages_per_query"]):
-            if len(records) >= max_jobs:
-                return records, labels
-            html = fetcher.get(guest_search_url(query, settings, page * PAGE_SIZE))
-            cards = parse_search_cards(html)
-            if not cards:
-                break  # pagina vacia: fin de la paginacion para esta query
-            for card in cards:
-                if card["job_id"] in seen or len(records) >= max_jobs:
-                    continue
-                seen.add(card["job_id"])
-                card["source"] = "guest"
-                if fetch_details:
-                    try:
-                        detail = parse_job_detail(fetcher.get(guest_detail_url(card["job_id"])))
-                        card.update({k: v for k, v in detail.items()
-                                     if k not in ("parse_warnings", "criteria")})
-                        card["parse_warnings"] = (card.get("parse_warnings") or []) + \
-                            detail.get("parse_warnings", [])
-                    except FileNotFoundError:
-                        card.setdefault("parse_warnings", []).append("sin detalle disponible")
-                records.append(card)
+    agotadas: set[int] = set()
+    for page, query in rotacion(queries, settings.run["max_pages_per_query"]):
+        if len(records) >= max_jobs:
+            break
+        if id(query) in agotadas:
+            continue
+        etiqueta = (f"{query.keywords} / {query.geo}"
+                    + (f" / {query.workplace}" if query.workplace else ""))
+        if etiqueta not in labels:
+            labels.append(etiqueta)
+        html = fetcher.get(guest_search_url(query, settings, page * PAGE_SIZE))
+        cards = parse_search_cards(html)
+        if not cards:
+            agotadas.add(id(query))  # fin de la paginacion para esta busqueda
+            continue
+        for card in cards:
+            if card["job_id"] in seen or len(records) >= max_jobs:
+                continue
+            seen.add(card["job_id"])
+            card["source"] = "guest"
+            if fetch_details:
+                try:
+                    detail = parse_job_detail(fetcher.get(guest_detail_url(card["job_id"])))
+                    card.update({k: v for k, v in detail.items()
+                                 if k not in ("parse_warnings", "criteria")})
+                    card["parse_warnings"] = (card.get("parse_warnings") or []) + \
+                        detail.get("parse_warnings", [])
+                except FileNotFoundError:
+                    card.setdefault("parse_warnings", []).append("sin detalle disponible")
+            records.append(card)
     return records, labels

@@ -17,7 +17,10 @@ set -uo pipefail
 cd "$(dirname "$0")"
 
 DIAS=${DIAS:-7}
-MAX=${MAX:-40}
+# 140 = 14 busquedas x 10 tarjetas: el minimo para que TODAS lleguen a lanzar
+# su primera pagina. Por debajo de eso el tope corta antes de terminar la
+# rotacion y el informe sale sesgado a las primeras busquedas.
+MAX=${MAX:-140}
 FUENTE=${FUENTE:-guest}
 
 echo
@@ -50,7 +53,9 @@ uv run rrhh-tools doctor --source "$FUENTE" || exit 1
 
 # --- 3. La tirada ------------------------------------------------------------
 echo
-echo "→ Buscando en LinkedIn. Con 4s entre peticiones, esto tarda unos minutos."
+MINUTOS=$(( (MAX * 2 * 4) / 60 + 1 ))
+echo "→ Buscando en LinkedIn. Unos ${MINUTOS} min: 4s entre peticiones, y cada"
+echo "  oferta son dos (la tarjeta y su descripción)."
 echo "  Se puede parar con Ctrl-C: lo descargado queda guardado y se reanuda"
 echo "  con --resume."
 echo

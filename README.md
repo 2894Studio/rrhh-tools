@@ -55,9 +55,23 @@ pensada para una tirada diaria: en la primera ejecución esa ventana deja casi t
 Se ajusta con variables de entorno:
 
 ```bash
-DIAS=14 MAX=80 ./arrancar.sh          # más histórico y más ofertas
+DIAS=30 MAX=400 ./arrancar.sh         # mucho más volumen (~1 h)
 FUENTE=session ./arrancar.sh          # con sesión iniciada, si guest da login
 ```
+
+**Sobre `MAX`.** Es un tope **global**, no por búsqueda, y hay 14 búsquedas. El
+presupuesto se reparte rotando por páginas, así que todas aportan su primera página
+antes de que ninguna pase a la segunda. Por debajo de 140 (14 × 10 tarjetas) el tope
+corta antes de completar la rotación y el informe se sesga hacia las primeras búsquedas.
+
+| `MAX` | Cobertura | Tiempo aprox. |
+|---|---|---|
+| 140 | una página de cada búsqueda | ~20 min |
+| 280 | dos páginas de cada una | ~40 min |
+| 400 | casi todo lo que hay en 30 días | ~1 h |
+
+Se puede parar con Ctrl-C y continuar después: lo descargado queda guardado y
+`uv run rrhh-tools search --source guest --resume` sigue por donde iba.
 
 ### A mano
 

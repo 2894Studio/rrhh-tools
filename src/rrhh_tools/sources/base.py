@@ -44,3 +44,23 @@ def guest_detail_url(job_id: str) -> str:
 
 def session_search_url(query: Query, settings: Settings, start: int = 0) -> str:
     return f"{SESSION_SEARCH}?{urlencode(_common_params(query, settings, start))}"
+
+
+def rotacion(queries: list, max_pages: int):
+    """Cede (pagina, busqueda) rotando POR PAGINAS, no por busqueda.
+
+    IMPORTA MAS DE LO QUE PARECE. `max_jobs` es un tope global, asi que
+    recorriendo las busquedas en orden la primera se comia el presupuesto
+    entero y las demas no llegaban a lanzarse: con 14 busquedas y un tope de
+    40, solo corria "product designer / Madrid" y el informe salia sesgado a
+    eso sin que nada lo dijera.
+
+    Rotando por paginas, todas las busquedas aportan su primera pagina antes de
+    que ninguna pase a la segunda. Si el tope corta, corta parejo.
+
+    Quien lo consume lleva su propio conjunto de busquedas agotadas y se las
+    salta; mantenerlo fuera evita el protocolo de send() del generador.
+    """
+    for pagina in range(max_pages):
+        for query in queries:
+            yield pagina, query
