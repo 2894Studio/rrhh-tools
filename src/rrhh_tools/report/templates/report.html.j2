@@ -14,9 +14,9 @@
 
   <header class="hero">
     <div class="wordmark">2894</div>
-    <h1>Quién busca diseño junior.</h1>
-    <p class="plain">Ofertas de LinkedIn en España, filtradas a nivel junior y ordenadas por
-       lo útil que es cada empresa como cuenta a la que llamar.</p>
+    <h1>Quién busca diseño.</h1>
+    <p class="plain">Todas las ofertas de diseño de LinkedIn en España, de cualquier nivel,
+       con las más recientes primero. Usa los filtros para quedarte con las junior.</p>
     <div class="meta">
       <span>Generado <code>{{ generated }}</code></span>
       <span>Ejecución <code>{{ run_id }}</code></span>
@@ -29,28 +29,35 @@
   <div class="temp" style="background:var(--ink-black)">
     <h2>Esto es una muestra, no datos reales</h2>
     <p class="plain" style="opacity:1;color:#C7C9D0;margin-bottom:0;max-width:66ch">
-      Las empresas que aparecen abajo son reales, pero <strong style="color:#fff;font-weight:500">las
-      ofertas son inventadas</strong>: sirven para enseñar el formato del informe antes de
-      ejecutarlo contra LinkedIn. Ninguna de estas vacantes existe. No uséis esta página
-      para contactar a nadie.
+      <strong style="color:#fff;font-weight:500">Las empresas y las ofertas son
+      inventadas</strong>: sirven para enseñar el formato antes de ejecutarlo contra
+      LinkedIn. Ninguna existe, y ninguna empresa real aparece juzgada aquí.
     </p>
   </div>
   {% endif %}
 
   <div class="temp">
     <h2>Temperatura del mercado</h2>
-    <p class="plain">Cuántas vacantes de diseño junior hay ahora mismo, y de quién son.</p>
+    <p class="plain">Cuántas vacantes de diseño hay ahora mismo, de quién son y de qué nivel.</p>
     <div class="temp-grid">
       <div class="stat"><div class="n">{{ counts.A }}</div><div class="l">en clientes finales</div></div>
       <div class="stat"><div class="n">{{ counts.B }}</div><div class="l">en agencias</div></div>
       <div class="stat"><div class="n">{{ counts.C }}</div><div class="l">en intermediarios</div></div>
       <div class="stat"><div class="n">{{ counts.D }}</div><div class="l">por revisar</div></div>
-      <div class="stat"><div class="n">{{ counts.filtered }}</div><div class="l">descartadas por nivel o rol</div></div>
+    </div>
+    <div class="temp-grid" style="margin-top:12px">
+      <div class="stat"><div class="n">{{ niveles.junior }}</div><div class="l">junior</div></div>
+      <div class="stat"><div class="n">{{ niveles.mid }}</div><div class="l">mid</div></div>
+      <div class="stat"><div class="n">{{ niveles.senior }}</div><div class="l">senior</div></div>
+      <div class="stat"><div class="n">{{ niveles.lead }}</div><div class="l">lead</div></div>
+      <div class="stat"><div class="n">{{ niveles.ai }}</div><div class="l">de diseño con IA</div></div>
     </div>
   </div>
 
+  {% include "_filtros.html.j2" %}
+
   {% for block in blocks %}
-  <section>
+  <section data-seccion="{{ block.id }}">
     <div class="sec-head">
       <div class="tag">Bloque {{ block.id }}</div>
       <h2>{{ block.title }}.</h2>
@@ -60,8 +67,17 @@
     {% if not block.rows %}
       <div class="empty">Ninguna empresa en este bloque en esta ejecución.</div>
     {% else %}
+      <div data-lista>
       {% for row in block.rows %}{% set c = row.c %}
-      <article class="card {{ 'dark' if block.id == 'C' else '' }}">
+      <article class="card {{ 'dark' if block.id == 'C' else '' }}"
+               data-ficha
+               data-bloque="{{ block.id }}"
+               data-nivel="{{ c.niveles|join(' ') }}"
+               data-rol="{{ c.roles|join(' ') }}"
+               data-ubicacion="{{ row.ubicaciones|join(' ') }}"
+               data-dias="{{ c.dias_min }}"
+               data-ia="{{ 'si' if row.menciona_ia else 'no' }}"
+               data-score="{{ c.score }}">
         <div class="card-top">
           <div class="marca">
             {% if c.logo_url %}
@@ -112,11 +128,15 @@
         </details>
 
         {% for j in c.jobs %}
-        <div class="job">
+        <div class="job" data-vacante
+             data-nivel="{{ j.seniority.label.clave_filtro if j.seniority else '' }}"
+             data-rol="{{ j.rol.label.clave_filtro if j.rol else '' }}">
           <a href="{{ j.url }}" target="_blank" rel="noopener">{{ j.title_raw }}</a>
           <div class="muted">
             {{ j.location_raw or 'ubicación sin determinar' }}
             {%- if j.posted_text %} · {{ j.posted_text }}{% endif %}
+            {%- if j.seniority %} · {{ j.seniority.label.etiqueta }}{% endif %}
+            {%- if j.rol %} · {{ j.rol.etiquetas|join(' + ') }}{% endif %}
             {%- if j.seniority %} · {{ j.seniority.explanation }}{% endif %}
             {%- if j.n_sightings > 1 %} · vista {{ j.n_sightings }} veces{% endif %}
           </div>
@@ -131,6 +151,7 @@
         </div>
       </article>
       {% endfor %}
+      </div>
     {% endif %}
   </section>
   {% endfor %}
@@ -139,12 +160,13 @@
     <div class="sec-head">
       <div class="tag">Control</div>
       <h2>Qué quedó fuera.</h2>
-      <p>Nada se descarta en silencio. Aquí está todo lo que el filtro apartó y por qué,
-         para poder corregir las reglas si algo se fue por error.</p>
+      <p>Ya no se descarta por nivel: un senior aparece en el listado con su etiqueta. Lo
+         único que sale es lo que no es diseño digital, y aquí está, para poder corregir las
+         reglas si algo se fue por error.</p>
     </div>
     <article class="card">
       <details {% if filtered %}open{% endif %}>
-        <summary>{{ filtered|length }} ofertas apartadas por nivel o por rol</summary>
+        <summary>{{ filtered|length }} ofertas apartadas por no ser diseño digital</summary>
         <div class="scroll">
         <table>
           <thead><tr><th>Oferta</th><th>Empresa</th><th>Motivo</th></tr></thead>
@@ -176,7 +198,7 @@
     <p class="plain">Esta lista prepara la conversación; la llamada la hacéis vosotros.</p>
     <p class="note">
       El listado recoge lo que se vio en {{ diagnostics.queries_run|length }} búsquedas de LinkedIn,
-      no todas las ofertas de diseño junior que existen en España. Las fechas de publicación son
+      no todas las ofertas de diseño que existen en España. Las fechas de publicación son
       aproximadas cuando LinkedIn solo da una referencia relativa. La clasificación de empresa es
       automática y revisable: el bloque «Por revisar» existe precisamente para las que el sistema
       no supo resolver.

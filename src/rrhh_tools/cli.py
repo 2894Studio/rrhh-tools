@@ -211,7 +211,8 @@ def cmd_process(args) -> int:
 def cmd_report(args) -> int:
     settings = _settings(args)
     run_id = cache.resolve_run(args.run)
-    run = process(cache.load_raw(run_id), settings, run_id)
+    run = process(cache.load_raw(run_id), settings, run_id,
+                  orden=args.orden or settings.report.get("orden", "reciente"))
     html = render_report(run, settings.report["title"], source_label=args.source_label,
                          geo_id=_geo_madrid(settings))
     out = Path(args.out or f"reports/{date.today().isoformat()}-{run_id}.html")
@@ -232,7 +233,8 @@ def cmd_replay(args) -> int:
     records, labels = guest.collect(fetcher, queries, settings, args.max_jobs or 250)
     diagnostics = RunDiagnostics(queries_run=labels, pages_fetched=fetcher.pages_fetched)
     run = process(records, settings, "replay", diagnostics,
-                  today=date.fromisoformat(args.today) if args.today else None)
+                  today=date.fromisoformat(args.today) if args.today else None,
+                  orden=args.orden or settings.report.get("orden", "reciente"))
     html = render_report(run, settings.report["title"],
                          source_label="fixtures (sin red)", es_muestra=True,
                          geo_id=_geo_madrid(settings))
@@ -255,7 +257,8 @@ def cmd_curated(args) -> int:
         return 1
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     html = render_curated(data, "2894 — Empresas objetivo",
-                          geo_id=_geo_madrid(settings), geo_es=_geo(settings, "spain"))
+                          geo_id=_geo_madrid(settings), geo_es=_geo(settings, "spain"),
+                          publico=args.publico)
     out = Path(args.out or "reports/empresas-objetivo.html")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
@@ -275,10 +278,15 @@ def cmd_site(args) -> int:
         (settings.config_dir / "curated_targets.yaml").read_text(encoding="utf-8"))
     (out / "empresas-objetivo.html").write_text(
         render_curated(datos, "2894 — Empresas objetivo",
-                       geo_id=_geo_madrid(settings), geo_es=_geo(settings, "spain")),
+                       geo_id=_geo_madrid(settings), geo_es=_geo(settings, "spain"),
+                       publico=args.publico),
         encoding="utf-8")
 
-    radar = Path(args.radar) if args.radar else Path("reports/replay.html")
+    # Por defecto la muestra sale de las fixtures FICTICIAS: el sitio publicado
+    # no debe juzgar a empresas reales en internet abierto.
+    radar = Path(args.radar) if args.radar else Path("reports/muestra.html")
+    if not radar.is_file() and radar.name == "muestra.html":
+        _generar_muestra(settings, radar)
     if radar.is_file():
         shutil.copy(radar, out / "radar.html")
     else:
@@ -295,6 +303,28 @@ def cmd_site(args) -> int:
     _share_stylesheet(out)
     print(f"Sitio montado en {out}/")
     return 0
+
+
+def _generar_muestra(settings, destino: Path) -> None:
+    """Genera la muestra del radar desde las fixtures ficticias."""
+    from .http import FixtureFetcher
+    from .sources import guest
+    fixtures = Path("tests/fixtures/demo")
+    if not fixtures.is_dir():
+        print(f"Aviso: no existe {fixtures}; el sitio saldrá sin la muestra del radar.",
+              file=sys.stderr)
+        return
+    fetcher = FixtureFetcher(fixtures)
+    queries, _ = settings.resolvable_queries()
+    records, labels = guest.collect(fetcher, queries, settings, 250)
+    diagnostics = RunDiagnostics(queries_run=labels, pages_fetched=fetcher.pages_fetched)
+    run = process(records, settings, "muestra", diagnostics)
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    destino.write_text(
+        render_report(run, settings.report["title"],
+                      source_label="datos de muestra", es_muestra=True,
+                      geo_id=_geo_madrid(settings)),
+        encoding="utf-8")
 
 
 def _share_stylesheet(out: Path) -> None:
@@ -394,6 +424,8 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("report", help="genera el informe HTML")
     p.add_argument("--run", default="latest")
     p.add_argument("--out", default=None)
+    p.add_argument("--orden", choices=["reciente", "prioridad"], default=None,
+                   help="por defecto, la oferta publicada más reciente primero")
     p.add_argument("--source-label", default="LinkedIn")
     p.set_defaults(func=cmd_report)
 
@@ -403,16 +435,21 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--query-id", default=None)
     p.add_argument("--max-jobs", type=int, default=None)
     p.add_argument("--today", default=None, help="fecha de referencia, para pruebas")
+    p.add_argument("--orden", choices=["reciente", "prioridad"], default=None)
     p.set_defaults(func=cmd_replay)
 
     p = sub.add_parser("curated", help="renderiza la lista curada inicial de empresas")
     p.add_argument("--data", default=None)
     p.add_argument("--out", default=None)
+    p.add_argument("--publico", action="store_true",
+                   help="recorta el razonamiento comercial, para poder compartir el enlace")
     p.set_defaults(func=cmd_curated)
 
     p = sub.add_parser("site", help="monta el sitio estático con los informes")
     p.add_argument("--out", default=None)
     p.add_argument("--radar", default=None, help="informe del radar a incluir como muestra")
+    p.add_argument("--publico", action="store_true",
+                   help="recorta el razonamiento comercial, para poder compartir el enlace")
     p.set_defaults(func=cmd_site)
 
     p = sub.add_parser("review", help="cola de revisión en formato decisions.yaml")

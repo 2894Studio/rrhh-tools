@@ -30,9 +30,15 @@
 
   <header class="hero">
     <div class="wordmark">2894</div>
+    {% if publico %}
+    <h1>Diseño de producto en España.</h1>
+    <p class="plain">Empresas con producto digital propio que merece la pena seguir, con
+       enlace directo a sus vacantes de diseño en LinkedIn.</p>
+    {% else %}
     <h1>Por dónde empezar.</h1>
     <p class="plain">Una primera lista de empresas a las que llamar, para no esperar a la
        primera ejecución del radar.</p>
+    {% endif %}
     <div class="meta">
       <span>Generado <code>{{ contexto.generado }}</code></span>
       <span>Método <code>{{ contexto.metodo }}</code></span>
@@ -47,8 +53,10 @@
     <p>Por eso cada empresa lleva su nivel de evidencia, y <strong>no se ha inventado
        ninguna oferta ni ninguna URL</strong>. Donde la fuente anonimiza el nombre de la
        empresa, se dice así en vez de adivinarlo.</p>
+    {% if not publico %}
     <p>La lista completa y fiable sale de ejecutar el radar:
        <code>rrhh-tools search --source session</code>.</p>
+    {% endif %}
   </div>
 
   <section>
@@ -62,15 +70,20 @@
     {% endfor %}
   </section>
 
+  {% include "_filtros.html.j2" %}
+
   {% for grupo in grupos %}
-  <section>
+  <section data-seccion="{{ loop.index }}">
     <div class="sec-head">
       <div class="tag">{{ grupo.tag }}</div>
       <h2>{{ grupo.titulo }}.</h2>
       <p>{{ grupo.descripcion }}</p>
     </div>
+    <div data-lista>
     {% for e in grupo.empresas %}
-    <article class="card">
+    <article class="card" data-ficha
+             data-evidencia="{{ e.evidencia }}"
+             data-ubicacion="{{ e.clave_ubicacion }}">
       <div class="card-top">
         <div class="marca">
           {% if e.logo %}
@@ -93,7 +106,9 @@
         </div>
       </div>
       {% if e.detalle %}<p class="why">{{ e.detalle }}</p>{% endif %}
+      {% if e.por_que %}
       <p class="why"><b style="font-weight:500;color:var(--ink-black)">Por qué:</b> {{ e.por_que }}</p>
+      {% endif %}
       {% if e.accion %}<div class="accion"><b>Siguiente paso:</b> {{ e.accion }}</div>{% endif %}
       {% if e.enlaces %}
       <div class="enlaces">
@@ -104,15 +119,23 @@
       {% endif %}
     </article>
     {% endfor %}
+    </div>
   </section>
   {% endfor %}
 
   <section>
     <div class="sec-head">
+      {% if publico %}
+      <div class="tag">Agencias y consultoras</div>
+      <h2>Quién más contrata diseño.</h2>
+      <p>Agencias y consultoras con vacantes de diseño. Se listan como parte de la foto
+         del mercado.</p>
+      {% else %}
       <div class="tag">Bloque B</div>
       <h2>Señal de competencia.</h2>
-      <p>Empresas con vacante de diseño junior que <em>no</em> son objetivo comercial.
+      <p>Empresas con vacante de diseño que <em>no</em> son objetivo comercial.
          Se listan porque dicen algo del mercado, no porque haya que llamarlas.</p>
+      {% endif %}
     </div>
     {% for c in competencia %}
     <article class="card dark">
@@ -131,7 +154,9 @@
         </div>
       </div>
       <p class="why">{{ c.detalle }}</p>
+      {% if c.lectura %}
       <p class="why"><b style="font-weight:500;color:#fff">Lectura:</b> {{ c.lectura }}</p>
+      {% endif %}
       {% if c.enlaces %}
       <div class="enlaces">
         {% for l in c.enlaces %}
@@ -144,6 +169,15 @@
   </section>
 
   <footer>
+    {% if publico %}
+    <p class="poetic">El mercado, en una página.</p>
+    <p class="plain">Quién tiene producto digital propio en España y dónde comprobarlo.</p>
+    <p class="note">
+      {{ n_confirmadas }} empresas con evidencia de vacante y {{ n_estrategicas }} sin
+      confirmar. Las segundas no son vacantes comprobadas: comprobadlas en LinkedIn antes
+      de darlas por buenas.
+    </p>
+    {% else %}
     <p class="poetic">Ellos buscan. Nosotros presentamos.</p>
     <p class="plain">Esta lista prepara la conversación; la llamada la hacéis vosotros.</p>
     <p class="note">
@@ -152,6 +186,7 @@
       el perfil de la empresa, no vacantes comprobadas: confirmadlas antes de invertir
       tiempo comercial en ellas.
     </p>
+    {% endif %}
   </footer>
 
 </div>

@@ -1,11 +1,29 @@
-# rrhh-tools — Radar de diseño junior
+# rrhh-tools — Radar de diseño
 
-Busca en LinkedIn ofertas de **Junior Designer / Junior Product Designer / Junior UX-UI**
-en España (Madrid o remoto) y las convierte en algo distinto de un listado de empleo:
-una **lista de empresas a las que 2894 puede llamar** para presentarles perfiles.
+Busca en LinkedIn **todas** las ofertas de diseño de producto, UX, UI y diseño con IA en
+España (Madrid o remoto), de cualquier nivel, y las convierte en algo distinto de un
+listado de empleo: una **lista de empresas a las que 2894 puede llamar** para presentarles
+perfiles.
+
+El nivel es un **filtro**, no una condición de entrada: se recoge la foto completa del
+mercado y el informe deja quedarse con las junior en un clic.
 
 Ese cambio de enfoque es lo que define el proyecto. La pieza central no es el scraper,
 es el clasificador que separa clientes finales de agencias, consultoras e intermediarios.
+
+## Nivel y rol
+
+Cada oferta se etiqueta con su **nivel** (junior · mid · senior · lead) y su **rol**
+(diseño con IA · producto · UX/UI · UX · UI · otro). Lo único que se descarta es lo que no
+es diseño digital: diseño industrial, textil, de interiores.
+
+El rol de **IA gana sobre los demás**: un *AI Product Designer* se etiqueta como IA, con
+producto como secundario. Es el diferencial de los perfiles de 2894 y hay que poder
+aislarlo de un vistazo.
+
+El informe se ordena por **la oferta publicada más reciente**. Para actuar sobre una
+vacante, lo primero que importa es que siga abierta; la prioridad sigue visible en cada
+ficha y a un clic en el selector de orden.
 
 ## Los cuatro bloques del informe
 
@@ -53,6 +71,7 @@ uv run rrhh-tools review  --run latest                             # cola de rev
 uv run rrhh-tools explain --company bankinter                      # desglose de una empresa
 uv run rrhh-tools replay                                           # end-to-end sin red
 uv run rrhh-tools curated                                          # lista curada inicial
+uv run rrhh-tools site --publico                                   # versión para compartir
 ```
 
 `search` es el **único** comando que abre una conexión. El resto trabaja sobre lo ya
@@ -69,6 +88,7 @@ lanzar una ejecución completa.
 | Login | Sí, con vuestra cookie `li_at` | No |
 | Parser | `parsing/session.py` | `parsing/guest.py` |
 | Descripción de la oferta | Sí, visitando cada `/jobs/view/<id>` | Sí, vía el endpoint público |
+| Niveles que trae | Todos: el nivel lo decide el clasificador | Todos |
 | Riesgo para la cuenta | LinkedIn puede restringirla | Ninguno |
 
 **El DOM del LinkedIn con login no se parece al del público**: usa `job-card-container`
@@ -117,6 +137,23 @@ momento. Son búsquedas, no URLs de ofertas: una URL de oferta que no hemos vist
 inventada y podría llevar a una vacante que ya no existe; una búsqueda siempre refleja el
 estado real de LinkedIn en el instante del clic.
 
+## La versión pública
+
+`--publico` genera una variante del sitio **sin el razonamiento comercial**: quedan las
+empresas, sus datos, los logos y los enlaces a LinkedIn, y desaparece por qué son objetivo,
+cuál es el siguiente paso y cualquier orden de prioridad.
+
+Existe porque el sitio desplegado está en internet abierto. Con la variante pública el
+enlace se puede compartir aunque nunca se active la protección de acceso de Vercel.
+
+El recorte se hace en el renderer con una **lista de campos permitidos**, no con
+condicionales en la plantilla. Es deliberado: si mañana se añade un campo al YAML, queda
+fuera de lo público por omisión en vez de colarse porque nadie actualizó una lista de
+exclusiones. Hay un test que lo comprueba con un campo inventado.
+
+La muestra del radar del sitio usa **empresas ficticias**. Publicar que una empresa real
+"no es cliente final", o puntuarla con un 92 bajo la marca de 2894 y en abierto, no procede.
+
 ## Cómo mejorar el clasificador
 
 El sistema aprende de vosotros. `rrhh-tools review` imprime los casos dudosos ya en el
@@ -134,7 +171,7 @@ valida al arrancar.
 ## Desarrollo
 
 ```bash
-uv run pytest        # 175 tests, todos sin red
+uv run pytest        # 274 tests, todos sin red
 ```
 
 Un guardia en `tests/conftest.py` hace **fallar** cualquier test que intente abrir una

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>2894 — Radar de diseño junior</title>
+<title>2894 — Radar de diseño</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -13,323 +13,265 @@
 
   <header class="hero">
     <div class="wordmark">2894</div>
-    <h1>Quién busca diseño junior.</h1>
-    <p class="plain">Ofertas de LinkedIn en España, filtradas a nivel junior y ordenadas por
-       lo útil que es cada empresa como cuenta a la que llamar.</p>
+    <h1>Quién busca diseño.</h1>
+    <p class="plain">Todas las ofertas de diseño de LinkedIn en España, de cualquier nivel,
+       con las más recientes primero. Usa los filtros para quedarte con las junior.</p>
     <div class="meta">
-      <span>Generado <code>04/09/2026 16:14</code></span>
-      <span>Ejecución <code>replay</code></span>
-      <span>Configuración <code>ba11c1fae931</code></span>
-      <span>Fuente <code>fixtures (sin red)</code></span>
+      <span>Generado <code>04/09/2026 19:37</code></span>
+      <span>Ejecución <code>muestra</code></span>
+      <span>Configuración <code>066622b43625</code></span>
+      <span>Fuente <code>datos de muestra</code></span>
     </div>
   </header>
 
   <div class="temp" style="background:var(--ink-black)">
     <h2>Esto es una muestra, no datos reales</h2>
     <p class="plain" style="opacity:1;color:#C7C9D0;margin-bottom:0;max-width:66ch">
-      Las empresas que aparecen abajo son reales, pero <strong style="color:#fff;font-weight:500">las
-      ofertas son inventadas</strong>: sirven para enseñar el formato del informe antes de
-      ejecutarlo contra LinkedIn. Ninguna de estas vacantes existe. No uséis esta página
-      para contactar a nadie.
+      <strong style="color:#fff;font-weight:500">Las empresas y las ofertas son
+      inventadas</strong>: sirven para enseñar el formato antes de ejecutarlo contra
+      LinkedIn. Ninguna existe, y ninguna empresa real aparece juzgada aquí.
     </p>
   </div>
 
   <div class="temp">
     <h2>Temperatura del mercado</h2>
-    <p class="plain">Cuántas vacantes de diseño junior hay ahora mismo, y de quién son.</p>
+    <p class="plain">Cuántas vacantes de diseño hay ahora mismo, de quién son y de qué nivel.</p>
     <div class="temp-grid">
       <div class="stat"><div class="n">4</div><div class="l">en clientes finales</div></div>
       <div class="stat"><div class="n">1</div><div class="l">en agencias</div></div>
       <div class="stat"><div class="n">1</div><div class="l">en intermediarios</div></div>
-      <div class="stat"><div class="n">0</div><div class="l">por revisar</div></div>
-      <div class="stat"><div class="n">2</div><div class="l">descartadas por nivel o rol</div></div>
+      <div class="stat"><div class="n">1</div><div class="l">por revisar</div></div>
+    </div>
+    <div class="temp-grid" style="margin-top:12px">
+      <div class="stat"><div class="n">3</div><div class="l">junior</div></div>
+      <div class="stat"><div class="n">2</div><div class="l">mid</div></div>
+      <div class="stat"><div class="n">1</div><div class="l">senior</div></div>
+      <div class="stat"><div class="n">1</div><div class="l">lead</div></div>
+      <div class="stat"><div class="n">1</div><div class="l">de diseño con IA</div></div>
     </div>
   </div>
 
-  <section>
+<div id="filtros" class="filtros"></div>
+<p id="recuento" class="recuento" aria-live="polite"></p>
+<div id="vacio" class="vacio" hidden>
+  <p>Ningún resultado con estos filtros.</p>
+  <button type="button" class="enlace" data-limpiar>Quitar los filtros</button>
+</div>
+
+<script type="application/json" id="facetas">[{"clave": "nivel", "etiqueta": "Nivel", "multi": true, "atajo": {"etiqueta": "Solo junior", "valores": ["junior"]}, "opciones": [{"valor": "junior", "etiqueta": "Junior"}, {"valor": "mid", "etiqueta": "Mid"}, {"valor": "senior", "etiqueta": "Senior"}, {"valor": "lead", "etiqueta": "Lead"}]}, {"clave": "rol", "etiqueta": "Rol", "multi": true, "opciones": [{"valor": "ai", "etiqueta": "Diseño con IA"}, {"valor": "product", "etiqueta": "Producto"}, {"valor": "uxui", "etiqueta": "UX/UI"}, {"valor": "ux", "etiqueta": "UX"}, {"valor": "ui", "etiqueta": "UI"}, {"valor": "otro", "etiqueta": "Otro"}]}, {"clave": "ubicacion", "etiqueta": "Dónde", "multi": false, "opciones": [{"valor": "madrid", "etiqueta": "Madrid"}, {"valor": "remote_es", "etiqueta": "Remoto España"}, {"valor": "rest_es", "etiqueta": "Resto de España"}]}, {"clave": "dias", "etiqueta": "Publicada", "multi": false, "tipo": "max", "opciones": [{"valor": "7", "etiqueta": "7 días"}, {"valor": "14", "etiqueta": "14 días"}, {"valor": "30", "etiqueta": "30 días"}]}, {"clave": "ia", "etiqueta": "IA", "multi": false, "opciones": [{"valor": "si", "etiqueta": "Menciona IA"}]}, {"clave": "bloque", "etiqueta": "Bloque", "multi": false, "opciones": [{"valor": "A", "etiqueta": "Objetivo"}, {"valor": "B", "etiqueta": "Agencias"}, {"valor": "C", "etiqueta": "Intermediarios"}, {"valor": "D", "etiqueta": "Por revisar"}]}]</script>
+<script>
+// Los controles se pintan arriba, pero las fichas estan mas abajo en el
+// documento: hay que esperar a que el DOM este completo o no se encuentra
+// ninguna y el script se rinde en silencio.
+document.addEventListener("DOMContentLoaded", function () {
+  "use strict";
+  var raiz = document.getElementById("filtros");
+  var facetas = JSON.parse(document.getElementById("facetas").textContent);
+  var fichas = Array.prototype.slice.call(document.querySelectorAll("[data-ficha]"));
+  if (!raiz || !fichas.length) return;
+
+  var estado = {};
+  facetas.forEach(function (f) { estado[f.clave] = f.multi ? [] : ""; });
+  var orden = "reciente";
+
+  // --- construcción de los controles ---
+  facetas.forEach(function (faceta) {
+    var grupo = document.createElement("div");
+    grupo.className = "grupo-filtro";
+    grupo.setAttribute("role", "group");
+    grupo.setAttribute("aria-label", faceta.etiqueta);
+
+    var titulo = document.createElement("span");
+    titulo.className = "grupo-titulo";
+    titulo.textContent = faceta.etiqueta;
+    grupo.appendChild(titulo);
+
+    faceta.opciones.forEach(function (op) {
+      var boton = document.createElement("button");
+      boton.type = "button";
+      boton.className = "chip";
+      boton.textContent = op.etiqueta;
+      boton.setAttribute("aria-pressed", "false");
+      boton.addEventListener("click", function () {
+        if (faceta.multi) {
+          var i = estado[faceta.clave].indexOf(op.valor);
+          if (i === -1) { estado[faceta.clave].push(op.valor); }
+          else { estado[faceta.clave].splice(i, 1); }
+        } else {
+          estado[faceta.clave] = estado[faceta.clave] === op.valor ? "" : op.valor;
+        }
+        pintar();
+      });
+      boton.dataset.faceta = faceta.clave;
+      boton.dataset.valor = op.valor;
+      grupo.appendChild(boton);
+    });
+
+    if (faceta.atajo) {
+      var atajo = document.createElement("button");
+      atajo.type = "button";
+      atajo.className = "atajo";
+      atajo.textContent = faceta.atajo.etiqueta;
+      atajo.addEventListener("click", function () {
+        estado[faceta.clave] = faceta.multi
+          ? faceta.atajo.valores.slice() : faceta.atajo.valores[0];
+        pintar();
+      });
+      grupo.appendChild(atajo);
+    }
+    raiz.appendChild(grupo);
+  });
+
+  if (facetas.some(function (f) { return f.clave === "dias"; })) {
+    var grupoOrden = document.createElement("div");
+    grupoOrden.className = "grupo-filtro";
+    var etiqueta = document.createElement("label");
+    etiqueta.className = "grupo-titulo";
+    etiqueta.setAttribute("for", "selector-orden");
+    etiqueta.textContent = "Orden";
+    var select = document.createElement("select");
+    select.id = "selector-orden";
+    select.className = "selector";
+    [["reciente", "Más recientes"], ["prioridad", "Prioridad"]].forEach(function (o) {
+      var opcion = document.createElement("option");
+      opcion.value = o[0]; opcion.textContent = o[1];
+      select.appendChild(opcion);
+    });
+    select.addEventListener("change", function () { orden = select.value; pintar(); });
+    grupoOrden.appendChild(etiqueta);
+    grupoOrden.appendChild(select);
+    raiz.appendChild(grupoOrden);
+  }
+
+  var limpiar = document.createElement("button");
+  limpiar.type = "button";
+  limpiar.className = "atajo";
+  limpiar.textContent = "Quitar filtros";
+  limpiar.addEventListener("click", reiniciar);
+  raiz.appendChild(limpiar);
+  document.querySelectorAll("[data-limpiar]").forEach(function (b) {
+    b.addEventListener("click", reiniciar);
+  });
+
+  function reiniciar() {
+    facetas.forEach(function (f) { estado[f.clave] = f.multi ? [] : ""; });
+    pintar();
+  }
+
+  // --- filtrado ---
+  function casa(ficha) {
+    return facetas.every(function (faceta) {
+      var elegido = estado[faceta.clave];
+      if (!elegido || (faceta.multi && !elegido.length)) return true;
+      var bruto = ficha.dataset[faceta.clave] || "";
+      if (faceta.tipo === "max") {
+        var dias = parseInt(bruto, 10);
+        return !isNaN(dias) && dias <= parseInt(elegido, 10);
+      }
+      // Una ficha puede llevar varios valores: aparece si CUALQUIERA casa,
+      // porque una empresa puede tener vacantes de varios niveles y roles.
+      var valores = bruto.split(" ").filter(Boolean);
+      var buscados = faceta.multi ? elegido : [elegido];
+      return buscados.some(function (v) { return valores.indexOf(v) !== -1; });
+    });
+  }
+
+  function pintar() {
+    raiz.querySelectorAll(".chip").forEach(function (b) {
+      var elegido = estado[b.dataset.faceta];
+      var activo = Array.isArray(elegido)
+        ? elegido.indexOf(b.dataset.valor) !== -1
+        : elegido === b.dataset.valor;
+      b.setAttribute("aria-pressed", activo ? "true" : "false");
+      b.classList.toggle("activo", activo);
+    });
+
+    var visibles = 0;
+    fichas.forEach(function (ficha) {
+      var ok = casa(ficha);
+      ficha.hidden = !ok;
+      if (ok) visibles++;
+      // Las vacantes que no casan se atenúan en vez de desaparecer: si no,
+      // parecería que la empresa solo tiene una.
+      ficha.querySelectorAll("[data-vacante]").forEach(function (v) {
+        var casaVacante = facetas.every(function (faceta) {
+          if (faceta.clave !== "nivel" && faceta.clave !== "rol") return true;
+          var elegido = estado[faceta.clave];
+          if (!elegido.length) return true;
+          return elegido.indexOf(v.dataset[faceta.clave]) !== -1;
+        });
+        v.classList.toggle("atenuada", !casaVacante);
+      });
+    });
+
+    ordenar();
+
+    document.querySelectorAll("[data-seccion]").forEach(function (sec) {
+      var algo = sec.querySelector("[data-ficha]:not([hidden])");
+      sec.hidden = !algo;
+    });
+
+    var total = fichas.length;
+    document.getElementById("recuento").textContent =
+      visibles === total
+        ? "Mostrando las " + total + " empresas."
+        : "Mostrando " + visibles + " de " + total + " empresas.";
+    document.getElementById("vacio").hidden = visibles !== 0;
+  }
+
+  function ordenar() {
+    document.querySelectorAll("[data-lista]").forEach(function (lista) {
+      var hijos = Array.prototype.slice.call(lista.querySelectorAll("[data-ficha]"));
+      hijos.sort(function (a, b) {
+        if (orden === "prioridad") {
+          return parseFloat(b.dataset.score) - parseFloat(a.dataset.score);
+        }
+        var da = parseInt(a.dataset.dias, 10), db = parseInt(b.dataset.dias, 10);
+        if (da !== db) return da - db;
+        return parseFloat(b.dataset.score) - parseFloat(a.dataset.score);
+      });
+      hijos.forEach(function (h) { lista.appendChild(h); });
+    });
+  }
+
+  pintar();
+});
+</script>
+  <section data-seccion="A">
     <div class="sec-head">
       <div class="tag">Bloque A</div>
       <h2>Cuentas objetivo.</h2>
       <p>Clientes finales. A quién podéis llamar para colocar los perfiles.</p>
     </div>
 
-      <article class="card ">
+      <div data-lista>
+      <article class="card "
+               data-ficha
+               data-bloque="A"
+               data-nivel="junior"
+               data-rol="product"
+               data-ubicacion="madrid"
+               data-dias="0"
+               data-ia="si"
+               data-score="83.0">
         <div class="card-top">
           <div class="marca">
-            <div class="monograma">BA</div>
+            <div class="monograma">VH</div>
             <div>
-            <h3><a href="https://www.linkedin.com/company/bankinter" target="_blank" rel="noopener">Bankinter</a></h3>
+            <h3><a href="https://www.linkedin.com/company/vela-health" target="_blank" rel="noopener">Vela Health</a></h3>
             <div class="badges">
               <span class="badge brand">Cliente final</span>
 <span class="badge line">Madrid</span><span class="badge line">Menciona IA</span>            </div>
             </div>
           </div>
           <div class="score">
-            <div class="n">92</div>
+            <div class="n">83</div>
             <div class="l">prioridad</div>
           </div>
         </div>
 
-        <div class="bar"><span style="width:91.5%"></span></div>
-        <p class="why">Cliente final con alta confianza · Título junior explícito.</p>
-
-        <details>
-          <summary>Por qué puntúa así</summary>
-          <div class="scroll">
-          <table>
-            <thead><tr><th>Factor</th><th>Lectura</th><th style="text-align:right">Peso</th><th style="text-align:right">Puntos</th></tr></thead>
-            <tbody>
-              <tr>
-                <td>Es cliente final</td>
-                <td>cliente final con alta confianza</td>
-                <td class="num">30</td>
-                <td class="num">30.0</td>
-              </tr>
-              <tr>
-                <td>Encaje de nivel</td>
-                <td>título junior explícito</td>
-                <td class="num">20</td>
-                <td class="num">20.0</td>
-              </tr>
-              <tr>
-                <td>Encaje de ubicación</td>
-                <td>Madrid, donde está el equipo</td>
-                <td class="num">15</td>
-                <td class="num">15.0</td>
-              </tr>
-              <tr>
-                <td>Relevancia de IA</td>
-                <td>la oferta habla de IA en varios sitios (figma ai, ia, inteligencia artificial)</td>
-                <td class="num">10</td>
-                <td class="num">10.0</td>
-              </tr>
-              <tr>
-                <td>Frescura</td>
-                <td>publicada hace 2 días</td>
-                <td class="num">10</td>
-                <td class="num">10.0</td>
-              </tr>
-              <tr>
-                <td>Equipo de diseño por construir</td>
-                <td>sin señales sobre la madurez de su equipo de diseño</td>
-                <td class="num">10</td>
-                <td class="num">5.0</td>
-              </tr>
-              <tr>
-                <td>Vacantes abiertas</td>
-                <td>1 vacante de diseño abierta</td>
-                <td class="num">5</td>
-                <td class="num">1.5</td>
-              </tr>
-            </tbody>
-          </table>
-          </div>
-          <ul class="reasons">
-<li>Está en la allowlist de clientes finales conocidos (sector: Banking).</li>          </ul>
-        </details>
-
-        <div class="job">
-          <a href="https://www.linkedin.com/jobs/view/4001000001/" target="_blank" rel="noopener">Junior Product Designer</a>
-          <div class="muted">
-            Madrid, Comunidad de Madrid, España · hace 2 días · Título junior explícito: junior.          </div>
-        </div>
-
-        <div class="enlaces">
-          <a class="enlace" href="https://www.linkedin.com/company/bankinter/jobs/" target="_blank" rel="noopener">Todas sus vacantes en LinkedIn</a>
-          <a class="enlace" href="https://www.linkedin.com/company/bankinter" target="_blank" rel="noopener">Perfil de empresa</a>
-        </div>
-      </article>
-      <article class="card ">
-        <div class="card-top">
-          <div class="marca">
-            <div class="monograma">CO</div>
-            <div>
-            <h3><a href="https://www.linkedin.com/company/cobee" target="_blank" rel="noopener">Cobee</a></h3>
-            <div class="badges">
-              <span class="badge brand">Cliente final</span>
-<span class="badge line">Madrid</span><span class="badge line">Su primer diseñador</span>            </div>
-            </div>
-          </div>
-          <div class="score">
-            <div class="n">88</div>
-            <div class="l">prioridad</div>
-          </div>
-        </div>
-
-        <div class="bar"><span style="width:87.5%"></span></div>
-        <p class="why">Cliente final con alta confianza · Título junior explícito. Lastre: sin mención de IA.</p>
-
-        <details>
-          <summary>Por qué puntúa así</summary>
-          <div class="scroll">
-          <table>
-            <thead><tr><th>Factor</th><th>Lectura</th><th style="text-align:right">Peso</th><th style="text-align:right">Puntos</th></tr></thead>
-            <tbody>
-              <tr>
-                <td>Es cliente final</td>
-                <td>cliente final con alta confianza</td>
-                <td class="num">30</td>
-                <td class="num">30.0</td>
-              </tr>
-              <tr>
-                <td>Encaje de nivel</td>
-                <td>título junior explícito</td>
-                <td class="num">20</td>
-                <td class="num">20.0</td>
-              </tr>
-              <tr>
-                <td>Encaje de ubicación</td>
-                <td>Madrid, donde está el equipo</td>
-                <td class="num">15</td>
-                <td class="num">15.0</td>
-              </tr>
-              <tr>
-                <td>Relevancia de IA</td>
-                <td>sin mención de IA</td>
-                <td class="num">10</td>
-                <td class="num">2.0</td>
-              </tr>
-              <tr>
-                <td>Frescura</td>
-                <td>publicada hace 5 días</td>
-                <td class="num">10</td>
-                <td class="num">9.0</td>
-              </tr>
-              <tr>
-                <td>Equipo de diseño por construir</td>
-                <td>la oferta dice que será su primera persona de diseño</td>
-                <td class="num">10</td>
-                <td class="num">10.0</td>
-              </tr>
-              <tr>
-                <td>Vacantes abiertas</td>
-                <td>1 vacante de diseño abierta</td>
-                <td class="num">5</td>
-                <td class="num">1.5</td>
-              </tr>
-            </tbody>
-          </table>
-          </div>
-          <ul class="reasons">
-<li>Está en la allowlist de clientes finales conocidos (sector: Financial Services).</li>          </ul>
-        </details>
-
-        <div class="job">
-          <a href="https://www.linkedin.com/jobs/view/4001000002/" target="_blank" rel="noopener">Diseñador/a UX/UI Junior</a>
-          <div class="muted">
-            Madrid, Comunidad de Madrid, España · hace 5 días · Título junior explícito: junior.          </div>
-        </div>
-
-        <div class="enlaces">
-          <a class="enlace" href="https://www.linkedin.com/company/cobee/jobs/" target="_blank" rel="noopener">Todas sus vacantes en LinkedIn</a>
-          <a class="enlace" href="https://www.linkedin.com/company/cobee" target="_blank" rel="noopener">Perfil de empresa</a>
-        </div>
-      </article>
-      <article class="card ">
-        <div class="card-top">
-          <div class="marca">
-            <div class="monograma">GE</div>
-            <div>
-            <h3><a href="https://www.linkedin.com/company/genially" target="_blank" rel="noopener">Genially</a></h3>
-            <div class="badges">
-              <span class="badge brand">Cliente final</span>
-<span class="badge line">Remoto España</span><span class="badge line">Menciona IA</span>            </div>
-            </div>
-          </div>
-          <div class="score">
-            <div class="n">85</div>
-            <div class="l">prioridad</div>
-          </div>
-        </div>
-
-        <div class="bar"><span style="width:85.2%"></span></div>
-        <p class="why">Cliente final con alta confianza · Título junior explícito.</p>
-
-        <details>
-          <summary>Por qué puntúa así</summary>
-          <div class="scroll">
-          <table>
-            <thead><tr><th>Factor</th><th>Lectura</th><th style="text-align:right">Peso</th><th style="text-align:right">Puntos</th></tr></thead>
-            <tbody>
-              <tr>
-                <td>Es cliente final</td>
-                <td>cliente final con alta confianza</td>
-                <td class="num">30</td>
-                <td class="num">30.0</td>
-              </tr>
-              <tr>
-                <td>Encaje de nivel</td>
-                <td>título junior explícito</td>
-                <td class="num">20</td>
-                <td class="num">20.0</td>
-              </tr>
-              <tr>
-                <td>Encaje de ubicación</td>
-                <td>remoto desde España</td>
-                <td class="num">15</td>
-                <td class="num">12.8</td>
-              </tr>
-              <tr>
-                <td>Relevancia de IA</td>
-                <td>la oferta menciona IA (ia, machine learning)</td>
-                <td class="num">10</td>
-                <td class="num">6.0</td>
-              </tr>
-              <tr>
-                <td>Frescura</td>
-                <td>publicada hace 1 día</td>
-                <td class="num">10</td>
-                <td class="num">10.0</td>
-              </tr>
-              <tr>
-                <td>Equipo de diseño por construir</td>
-                <td>sin señales sobre la madurez de su equipo de diseño</td>
-                <td class="num">10</td>
-                <td class="num">5.0</td>
-              </tr>
-              <tr>
-                <td>Vacantes abiertas</td>
-                <td>1 vacante de diseño abierta</td>
-                <td class="num">5</td>
-                <td class="num">1.5</td>
-              </tr>
-            </tbody>
-          </table>
-          </div>
-          <ul class="reasons">
-<li>Está en la allowlist de clientes finales conocidos (sector: Software Development).</li>          </ul>
-        </details>
-
-        <div class="job">
-          <a href="https://www.linkedin.com/jobs/view/4001000007/" target="_blank" rel="noopener">Junior UI Designer</a>
-          <div class="muted">
-            España (En remoto) · hace 1 día · Título junior explícito: junior.          </div>
-        </div>
-
-        <div class="enlaces">
-          <a class="enlace" href="https://www.linkedin.com/company/genially/jobs/" target="_blank" rel="noopener">Todas sus vacantes en LinkedIn</a>
-          <a class="enlace" href="https://www.linkedin.com/company/genially" target="_blank" rel="noopener">Perfil de empresa</a>
-        </div>
-      </article>
-      <article class="card ">
-        <div class="card-top">
-          <div class="marca">
-            <div class="monograma">NR</div>
-            <div>
-            <h3><a href="https://www.linkedin.com/company/nova-retail" target="_blank" rel="noopener">Nova Retail Group</a></h3>
-            <div class="badges">
-              <span class="badge brand">Cliente final</span>
-<span class="badge line">Madrid</span><span class="badge line">Su primer diseñador</span>            </div>
-            </div>
-          </div>
-          <div class="score">
-            <div class="n">75</div>
-            <div class="l">prioridad</div>
-          </div>
-        </div>
-
-        <div class="bar"><span style="width:75.0%"></span></div>
-        <p class="why">Cliente final probable · Madrid, donde está el equipo.</p>
+        <div class="bar"><span style="width:83.0%"></span></div>
+        <p class="why">Cliente final probable · Título junior explícito.</p>
 
         <details>
           <summary>Por qué puntúa así</summary>
@@ -345,9 +287,9 @@
               </tr>
               <tr>
                 <td>Encaje de nivel</td>
-                <td>nivel junior deducido del cuerpo de la oferta</td>
+                <td>título junior explícito</td>
                 <td class="num">20</td>
-                <td class="num">12.0</td>
+                <td class="num">20.0</td>
               </tr>
               <tr>
                 <td>Encaje de ubicación</td>
@@ -357,21 +299,21 @@
               </tr>
               <tr>
                 <td>Relevancia de IA</td>
-                <td>sin mención de IA</td>
+                <td>la oferta menciona IA (ia, inteligencia artificial)</td>
                 <td class="num">10</td>
-                <td class="num">2.0</td>
+                <td class="num">6.0</td>
               </tr>
               <tr>
                 <td>Frescura</td>
-                <td>publicada hace 6 días</td>
+                <td>publicada hace 0 días</td>
                 <td class="num">10</td>
-                <td class="num">9.0</td>
+                <td class="num">10.0</td>
               </tr>
               <tr>
                 <td>Equipo de diseño por construir</td>
-                <td>la oferta dice que será su primera persona de diseño</td>
+                <td>sin señales sobre la madurez de su equipo de diseño</td>
                 <td class="num">10</td>
-                <td class="num">10.0</td>
+                <td class="num">5.0</td>
               </tr>
               <tr>
                 <td>Vacantes abiertas</td>
@@ -383,46 +325,257 @@
           </table>
           </div>
           <ul class="reasons">
-<li>Sector de cliente final: Retail.</li>          </ul>
+<li>La oferta dice &#34;nuestro producto&#34;.</li><li>La oferta dice &#34;nuestros usuarios&#34;.</li><li>Sector de cliente final: Hospitals and Health Care.</li>          </ul>
         </details>
 
-        <div class="job">
-          <a href="https://www.linkedin.com/jobs/view/4001000008/" target="_blank" rel="noopener">UX/UI Designer</a>
+        <div class="job" data-vacante
+             data-nivel="junior"
+             data-rol="product">
+          <a href="https://www.linkedin.com/jobs/view/5001000001/" target="_blank" rel="noopener">Junior Product Designer</a>
           <div class="muted">
-            Madrid, Comunidad de Madrid, España · hace 6 días · El título no indica nivel, pero el cuerpo sí: 1-2 anos.          </div>
+            Madrid, Comunidad de Madrid, España · hace 1 día · Junior · Producto · Título junior explícito: junior.          </div>
         </div>
 
         <div class="enlaces">
-          <a class="enlace" href="https://www.linkedin.com/company/nova-retail/jobs/" target="_blank" rel="noopener">Todas sus vacantes en LinkedIn</a>
-          <a class="enlace" href="https://www.linkedin.com/company/nova-retail" target="_blank" rel="noopener">Perfil de empresa</a>
+          <a class="enlace" href="https://www.linkedin.com/company/vela-health/jobs/" target="_blank" rel="noopener">Todas sus vacantes en LinkedIn</a>
+          <a class="enlace" href="https://www.linkedin.com/company/vela-health" target="_blank" rel="noopener">Perfil de empresa</a>
         </div>
       </article>
+      <article class="card "
+               data-ficha
+               data-bloque="A"
+               data-nivel="mid senior"
+               data-rol="ai uxui"
+               data-ubicacion="madrid"
+               data-dias="1"
+               data-ia="si"
+               data-score="80.0">
+        <div class="card-top">
+          <div class="marca">
+            <div class="monograma">BF</div>
+            <div>
+            <h3><a href="https://www.linkedin.com/company/bruma-finanzas" target="_blank" rel="noopener">Bruma Finanzas</a></h3>
+            <div class="badges">
+              <span class="badge brand">Cliente final</span>
+<span class="badge line">Madrid</span><span class="badge line">Menciona IA</span><span class="badge line">Su primer diseñador</span><span class="badge line">2 vacantes</span>            </div>
+            </div>
+          </div>
+          <div class="score">
+            <div class="n">80</div>
+            <div class="l">prioridad</div>
+          </div>
+        </div>
+
+        <div class="bar"><span style="width:80.0%"></span></div>
+        <p class="why">Cliente final probable · Madrid, donde está el equipo. Lastre: nivel intermedio.</p>
+
+        <details>
+          <summary>Por qué puntúa así</summary>
+          <div class="scroll">
+          <table>
+            <thead><tr><th>Factor</th><th>Lectura</th><th style="text-align:right">Peso</th><th style="text-align:right">Puntos</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Es cliente final</td>
+                <td>cliente final probable</td>
+                <td class="num">30</td>
+                <td class="num">25.5</td>
+              </tr>
+              <tr>
+                <td>Encaje de nivel</td>
+                <td>nivel intermedio</td>
+                <td class="num">20</td>
+                <td class="num">6.0</td>
+              </tr>
+              <tr>
+                <td>Encaje de ubicación</td>
+                <td>Madrid, donde está el equipo</td>
+                <td class="num">15</td>
+                <td class="num">15.0</td>
+              </tr>
+              <tr>
+                <td>Relevancia de IA</td>
+                <td>la oferta habla de IA en varios sitios (ai, inteligencia artificial, machine learning)</td>
+                <td class="num">10</td>
+                <td class="num">10.0</td>
+              </tr>
+              <tr>
+                <td>Frescura</td>
+                <td>publicada hace 1 día</td>
+                <td class="num">10</td>
+                <td class="num">10.0</td>
+              </tr>
+              <tr>
+                <td>Equipo de diseño por construir</td>
+                <td>la oferta dice que será su primera persona de diseño</td>
+                <td class="num">10</td>
+                <td class="num">10.0</td>
+              </tr>
+              <tr>
+                <td>Vacantes abiertas</td>
+                <td>2 vacantes de diseño abiertas</td>
+                <td class="num">5</td>
+                <td class="num">3.5</td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+          <ul class="reasons">
+<li>La oferta dice &#34;nuestro producto&#34;.</li><li>La oferta dice &#34;nuestra plataforma&#34;.</li><li>Sector de cliente final: Financial Services.</li>          </ul>
+        </details>
+
+        <div class="job" data-vacante
+             data-nivel="mid"
+             data-rol="ai">
+          <a href="https://www.linkedin.com/jobs/view/5001000002/" target="_blank" rel="noopener">AI Designer</a>
+          <div class="muted">
+            Madrid, Comunidad de Madrid, España · hace 2 días · Mid · Diseño con IA · Sin marca de nivel en el título ni en el cuerpo: se cuenta como mid.          </div>
+        </div>
+        <div class="job" data-vacante
+             data-nivel="senior"
+             data-rol="uxui">
+          <a href="https://www.linkedin.com/jobs/view/5001000003/" target="_blank" rel="noopener">Senior UX/UI Designer</a>
+          <div class="muted">
+            Madrid, Comunidad de Madrid, España · hace 3 días · Senior · UX/UI · Título de nivel senior: senior.          </div>
+        </div>
+
+        <div class="enlaces">
+          <a class="enlace" href="https://www.linkedin.com/company/bruma-finanzas/jobs/" target="_blank" rel="noopener">Todas sus vacantes en LinkedIn</a>
+          <a class="enlace" href="https://www.linkedin.com/company/bruma-finanzas" target="_blank" rel="noopener">Perfil de empresa</a>
+        </div>
+      </article>
+      <article class="card "
+               data-ficha
+               data-bloque="A"
+               data-nivel="mid"
+               data-rol="product"
+               data-ubicacion="remote_es"
+               data-dias="3"
+               data-ia="no"
+               data-score="62.8">
+        <div class="card-top">
+          <div class="marca">
+            <div class="monograma">ÁR</div>
+            <div>
+            <h3><a href="https://www.linkedin.com/company/anfora-retail" target="_blank" rel="noopener">Ánfora Retail</a></h3>
+            <div class="badges">
+              <span class="badge brand">Cliente final</span>
+<span class="badge line">Remoto España</span>            </div>
+            </div>
+          </div>
+          <div class="score">
+            <div class="n">63</div>
+            <div class="l">prioridad</div>
+          </div>
+        </div>
+
+        <div class="bar"><span style="width:62.8%"></span></div>
+        <p class="why">Cliente final probable · Remoto desde España. Lastre: nivel intermedio.</p>
+
+        <details>
+          <summary>Por qué puntúa así</summary>
+          <div class="scroll">
+          <table>
+            <thead><tr><th>Factor</th><th>Lectura</th><th style="text-align:right">Peso</th><th style="text-align:right">Puntos</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Es cliente final</td>
+                <td>cliente final probable</td>
+                <td class="num">30</td>
+                <td class="num">25.5</td>
+              </tr>
+              <tr>
+                <td>Encaje de nivel</td>
+                <td>nivel intermedio</td>
+                <td class="num">20</td>
+                <td class="num">6.0</td>
+              </tr>
+              <tr>
+                <td>Encaje de ubicación</td>
+                <td>remoto desde España</td>
+                <td class="num">15</td>
+                <td class="num">12.8</td>
+              </tr>
+              <tr>
+                <td>Relevancia de IA</td>
+                <td>sin mención de IA</td>
+                <td class="num">10</td>
+                <td class="num">2.0</td>
+              </tr>
+              <tr>
+                <td>Frescura</td>
+                <td>publicada hace 3 días</td>
+                <td class="num">10</td>
+                <td class="num">10.0</td>
+              </tr>
+              <tr>
+                <td>Equipo de diseño por construir</td>
+                <td>sin señales sobre la madurez de su equipo de diseño</td>
+                <td class="num">10</td>
+                <td class="num">5.0</td>
+              </tr>
+              <tr>
+                <td>Vacantes abiertas</td>
+                <td>1 vacante de diseño abierta</td>
+                <td class="num">5</td>
+                <td class="num">1.5</td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+          <ul class="reasons">
+<li>La oferta dice &#34;nuestros usuarios&#34;.</li><li>La oferta dice &#34;nuestra plataforma&#34;.</li><li>Sector de cliente final: Retail.</li>          </ul>
+        </details>
+
+        <div class="job" data-vacante
+             data-nivel="mid"
+             data-rol="product">
+          <a href="https://www.linkedin.com/jobs/view/5001000004/" target="_blank" rel="noopener">Diseñador/a de Producto</a>
+          <div class="muted">
+            España (En remoto) · hace 4 días · Mid · Producto · Sin marca de nivel en el título ni en el cuerpo: se cuenta como mid.          </div>
+        </div>
+
+        <div class="enlaces">
+          <a class="enlace" href="https://www.linkedin.com/company/anfora-retail/jobs/" target="_blank" rel="noopener">Todas sus vacantes en LinkedIn</a>
+          <a class="enlace" href="https://www.linkedin.com/company/anfora-retail" target="_blank" rel="noopener">Perfil de empresa</a>
+        </div>
+      </article>
+      </div>
   </section>
-  <section>
+  <section data-seccion="B">
     <div class="sec-head">
       <div class="tag">Bloque B</div>
       <h2>Señal de competencia.</h2>
       <p>Agencias y estudios. Que contraten junior significa que hay demanda y que están ganando proyectos.</p>
     </div>
 
-      <article class="card ">
+      <div data-lista>
+      <article class="card "
+               data-ficha
+               data-bloque="B"
+               data-nivel="junior"
+               data-rol="ux"
+               data-ubicacion="madrid"
+               data-dias="4"
+               data-ia="no"
+               data-score="52.5">
         <div class="card-top">
           <div class="marca">
-            <div class="monograma">TC</div>
+            <div class="monograma">EM</div>
             <div>
-            <h3><a href="https://www.linkedin.com/company/the-cocktail" target="_blank" rel="noopener">The Cocktail</a></h3>
+            <h3><a href="https://www.linkedin.com/company/estudio-marea" target="_blank" rel="noopener">Estudio Marea</a></h3>
             <div class="badges">
               <span class="badge line">Agencia / estudio digital</span>
 <span class="badge line">Madrid</span>            </div>
             </div>
           </div>
           <div class="score">
-            <div class="n">54</div>
+            <div class="n">52</div>
             <div class="l">prioridad</div>
           </div>
         </div>
 
-        <div class="bar"><span style="width:53.5%"></span></div>
+        <div class="bar"><span style="width:52.5%"></span></div>
         <p class="why">Título junior explícito · Madrid, donde está el equipo. Lastre: no es cliente final (agencia / estudio digital).</p>
 
         <details>
@@ -457,9 +610,9 @@
               </tr>
               <tr>
                 <td>Frescura</td>
-                <td>publicada hace 3 días</td>
+                <td>publicada hace 4 días</td>
                 <td class="num">10</td>
-                <td class="num">10.0</td>
+                <td class="num">9.0</td>
               </tr>
               <tr>
                 <td>Equipo de diseño por construir</td>
@@ -477,46 +630,58 @@
           </table>
           </div>
           <ul class="reasons">
-<li>Coincidencia exacta con The Cocktail en la denylist.</li>          </ul>
+<li>La oferta dice &#34;nuestros clientes&#34;.</li><li>La oferta dice &#34;proyectos de cliente&#34;.</li><li>La oferta dice &#34;somos una agencia&#34;.</li><li>La oferta dice &#34;clientes de diferentes sectores&#34;.</li><li>Sector declarado en LinkedIn: Design Services.</li><li>El nombre contiene &#39;estudio&#39; (indicio de agency, solo modificador).</li>          </ul>
         </details>
 
-        <div class="job">
-          <a href="https://www.linkedin.com/jobs/view/4001000003/" target="_blank" rel="noopener">Becario Diseño UX</a>
+        <div class="job" data-vacante
+             data-nivel="junior"
+             data-rol="ux">
+          <a href="https://www.linkedin.com/jobs/view/5001000005/" target="_blank" rel="noopener">Becario Diseño UX</a>
           <div class="muted">
-            Madrid, Comunidad de Madrid, España · hace 3 días · Título junior explícito: becario.          </div>
+            Madrid, Comunidad de Madrid, España · hace 5 días · Junior · UX · Título junior explícito: becario.          </div>
         </div>
 
         <div class="enlaces">
-          <a class="enlace" href="https://www.linkedin.com/company/the-cocktail/jobs/" target="_blank" rel="noopener">Todas sus vacantes en LinkedIn</a>
-          <a class="enlace" href="https://www.linkedin.com/company/the-cocktail" target="_blank" rel="noopener">Perfil de empresa</a>
+          <a class="enlace" href="https://www.linkedin.com/company/estudio-marea/jobs/" target="_blank" rel="noopener">Todas sus vacantes en LinkedIn</a>
+          <a class="enlace" href="https://www.linkedin.com/company/estudio-marea" target="_blank" rel="noopener">Perfil de empresa</a>
         </div>
       </article>
+      </div>
   </section>
-  <section>
+  <section data-seccion="C">
     <div class="sec-head">
       <div class="tag">Bloque C</div>
       <h2>Intermediarios.</h2>
       <p>Consultoras y empresas de selección. Ocultan al cliente final, aunque a veces la oferta lo deja entrever.</p>
     </div>
 
-      <article class="card dark">
+      <div data-lista>
+      <article class="card dark"
+               data-ficha
+               data-bloque="C"
+               data-nivel="junior"
+               data-rol="ui"
+               data-ubicacion="remote_es"
+               data-dias="5"
+               data-ia="no"
+               data-score="50.2">
         <div class="card-top">
           <div class="marca">
-            <div class="monograma">TD</div>
+            <div class="monograma">SA</div>
             <div>
-            <h3><a href="https://www.linkedin.com/company/talento-digital" target="_blank" rel="noopener">Talento Digital Selección</a></h3>
+            <h3><a href="https://www.linkedin.com/company/seleccion-aurora" target="_blank" rel="noopener">Selección Aurora</a></h3>
             <div class="badges">
               <span class="badge line">Selección / ETT</span>
 <span class="badge line">Remoto España</span>            </div>
             </div>
           </div>
           <div class="score">
-            <div class="n">48</div>
+            <div class="n">50</div>
             <div class="l">prioridad</div>
           </div>
         </div>
 
-        <div class="bar"><span style="width:48.2%"></span></div>
+        <div class="bar"><span style="width:50.2%"></span></div>
         <p class="why">Título junior explícito · Remoto desde España. Lastre: no es cliente final (selección / ett).</p>
 
         <details>
@@ -551,9 +716,9 @@
               </tr>
               <tr>
                 <td>Frescura</td>
-                <td>publicada hace 8 días</td>
+                <td>publicada hace 5 días</td>
                 <td class="num">10</td>
-                <td class="num">7.0</td>
+                <td class="num">9.0</td>
               </tr>
               <tr>
                 <td>Equipo de diseño por construir</td>
@@ -571,47 +736,147 @@
           </table>
           </div>
           <ul class="reasons">
-<li>La oferta dice &#34;para uno de nuestros clientes&#34;.</li><li>La oferta dice &#34;importante empresa del sector&#34;.</li><li>La oferta dice &#34;nuestros clientes&#34;.</li><li>Sector declarado en LinkedIn: Staffing and Recruiting.</li><li>El nombre contiene &#39;seleccion, talento&#39; (indicio de staffing, solo modificador).</li>          </ul>
+<li>La oferta dice &#34;para uno de nuestros clientes&#34;.</li><li>La oferta dice &#34;importante empresa del sector&#34;.</li><li>La oferta dice &#34;nuestros clientes&#34;.</li><li>Sector declarado en LinkedIn: Staffing and Recruiting.</li><li>El nombre contiene &#39;seleccion&#39; (indicio de staffing, solo modificador).</li>          </ul>
         </details>
 
-        <div class="job">
-          <a href="https://www.linkedin.com/jobs/view/4001000005/" target="_blank" rel="noopener">Junior UX Designer</a>
+        <div class="job" data-vacante
+             data-nivel="junior"
+             data-rol="ui">
+          <a href="https://www.linkedin.com/jobs/view/5001000006/" target="_blank" rel="noopener">Junior UI Designer</a>
           <div class="muted">
-            España (En remoto) · hace 1 semana · Título junior explícito: junior.          </div>
+            España (En remoto) · hace 6 días · Junior · UI · Título junior explícito: junior.          </div>
         </div>
 
         <div class="enlaces">
-          <a class="enlace" href="https://www.linkedin.com/company/talento-digital/jobs/" target="_blank" rel="noopener">Todas sus vacantes en LinkedIn</a>
-          <a class="enlace" href="https://www.linkedin.com/company/talento-digital" target="_blank" rel="noopener">Perfil de empresa</a>
+          <a class="enlace" href="https://www.linkedin.com/company/seleccion-aurora/jobs/" target="_blank" rel="noopener">Todas sus vacantes en LinkedIn</a>
+          <a class="enlace" href="https://www.linkedin.com/company/seleccion-aurora" target="_blank" rel="noopener">Perfil de empresa</a>
         </div>
       </article>
+      </div>
   </section>
-  <section>
+  <section data-seccion="D">
     <div class="sec-head">
       <div class="tag">Bloque D</div>
       <h2>Por revisar.</h2>
       <p>Clasificación ambigua o nivel dudoso. Aquí están las oportunidades que ni la heurística ni nosotros conocemos todavía.</p>
     </div>
 
-      <div class="empty">Ninguna empresa en este bloque en esta ejecución.</div>
+      <div data-lista>
+      <article class="card "
+               data-ficha
+               data-bloque="D"
+               data-nivel="lead"
+               data-rol="otro"
+               data-ubicacion="madrid"
+               data-dias="6"
+               data-ia="no"
+               data-score="32.5">
+        <div class="card-top">
+          <div class="marca">
+            <div class="monograma">TN</div>
+            <div>
+            <h3><a href="https://www.linkedin.com/company/talleres-nube" target="_blank" rel="noopener">Talleres Nube</a></h3>
+            <div class="badges">
+              <span class="badge line">Sin clasificar</span>
+<span class="badge line">Madrid</span><span class="badge line">Clasificación dudosa</span>            </div>
+            </div>
+          </div>
+          <div class="score">
+            <div class="n">32</div>
+            <div class="l">prioridad</div>
+          </div>
+        </div>
+
+        <div class="bar"><span style="width:32.5%"></span></div>
+        <p class="why">Madrid, donde está el equipo · Publicada hace 6 días. Lastre: no es cliente final (sin clasificar).</p>
+
+        <details>
+          <summary>Por qué puntúa así</summary>
+          <div class="scroll">
+          <table>
+            <thead><tr><th>Factor</th><th>Lectura</th><th style="text-align:right">Peso</th><th style="text-align:right">Puntos</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Es cliente final</td>
+                <td>no es cliente final (sin clasificar)</td>
+                <td class="num">30</td>
+                <td class="num">0.0</td>
+              </tr>
+              <tr>
+                <td>Encaje de nivel</td>
+                <td></td>
+                <td class="num">20</td>
+                <td class="num">0.0</td>
+              </tr>
+              <tr>
+                <td>Encaje de ubicación</td>
+                <td>Madrid, donde está el equipo</td>
+                <td class="num">15</td>
+                <td class="num">15.0</td>
+              </tr>
+              <tr>
+                <td>Relevancia de IA</td>
+                <td>sin mención de IA</td>
+                <td class="num">10</td>
+                <td class="num">2.0</td>
+              </tr>
+              <tr>
+                <td>Frescura</td>
+                <td>publicada hace 6 días</td>
+                <td class="num">10</td>
+                <td class="num">9.0</td>
+              </tr>
+              <tr>
+                <td>Equipo de diseño por construir</td>
+                <td>sin señales sobre la madurez de su equipo de diseño</td>
+                <td class="num">10</td>
+                <td class="num">5.0</td>
+              </tr>
+              <tr>
+                <td>Vacantes abiertas</td>
+                <td>1 vacante de diseño abierta</td>
+                <td class="num">5</td>
+                <td class="num">1.5</td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+          <ul class="reasons">
+<li>Ninguna regla identificó el tipo de empresa.</li>          </ul>
+        </details>
+
+        <div class="job" data-vacante
+             data-nivel="lead"
+             data-rol="otro">
+          <a href="https://www.linkedin.com/jobs/view/5001000007/" target="_blank" rel="noopener">Head of Design</a>
+          <div class="muted">
+            Madrid, Comunidad de Madrid, España · hace 1 semana · Lead · Otro diseño · Puesto de responsabilidad: head.          </div>
+        </div>
+
+        <div class="enlaces">
+          <a class="enlace" href="https://www.linkedin.com/company/talleres-nube/jobs/" target="_blank" rel="noopener">Todas sus vacantes en LinkedIn</a>
+          <a class="enlace" href="https://www.linkedin.com/company/talleres-nube" target="_blank" rel="noopener">Perfil de empresa</a>
+        </div>
+      </article>
+      </div>
   </section>
 
   <section>
     <div class="sec-head">
       <div class="tag">Control</div>
       <h2>Qué quedó fuera.</h2>
-      <p>Nada se descarta en silencio. Aquí está todo lo que el filtro apartó y por qué,
-         para poder corregir las reglas si algo se fue por error.</p>
+      <p>Ya no se descarta por nivel: un senior aparece en el listado con su etiqueta. Lo
+         único que sale es lo que no es diseño digital, y aquí está, para poder corregir las
+         reglas si algo se fue por error.</p>
     </div>
     <article class="card">
       <details open>
-        <summary>2 ofertas apartadas por nivel o por rol</summary>
+        <summary>1 ofertas apartadas por no ser diseño digital</summary>
         <div class="scroll">
         <table>
           <thead><tr><th>Oferta</th><th>Empresa</th><th>Motivo</th></tr></thead>
           <tbody>
-            <tr><td>Senior Product Designer</td><td>Cabify</td><td>Título de nivel superior: senior.</td></tr>
-            <tr><td>Diseñador Industrial Junior</td><td>Acciona</td><td>Diseño, pero no del que buscamos: industrial.</td></tr>
+            <tr><td>Diseñador Industrial</td><td>Ánfora Retail</td><td>Diseño, pero no del que buscamos: industrial.</td></tr>
           </tbody>
         </table>
         </div>
@@ -619,10 +884,10 @@
       <details>
         <summary>Diagnóstico de la ejecución</summary>
         <ul class="reasons">
-          <li>Reconciliación: vistas=8 contabilizadas=8 (A=4 B=1 C=1 D=0 filtradas=2 fusionadas=0)</li>
-          <li>Páginas descargadas: 16</li>
+          <li>Reconciliación: vistas=8 contabilizadas=8 (A=4 B=1 C=1 D=1 filtradas=1 fusionadas=0)</li>
+          <li>Páginas descargadas: 23</li>
           <li>Duplicadas fusionadas: 0</li>
-<li>Búsqueda: junior UX UI designer / comunidad_madrid</li><li>Búsqueda: junior product designer / comunidad_madrid</li><li>Búsqueda: disenador junior / comunidad_madrid</li><li>Búsqueda: becario UX / comunidad_madrid</li><li>Búsqueda: practicas diseno UX / comunidad_madrid</li><li>Búsqueda: junior UX designer / spain / remote</li><li>Búsqueda: junior product designer / spain / remote</li>        </ul>
+<li>Búsqueda: product designer / comunidad_madrid</li><li>Búsqueda: UX UI designer / comunidad_madrid</li><li>Búsqueda: UX designer / comunidad_madrid</li><li>Búsqueda: UI designer / comunidad_madrid</li><li>Búsqueda: AI designer / comunidad_madrid</li><li>Búsqueda: disenador de producto / comunidad_madrid</li><li>Búsqueda: diseno inteligencia artificial / comunidad_madrid</li><li>Búsqueda: becario diseno UX / comunidad_madrid</li><li>Búsqueda: product designer / spain / remote</li><li>Búsqueda: UX UI designer / spain / remote</li><li>Búsqueda: UX designer / spain / remote</li><li>Búsqueda: UI designer / spain / remote</li><li>Búsqueda: AI designer / spain / remote</li><li>Búsqueda: disenador de producto / spain / remote</li>        </ul>
       </details>
     </article>
   </section>
@@ -631,8 +896,8 @@
     <p class="poetic">Ellos buscan. Nosotros presentamos.</p>
     <p class="plain">Esta lista prepara la conversación; la llamada la hacéis vosotros.</p>
     <p class="note">
-      El listado recoge lo que se vio en 7 búsquedas de LinkedIn,
-      no todas las ofertas de diseño junior que existen en España. Las fechas de publicación son
+      El listado recoge lo que se vio en 14 búsquedas de LinkedIn,
+      no todas las ofertas de diseño que existen en España. Las fechas de publicación son
       aproximadas cuando LinkedIn solo da una referencia relativa. La clasificación de empresa es
       automática y revisable: el bloque «Por revisar» existe precisamente para las que el sistema
       no supo resolver.

@@ -174,10 +174,13 @@ competencia_detectada:
   - nombre: "Alkemy España"
     dominio: "alkemy.com"
     tipo: "Consultora digital"
+    # OJO: `detalle` se publica, `lectura` no. Por eso aqui solo van HECHOS
+    # comprobables; cualquier valoracion nuestra va en `lectura`.
     detalle: >-
       Tenía vacante de Junior UX/UI Designer en Madrid. Es consultora digital con
       área propia de UX y CRO: 110 empleados en España, grupo cotizado en Milán con
-      700 empleados. No es cliente final y compite con 2894.
+      700 empleados.
     lectura: >-
-      Que una consultora de este tamaño abra una vacante junior de UX confirma que
-      hay demanda de perfiles como los vuestros en Madrid.
+      No es cliente final y compite con 2894. Que una consultora de este tamaño abra
+      una vacante junior de UX confirma que hay demanda de perfiles como los
+      vuestros en Madrid.
