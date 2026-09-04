@@ -14,6 +14,12 @@ role:
     - "\\bvisual design"
     - "\\bux (writer|research(er)?)\\b"
     - "\\bproducto digital\\b"
+    # Formas espanolas habituales que el filtro se estaba perdiendo:
+    # "Arquitecto de Experiencia de Usuario", "Especialista en Interfaz".
+    - "\\bexperiencia de usuario\\b"
+    - "\\binterfa[cz]"
+    - "\\bdise[nñ]o de producto\\b"
+    - "\\busabilidad\\b"
   # Diseno, si, pero no del que nos interesa.
   exclude:
     - "\\bindustrial\\b"

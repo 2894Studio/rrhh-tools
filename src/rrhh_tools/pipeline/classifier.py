@@ -242,6 +242,15 @@ class CompanyClassifier:
                     total += weight
                     per_category[category] = per_category.get(category, 0.0) + weight
                     reasons.append(f'La oferta dice "{pattern}".')
+        # Escalones: una frase de intermediario es indicio; dos o mas frases
+        # independientes ("para uno de nuestros clientes" + "importante empresa
+        # del sector") son concluyentes. Sin este primer escalon el maximo era
+        # 0.80, por debajo del umbral de exclusion, y ninguna oferta podia
+        # clasificarse por su texto por explicita que fuera: todas acababan en
+        # revision manual.
+        if total <= -6:
+            worst = min(per_category, key=lambda k: per_category[k])
+            return _CATEGORY_TO_LABEL.get(worst, CompanyLabel.STAFFING), 0.88, reasons
         if total <= -4:
             worst = min(per_category, key=lambda k: per_category[k])
             return _CATEGORY_TO_LABEL.get(worst, CompanyLabel.STAFFING), 0.80, reasons

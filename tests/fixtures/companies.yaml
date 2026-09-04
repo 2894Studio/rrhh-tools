@@ -1,0 +1,46 @@
+# Tabla de casos del clasificador de empresas.
+# bloque: A = cliente final, B = agencia, C = intermediario, D = por revisar.
+casos:
+  # --- agencias: bloque B, senal de competencia ---
+  - {nombre: "Nateevo", esperado: AGENCY, bloque: B}
+  - {nombre: "Flat 101", esperado: AGENCY, bloque: B}
+  - {nombre: "Flat101", esperado: AGENCY, bloque: B}
+  - {nombre: "The Cocktail", esperado: AGENCY, bloque: B}
+  - {nombre: "The Cocktail Experience", esperado: AGENCY, bloque: B}
+  - {nombre: "Good Rebels", esperado: AGENCY, bloque: B}
+  - {nombre: "Making Science", esperado: AGENCY, bloque: B}
+
+  # --- consultoras y seleccion: bloque C, intermediarios ---
+  - {nombre: "Minsait", esperado: CONSULTANCY, bloque: C}
+  - {nombre: "Indra", esperado: CONSULTANCY, bloque: C}
+  - {nombre: "NTT Data", esperado: CONSULTANCY, bloque: C}
+  - {nombre: "Everis", esperado: CONSULTANCY, bloque: C}
+  - {nombre: "Accenture", esperado: CONSULTANCY, bloque: C}
+  - {nombre: "Capgemini", esperado: CONSULTANCY, bloque: C}
+  - {nombre: "atSistemas", esperado: CONSULTANCY, bloque: C}
+  - {nombre: "Sngular", esperado: CONSULTANCY, bloque: C}
+  - {nombre: "Michael Page", esperado: STAFFING, bloque: C}
+  - {nombre: "Page Personnel", esperado: STAFFING, bloque: C}
+  - {nombre: "Hays", esperado: STAFFING, bloque: C}
+  - {nombre: "Randstad Digital", esperado: STAFFING, bloque: C}
+  - {nombre: "Talent Search People", esperado: STAFFING, bloque: C}
+
+  # --- clientes finales: bloque A ---
+  - {nombre: "BBVA", esperado: END_CLIENT, bloque: A}
+  - {nombre: "Telefónica, S.A.", esperado: END_CLIENT, bloque: A}
+  - {nombre: "Zara", esperado: END_CLIENT, bloque: A}
+  - {nombre: "Cabify", esperado: END_CLIENT, bloque: A}
+  - {nombre: "Idealista", esperado: END_CLIENT, bloque: A}
+  - {nombre: "Mutua Madrileña", esperado: END_CLIENT, bloque: A}
+
+  # --- los tres falsos positivos que el diseno debe evitar ---
+  # Singular Bank no puede caer por parecerse a Sngular (consultora).
+  - {nombre: "Singular Bank", esperado: END_CLIENT, bloque: A}
+  # Prosegur Solutions no puede caer por contener "solutions".
+  - {nombre: "Prosegur Solutions", esperado: END_CLIENT, bloque: A}
+  # Glovo Labs no puede caer por contener "labs"; sin mas datos va a revision.
+  - {nombre: "Glovo Labs", esperado: UNKNOWN, bloque: D}
+  - {nombre: "Digital Origin", esperado: UNKNOWN, bloque: D}
+
+  # --- desconocidas sin senales: a revision, nunca descartadas ---
+  - {nombre: "Empresa Desconocida SL", esperado: UNKNOWN, bloque: D}

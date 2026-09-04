@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+from jinja2 import Environment, FileSystemLoader
 
 from ..models import Company, ProcessedRun
 
@@ -39,7 +39,11 @@ def _badges(company: Company) -> list[str]:
 def render_report(run: ProcessedRun, title: str, source_label: str = "LinkedIn") -> str:
     env = Environment(
         loader=FileSystemLoader(TEMPLATE_DIR),
-        autoescape=select_autoescape(["html"]),
+        # autoescape=True explicito, NO select_autoescape(["html"]): esa funcion
+        # mira la extension del fichero, que aqui es ".j2", asi que el escapado
+        # no llegaba a activarse nunca y un nombre de empresa con HTML dentro se
+        # inyectaba tal cual en el informe.
+        autoescape=True,
         trim_blocks=True,
         lstrip_blocks=True,
     )

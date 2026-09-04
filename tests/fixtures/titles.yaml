@@ -1,0 +1,51 @@
+# Tabla de casos del filtro de nivel. Cada fila es un titulo real o plausible
+# y el veredicto que debe producir. Las trampas estan puestas a proposito:
+# titulos que contienen "Designer" pero no son junior, y palabras que contienen
+# un termino de nivel dentro de otra palabra.
+casos:
+  # --- niveles superiores: contienen "Designer" pero deben caer ---
+  - {titulo: "Senior Product Designer", esperado: NOT_JUNIOR}
+  - {titulo: "Sr. UX Designer", esperado: NOT_JUNIOR}
+  - {titulo: "Lead UX Designer", esperado: NOT_JUNIOR}
+  - {titulo: "Principal Designer", esperado: NOT_JUNIOR}
+  - {titulo: "Staff Product Designer", esperado: NOT_JUNIOR}
+  - {titulo: "Head of Design", esperado: NOT_JUNIOR}
+  - {titulo: "Design Manager", esperado: NOT_JUNIOR}
+  - {titulo: "Director de Diseño", esperado: NOT_JUNIOR}
+  - {titulo: "Responsable de Diseño UX", esperado: NOT_JUNIOR}
+  - {titulo: "Product Designer II", esperado: NOT_JUNIOR}
+  - {titulo: "UX Designer III", esperado: NOT_JUNIOR}
+  - {titulo: "Diseñador UX Sénior", esperado: NOT_JUNIOR}
+  - {titulo: "Arquitecto de Experiencia de Usuario", esperado: NOT_JUNIOR}
+
+  # --- junior explicito, en ingles y en espanol ---
+  - {titulo: "Junior UX/UI Designer", esperado: JUNIOR}
+  - {titulo: "Jr Product Designer", esperado: JUNIOR}
+  - {titulo: "Diseñador/a UX/UI Junior", esperado: JUNIOR}
+  - {titulo: "Diseñadora UI Junior", esperado: JUNIOR}
+  - {titulo: "Becario Diseño UX", esperado: JUNIOR}
+  - {titulo: "Becaria de Diseño de Producto", esperado: JUNIOR}
+  - {titulo: "Prácticas Diseño de Producto", esperado: JUNIOR}
+  - {titulo: "Trainee UX Designer", esperado: JUNIOR}
+  - {titulo: "Graduate Product Designer", esperado: JUNIOR}
+  - {titulo: "Entry Level UI Designer", esperado: JUNIOR}
+  - {titulo: "UX Design Intern", esperado: JUNIOR}
+  - {titulo: "Diseñador Gráfico Junior", esperado: JUNIOR}
+
+  # --- no es diseno digital ---
+  - {titulo: "Interior Designer", esperado: NOT_DESIGN}
+  - {titulo: "Diseñador Industrial Junior", esperado: NOT_DESIGN}
+  - {titulo: "Diseñador Textil", esperado: NOT_DESIGN}
+  - {titulo: "Fashion Designer", esperado: NOT_DESIGN}
+  - {titulo: "Instructional Designer", esperado: NOT_DESIGN}
+  - {titulo: "Backend Engineer", esperado: NOT_DESIGN}
+  - {titulo: "Product Manager", esperado: NOT_DESIGN}
+  # Trampa: contiene "head" dentro de otra palabra. No debe leerse como nivel,
+  # y ademas no es una oferta de diseno.
+  - {titulo: "Headless CMS Developer", esperado: NOT_DESIGN}
+
+  # --- ambiguos: no se tiran, van a revision humana ---
+  - {titulo: "Junior/Senior UX Designer", esperado: AMBIGUOUS}
+  - {titulo: "UX/UI Designer (m/f/d)", esperado: AMBIGUOUS}
+  - {titulo: "Product Designer", esperado: AMBIGUOUS}
+  - {titulo: "Associate Designer", esperado: AMBIGUOUS}
